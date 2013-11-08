@@ -3,19 +3,28 @@
 
 package com.simple3d.scene;
 
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW_MATRIX;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import com.simple3d.Physics;
+import org.lwjgl.opengl.GL11;
+
 import com.simple3d.Graphics;
 import com.simple3d.Logic;
-import com.simple3d.math.geometry.Bounded;
-import com.simple3d.math.geometry.Box;
+import com.simple3d.Physics;
 import com.simple3d.math.Matrix;
 import com.simple3d.math.Transform;
+import com.simple3d.math.Vector3f;
+import com.simple3d.math.Vector4f;
+import com.simple3d.math.geometry.Bounded;
+import com.simple3d.math.geometry.Box;
 
 public class Node implements Logic, Graphics, Bounded, Physics
 {
@@ -26,6 +35,7 @@ public class Node implements Logic, Graphics, Bounded, Physics
 	protected Node parent;
 	protected Transform transform = new Transform();
 	private LinkedHashSet<Node> children = new LinkedHashSet<Node>();
+	private LinkedHashSet<Logic> logicalComponents = new LinkedHashSet<Logic>();
 	private LinkedHashSet<Physics> physicsComponents = new LinkedHashSet<Physics>();
 	private LinkedHashSet<Graphics> graphicsComponents = new LinkedHashSet<Graphics>();
 	private LinkedHashSet<Component> components = new LinkedHashSet<Component>();
@@ -180,6 +190,8 @@ public class Node implements Logic, Graphics, Bounded, Physics
 			graphicsComponents.add((Graphics)c);
 		if(c instanceof Physics)
 			physicsComponents.add((Physics)c);
+		if(c instanceof Logic)
+			logicalComponents.add((Logic)c);
 		return components.add(c);
 	}
 
@@ -194,6 +206,8 @@ public class Node implements Logic, Graphics, Bounded, Physics
 			graphicsComponents.remove((Graphics)c);
 		if(c instanceof Physics)
 			physicsComponents.remove((Physics)c);
+		if(c instanceof Logic)
+			logicalComponents.remove((Logic)c);
 		return true;
 	}
 	
@@ -206,6 +220,7 @@ public class Node implements Logic, Graphics, Bounded, Physics
 		components.clear();
 		graphicsComponents.clear();
 		physicsComponents.clear();
+		logicalComponents.clear();
 		for(Component c : list)
 			c.node = null;
 		return list;
@@ -232,15 +247,29 @@ public class Node implements Logic, Graphics, Bounded, Physics
 		return components.contains(c);
 	}
 	
+	public Transform getTransform()
+	{
+		return transform;
+	}
+	
 	public void setTransform(Transform t)
 	{
 		transform = t;
 		modifiedTransform = true;
 	}
 	
+	public Transform getAbsoluteTransform()
+	{
+		// Go up the chain to the root, then back out, applying transforms. End result will be absolute transform referenced to the identity
+		if(parent == null)
+			return new Transform();
+		Transform pt = parent.getAbsoluteTransform();
+		return pt.transformInto(transform, pt);
+	}
+	
 	private void updateBounds()
 	{
-		//calculate bounds of node -> boundedNode
+		// TODO calculate bounds of node -> boundedNode
 	}
 	
 	public Box getBounds()
@@ -268,7 +297,7 @@ public class Node implements Logic, Graphics, Bounded, Physics
 		
 		modifiedNode = modifiedComponent|modifiedTransform;	// is node modified?
 
-		for(Component c : components)
+		for(Logic c : logicalComponents)
 		{
 			c.logic(delta);	
 		}
@@ -296,12 +325,34 @@ public class Node implements Logic, Graphics, Bounded, Physics
 	
 	public void graphics()
 	{
-		if(!enabled)
+		if(!enabled)	// If this node is disabled, don't continue!
 			return;
-		for(Graphics rc : graphicsComponents)
+		
+		// TODO Now we need to transform the modelview, using our Transform object. Basic implementation, needs speedup
+		Vector3f pos = transform.getPosition();
+		Vector3f scale = transform.getScale();
+		Vector4f rot = transform.getRotation().getAxisAngle();
+		GL11.glTranslatef(pos.x, pos.y, pos.z);
+		GL11.glScalef(scale.x, scale.y, scale.z);
+		GL11.glRotatef(rot.w, rot.x, rot.y, rot.z);
+
+		// Now we need to save this transform so we can reload it later
+		ByteBuffer vbb = ByteBuffer.allocateDirect(64); 
+		vbb.order(ByteOrder.nativeOrder());
+		FloatBuffer fb = vbb.asFloatBuffer();
+		GL11.glGetFloat(GL_MODELVIEW_MATRIX, fb);
+		
+		for(Graphics rc : graphicsComponents)	// Do component renders
+		{
 			rc.graphics();
+			GL11.glLoadMatrix(fb);	// Reload the node transform
+		}
+		
 		for(Node n : children)
+		{
 			n.graphics();
+			GL11.glLoadMatrix(fb);	// Reload the node transform
+		}
 	}
 	
 	public void physics(int delta)

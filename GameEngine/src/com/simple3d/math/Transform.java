@@ -109,6 +109,27 @@ public class Transform
 		scale.set(1.0f);
 	}
 
+	public void scale(float x)
+	{
+		scale.scale(x);
+	}
+	
+	public Transform transform(Transform t)
+	{
+		return transformInto(t, this);
+	}
+	
+	public Transform transformInto(Transform t, Transform r)
+	{
+		if(r == null)
+			r = new Transform();
+		position.addInto(t.position, r.position);
+		scale.scaleInto(t.scale, r.scale);
+		rotation.multiplyInto(t.rotation, r.rotation);
+		return r;
+	}
+	
+	
 	public void scale(float x, float y, float z)
 	{
 		position = position.add(x, y, z);

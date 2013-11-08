@@ -1,5 +1,7 @@
 package com.simple3d.math;
 
+import java.nio.FloatBuffer;
+
 public interface Matrix<T extends Matrix<T>>
 {
 	public static final int COL_MAJOR = 0;
@@ -46,4 +48,14 @@ public interface Matrix<T extends Matrix<T>>
 	public T transpose();
 
 	public T transposeInto(T r);
+	
+	public T fill(float f);
+	
+	public T load(FloatBuffer fb);
+	
+	public T load(float[] f);
+
+	public FloatBuffer to(FloatBuffer fb);
+	
+	public float[] to(float[] f);
 }

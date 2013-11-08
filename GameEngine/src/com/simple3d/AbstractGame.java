@@ -4,17 +4,16 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.*;
-import org.lwjgl.opengl.GL11.*;
-import org.lwjgl.opengl.GLUConstants.*;
-import org.lwjgl.opengl.GLContext.*; 
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
-
 
 import com.simple3d.events.EventManager;
 import com.simple3d.events.KeyEvent;
@@ -22,11 +21,7 @@ import com.simple3d.events.MouseClickEvent;
 import com.simple3d.events.MouseEvent;
 import com.simple3d.events.MouseMoveEvent;
 import com.simple3d.events.MouseScrollEvent;
-import com.simple3d.scene.Component;
-import com.simple3d.scene.Node;
 import com.simple3d.scene.Scene;
-import com.simple3d.scene.component.GBox;
-import com.simple3d.scene.component.TestComponent;
 
 public abstract class AbstractGame
 {	
@@ -132,18 +127,19 @@ public abstract class AbstractGame
 			int key = Keyboard.getEventKey();
 			boolean isRepeat = Keyboard.isRepeatEvent();
 			boolean isPress = Keyboard.isKeyDown(key);
+			char c = Keyboard.getEventCharacter();
 			if(Keyboard.areRepeatEventsEnabled() && isRepeat)
 			{
 			 	keyPressTime += Keyboard.getEventNanoseconds();
-				e = new KeyEvent(key, isPress, Keyboard.getEventNanoseconds());
+				e = new KeyEvent(key, c, isPress, Keyboard.getEventNanoseconds());
 			}
 			else if(keyPressTime > 0)
 			{
-				e = new KeyEvent(key, isPress, keyPressTime);
+				e = new KeyEvent(key, c, isPress, keyPressTime);
 				keyPressTime = 0;
 			}
 			else
-				e = new KeyEvent(key, isPress);
+				e = new KeyEvent(key, c, isPress);
 			eventManager.callEvent(e);
 		}
 		while(Mouse.next())
@@ -193,9 +189,13 @@ public abstract class AbstractGame
 	}
 
 	protected void graphics()
-	{
+	{		
+		glMatrixMode(GL11.GL_MODELVIEW); // Select The Modelview Matrix
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Clear The Screen And The Depth Buffer
 		glLoadIdentity(); // Reset The View
+		
+		// Okay, now we have a clean screen and depth buffer, and the modelview is an identity transform.
+		// Now we should go through the scene node tree. See Node.java for cont. notes
 		
 		if (activeScene == null)
 			return;

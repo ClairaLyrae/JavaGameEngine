@@ -1,40 +1,48 @@
 package com.simple3d.io;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import static org.lwjgl.opengl.GL11.GL_POINTS;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 public class Mesh
 {
-	private float[][] vertex = new float[0][3];
-	private float[][] normal = new float[0][3];
-	private float[][] face = new float[0][3];
+	protected int meshMode = GL_POINTS;
 	
-	private int vertexCount = 0;
-	private int faceCount = 0;
+	protected float[] vertices;
+	protected float[] normals;
+	protected float[] faces;
 	
-	public float[][] getVertices()
+	protected int vertexCount = 0;
+	protected int faceCount = 0;
+	
+	public Mesh()
 	{
-		return vertex;
+		vertices = new float[0];
+		normals = new float[0];
+		faces = new float[0];
+	}
+	
+	public float[] getVertices()
+	{
+		return vertices;
 		
 	}
 	
-	public float[] getVertex(int i)
+	public float getVertex(int i)
 	{
-		return vertex[i];
+		return vertices[i];
 	}
 	
-	public float[][] getNormals()
+	public float[] getNormals()
 	{
-		return normal;
+		return normals;
 	}
 	
-	public float[] getNormal(int i)
+	public float getNormal(int i)
 	{
-		return normal[i];
+		return normals[i];
 	}
 	
 	public int getVertexCount()
@@ -47,13 +55,13 @@ public class Mesh
 		return faceCount;
 	}
 	
-	public void loadOBJFile(File f) throws FileNotFoundException, IOException, InvalidMeshException
+	public FloatBuffer getFloatBuffer()
 	{
-		BufferedReader r = new BufferedReader(new FileReader(f));
-		String line;
-		while((line = r.readLine()) != null)
-		{
-			
-		}
+		ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4); 
+		vbb.order(ByteOrder.nativeOrder());    // use the device hardware's native byte order
+		FloatBuffer fb = vbb.asFloatBuffer();  // create a floating point buffer from the ByteBuffer
+		fb.put(vertices);    // add the coordinates to the FloatBuffer
+		fb.position(0);      // set the buffer to read the first coordinate
+		return fb;
 	}
 }

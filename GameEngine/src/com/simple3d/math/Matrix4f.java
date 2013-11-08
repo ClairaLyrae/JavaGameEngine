@@ -1,5 +1,7 @@
 package com.simple3d.math;
 
+import java.nio.FloatBuffer;
+
 public class Matrix4f implements Matrix<Matrix4f>
 {
 	public float f00, f01, f02, f03, f10, f11, f12, f13, f20, f21, f22, f23,
@@ -204,7 +206,7 @@ public class Matrix4f implements Matrix<Matrix4f>
 		return r;
 	}
 
-	public Matrix4f set(float f)
+	public Matrix4f fill(float f)
 	{
 		return set(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
 	}
@@ -332,5 +334,29 @@ public class Matrix4f implements Matrix<Matrix4f>
 	{
 		return r.set(f00, f10, f20, f30, f01, f11, f21, f31, f02, f12, f22,
 				f32, f03, f13, f23, f33);
+	}
+	
+	public Matrix4f load(FloatBuffer fb)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Matrix4f load(float[] f)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public FloatBuffer to(FloatBuffer fb)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public float[] to(float[] f)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

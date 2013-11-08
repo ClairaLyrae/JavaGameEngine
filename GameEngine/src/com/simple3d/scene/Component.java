@@ -2,7 +2,7 @@ package com.simple3d.scene;
 
 import com.simple3d.Logic;
 
-public abstract class Component implements Logic
+public abstract class Component
 {
 	protected boolean enabled = true;
 	protected boolean modified = false;
@@ -15,6 +15,11 @@ public abstract class Component implements Logic
 	
 	protected Component(Scene scene)
 	{
+	}
+	
+	public void setEnabled(boolean bool)
+	{
+		enabled = bool;
 	}
 	
 	public boolean isEnabled()

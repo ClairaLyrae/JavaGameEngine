@@ -1,8 +1,8 @@
 package com.simple3d.scene;
 
-import com.simple3d.Physics;
 import com.simple3d.Graphics;
 import com.simple3d.Logic;
+import com.simple3d.Physics;
 
 public class Scene implements Logic, Graphics, Physics
 {

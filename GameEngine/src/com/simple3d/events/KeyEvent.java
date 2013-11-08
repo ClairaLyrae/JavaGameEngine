@@ -7,6 +7,7 @@ public class KeyEvent extends InputEvent
 	private int key;
 	private boolean state;
 	private long timeHeld;
+	private char c;
 	
 	public enum Type{
 		KEY_PRESSED,
@@ -14,18 +15,25 @@ public class KeyEvent extends InputEvent
 		KEY_HELD;
 	};
 	
-	public KeyEvent(int key, boolean state, long timeHeld)
+	public KeyEvent(int key, char c, boolean state, long timeHeld)
 	{
+		this.c = c;
 		this.key = key;
 		this.state = state;
 		this.timeHeld = timeHeld;
 	}
 	
-	public KeyEvent(int key, boolean state)
+	public KeyEvent(int key, char c, boolean state)
 	{
+		this.c = c;
 		this.key = key;
 		this.state = state;
 		this.timeHeld = 0;
+	}
+	
+	public char getChar()
+	{
+		return c;
 	}
 	
 	public int getKey()
@@ -48,6 +56,6 @@ public class KeyEvent extends InputEvent
 	}
 	public String toString()
 	{
-		return String.format("KeyEvent : Key[%s], State[%b], Time[%d]", Keyboard.getKeyName(key), state, timeHeld);
+		return String.format("KeyEvent : Key[%s, %c], State[%b], Time[%d]", Keyboard.getKeyName(key), c, state, timeHeld);
 	}
 }

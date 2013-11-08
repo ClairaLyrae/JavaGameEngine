@@ -24,14 +24,6 @@ public class MeshRenderer extends Geometry
 	@Override
 	public void graphics()
 	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void logic(int delta)
-	{
-		// TODO Auto-generated method stub
-		
+		// TODO Render mesh data 
 	}
 }

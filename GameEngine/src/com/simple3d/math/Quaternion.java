@@ -107,6 +107,31 @@ public class Quaternion implements Vector<Quaternion>
 		return (w * w + x * x + y * y + z * z);
 	}
 
+	public Quaternion multiply(Quaternion m)
+	{
+		return multiplyInto(m, this);
+	}
+	
+	public Quaternion multiplyInto(Quaternion q, Quaternion r)
+	{
+		// TODO check if this works
+		if(r == null)
+			r = new Quaternion();
+		float w1 = w;
+		float x1 = x;
+		float y1 = y;
+		float z1 = z;	
+		float w2 = q.w;
+		float x2 = q.x;
+		float y2 = q.y;
+		float z2 = q.z;	
+		r.w = w1*w2 - x1*x2 - y1*y2 - z1*z2;
+		r.x = w1*x2 + x1*w2 + y1*z2 - z1*y2;
+		r.y = w1*y2 - x1*z2 + y1*w2 + z1*x2;
+		r.z = w1*z2 + x1*y2 - y1*x2 + z1*w2;
+		return r;
+	}
+	
 	public Quaternion multiply(Matrix4f m)
 	{
 		return multiplyInto(m, this);
@@ -247,6 +272,13 @@ public class Quaternion implements Vector<Quaternion>
 		a[2] = y;
 		a[3] = z;
 		return a;
+	}
+	
+	public Vector4f getAxisAngle()
+	{
+		Quaternion q = normalizeInto(new Quaternion());
+		float angle = 2f*(float)Math.acos((double)q.w);
+		return new Vector4f(angle, q.x, q.y, q.z);
 	}
 
 	public Matrix4f toRotationMatrix()
