@@ -2,21 +2,16 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/jar/lwjgl.jar" sourcepath="C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/src">
+	<classpathentry kind="lib" path="lwjgl-2.8.3/jar/lwjgl.jar" sourcepath="lwjgl-2.8.3/src">
 		<attributes>
-			<attribute name="javadoc_location" value="file:/C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/javadoc/"/>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/native/windows"/>
+			<attribute name="javadoc_location" value="http://www.lwjgl.org/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="GameEngine/lwjgl-2.8.3/native/windows"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/jar/lwjgl_util.jar" sourcepath="C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/src">
+	<classpathentry kind="lib" path="lwjgl-2.8.3/jar/lwjgl_util.jar" sourcepath="lwjgl-2.8.3/src">
 		<attributes>
-			<attribute name="javadoc_location" value="file:/C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/javadoc/"/>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/native/windows"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/jar/jinput.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Storage/Programming/Libraries/Java/lwjgl-2.8.3/native/windows"/>
+			<attribute name="javadoc_location" value="http://www.lwjgl.org/javadoc/"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="GameEngine/lwjgl-2.8.3/native/windows"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>

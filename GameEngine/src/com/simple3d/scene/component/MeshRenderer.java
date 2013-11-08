@@ -14,6 +14,7 @@ public class MeshRenderer extends Geometry
 	public Mesh getMesh()
 	{
 		return mesh;
+		
 	}
 	
 	public void setMesh(Mesh m)
@@ -26,4 +27,5 @@ public class MeshRenderer extends Geometry
 	{
 		// TODO Render mesh data 
 	}
+	
 }
