@@ -1,5 +1,7 @@
 package com.javagameengine.graphics;
 
+import com.javagameengine.io.Texture;
+
 //TODO Need to plan out this class and the render system
 
 /**
@@ -8,5 +10,4 @@ package com.javagameengine.graphics;
  */
 public class Screenshot extends RenderTarget
 {
-
 }

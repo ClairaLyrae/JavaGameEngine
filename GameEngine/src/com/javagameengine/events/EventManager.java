@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Handles Events and Listeners. When callEvent is called, this class looks through all of its registered 
@@ -68,13 +69,16 @@ public class EventManager
 	public void unregisterListener(Listener l)
 	{
 		// Search through the map structure and remove all references to the Listener
+		List<Class<? extends Event>> list = new ArrayList<Class<? extends Event>>();
 		for(Class<? extends Event> c : methodCalls.keySet())
 		{
 			HashMap<Listener, Method> methods = methodCalls.get(c);
-			if(methods == null)
-				continue;
 			methods.remove(l);
+			if(methods.isEmpty())
+				list.add(c);
 		}
+		for(Class<? extends Event> c : list)
+			methodCalls.remove(c);
 		listeners.remove(l);
 	}
 	
@@ -94,16 +98,36 @@ public class EventManager
 	 */
 	public void callEvent(Event e)
 	{
-		HashMap<Listener, Method> methods = methodCalls.get(e.getClass());
+		Map<Listener, Method> methods = methodCalls.get(e.getClass());
 		if(methods == null)
 			return;
+		Map<Listener, Method> methodsCopy = new HashMap<Listener, Method>();
 		for(Listener l : methods.keySet())
+			methodsCopy.put(l, methods.get(l));
+		for(Listener l : methodsCopy.keySet())
 		{
 			try {
-				methods.get(l).invoke(l, e);
+				methodsCopy.get(l).invoke(l, e);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
 				ex.printStackTrace();
 			}
 		}
+	}
+	
+	public void print()
+	{
+		System.out.println("Method Map:");
+		for(Class<? extends Event> c : methodCalls.keySet())
+		{
+			System.out.println("- Event Class: " + c.getName());
+			HashMap<Listener, Method> methods = methodCalls.get(c);
+			for(Listener l : methods.keySet())
+			{
+				System.out.println("-- Listener: " + l + ", Method: " + methods.get(l));
+			}
+		}
+		System.out.println("Listener List:");
+		for(Listener l : listeners)
+			System.out.println("- Listener: " + l);
 	}
 }

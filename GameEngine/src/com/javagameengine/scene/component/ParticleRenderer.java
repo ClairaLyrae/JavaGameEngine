@@ -2,10 +2,18 @@ package com.javagameengine.scene.component;
 
 import com.javagameengine.graphics.RenderState;
 
-public class ParticleRenderer extends Renderer
+public class ParticleRenderer extends RendererComponent
 {
 	@Override
 	public void graphics()
+	{
+	}
+
+	public void onDestroy()
+	{
+	}
+
+	public void onCreate()
 	{
 	}
 }

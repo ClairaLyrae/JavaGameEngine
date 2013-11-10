@@ -5,6 +5,7 @@ import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.TestComponent;
+import com.javagameengine.scene.component.TestSceneDebugger;
 
 public class TestGame extends AbstractGame
 {
@@ -31,7 +32,7 @@ public class TestGame extends AbstractGame
 	public static void main(String[] args)
 	{
 		TestGame game = new TestGame();
-		Scene s = new Scene();
+		Scene s = new Scene("TestScene");
 		
 		Node root = s.getRoot();
 		Node n1 = new Node("n1");
@@ -44,19 +45,15 @@ public class TestGame extends AbstractGame
 		n1.addChild(n3);
 		root.addChild(n4);
 		
-		TestComponent b = new TestComponent();
-		b.getBox().set(2.0f, 0.5f, 1.0f);
-		b.index = 0;
+		TestSceneDebugger deb = new TestSceneDebugger();
+		root.addComponent(deb);
 		
-		TestComponent b2 = new TestComponent(new Bounds(1.0f, 1.0f, 1.0f, new Vector3f(0.3f, 0.5f, -1.2f)));
-		b2.index = 1;
+		TestComponent b = new TestComponent(new Bounds(1.0f, 1.0f, 1.0f), 1);
 		
 		n4.addComponent(b);
-		n3.addComponent(b2);
 		
-		game.getEventManager().registerListener(b);
-		game.getEventManager().registerListener(b2);
 		game.loadScene(s);
+		s.print();
 		game.run(args);
 	}
 }

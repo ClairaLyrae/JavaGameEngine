@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
+import static org.lwjgl.opengl.GL11.*;
 
 import org.lwjgl.input.Keyboard;
 
@@ -22,18 +23,18 @@ import com.javagameengine.scene.Component;
 
 public class TestComponent extends Component implements Graphics, Listener, Bounded
 {
-	private Bounds bounds = new Bounds();
+	private Bounds bounds = Bounds.getVoid();
 	public int index = 0;
 	public boolean selected = false;
 	
 	public TestComponent()
 	{
-		this.bounds = new Bounds(1f, 1f, 1f);
 	}
 	
-	public TestComponent(Bounds b)
+	public TestComponent(Bounds b, int index)
 	{
 		this.bounds = b;
+		this.index = index;
 	}
 	
 	@EventMethod
@@ -44,6 +45,20 @@ public class TestComponent extends Component implements Graphics, Listener, Boun
 			selected = !selected;
 			System.out.println("Component " + index + " is " + selected);
 		}
+		if(e.state() && e.getKey() == Keyboard.KEY_DELETE && selected)
+		{
+			System.out.println("Component " + index + " has been destroyed");
+			this.destroy();
+			System.out.println("This is the new state of it: " + this.toString());
+		}
+		if(e.state() && e.getKey() == Keyboard.KEY_C && selected)
+		{
+			if(node != null)
+			{
+				System.out.println("Component " + index + " has been copied with index " + (index+1));
+				node.addComponent(new TestComponent(new Bounds(bounds), index+1));
+			}
+		}
 	}
 	
 	@EventMethod
@@ -51,24 +66,26 @@ public class TestComponent extends Component implements Graphics, Listener, Boun
 	{
 		if(!selected)
 			return;
-		float s = (float)(e.getAmount());
+		System.out.println("OnMouseScroll for component: " + index);
+		float s = (float)(e.getAmount())*1.1f;
 		if(Keyboard.isKeyDown(Keyboard.KEY_S))
 		{
 			if(s < 0)
 				s = -1.0f/s;
-			node.getTransform().scale(s);
+			System.out.println("Scale component " + index + " by " + s + " units");
+			bounds.scale(s);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_X))
 		{
-			node.getTransform().translate(s, 0f, 0f);
+			bounds.translate(s, 0f, 0f);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_Y))
 		{
-			node.getTransform().translate(0f, s, 0f);
+			bounds.translate(0f, s, 0f);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_Z))
 		{
-			node.getTransform().translate(0f, 0f, s);
+			bounds.translate(0f, 0f, s);
 		}
 	}
 	
@@ -80,43 +97,32 @@ public class TestComponent extends Component implements Graphics, Listener, Boun
 	@Override
 	public void graphics()
 	{
-		glTranslatef(0.0f, 0.0f, -5.0f); // Move Into The Screen
-		glBegin(GL_QUADS); // Start Drawing 
-		glColor3f(1.0f, 0.0f, 0.0f); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
-		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ); 
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
-		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
-		glColor3f(1.0f, 1.0f, 0.0f); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ); 
-		glColor3f(1.0f, 0.0f, 1.0f); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
-		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);		
-		glColor3f(0.0f, 0.0f, 1.0f); 
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
-		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
-		glColor3f(0.0f, 1.0f, 0.0f); 
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
-		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ); 
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
-		glColor3f(0.0f, 1.0f, 1.0f);
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
-		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
-		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-		glEnd();
+		if(selected)
+			glColor3f(1f, 1f, 1f); 
+		else
+			glColor3f(0.5f, 0.5f, 0.5f); 
+		bounds.graphics();
 	}
 
 	public Bounds getBounds()
 	{
 		return bounds;
+	}
+	
+	public void onDestroy()
+	{
+		System.out.println("Destroying TestComponent!");
+		if(getScene() != null)
+		{
+			System.out.println("Unregistering its listener!");
+			getScene().getEventManager().unregisterListener(this);
+		}
+	}
+
+	public void onCreate()
+	{
+		System.out.println("Creating TestComponent!");
+		if(getScene() != null)
+			getScene().getEventManager().registerListener(this);
 	}
 }

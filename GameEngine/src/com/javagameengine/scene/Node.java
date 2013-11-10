@@ -23,6 +23,7 @@ import com.javagameengine.math.Matrix;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.math.Vector4f;
+import com.javagameengine.scene.component.RendererComponent;
 
 /**
  * Node is the discrete element of the scene graph structure that comprises the heart of the game engine. It 
@@ -48,10 +49,10 @@ import com.javagameengine.math.Vector4f;
  * main game loop down the scene graph to each node in the tree and to each component the nodes contain.
  * @author ClairaLyrae
  */
-public class Node implements Logic, Physics, Graphics, Bounded
+public final class Node implements Logic, Physics, Graphics, Bounded
 {
-	protected Bounds boundingBox = new Bounds();
-	protected Bounds boundingBoxNode = new Bounds();
+	protected Bounds boundingBox = Bounds.getVoid();
+	protected Bounds boundingBoxNode = Bounds.getVoid();
 	
 	protected Scene scene;
 	protected Node parent;
@@ -62,20 +63,46 @@ public class Node implements Logic, Physics, Graphics, Bounded
 	private LinkedHashSet<Graphics> graphicsComponents = new LinkedHashSet<Graphics>();
 	private LinkedHashSet<Bounded> boundedComponents = new LinkedHashSet<Bounded>();
 	private LinkedHashSet<Component> components = new LinkedHashSet<Component>();
-	protected String name;
+	private String name;
 	
 	protected boolean enabled = true;	// setting to false will ignore this subtree!
-	
-	protected boolean modifiedNode = false;
-	protected boolean modifiedTransform = false;
-	protected boolean modifiedChildren = false;
-	protected boolean modifiedComponent = false;
 	
 	protected float[] transformMatrix = new float[4];
 	
 	public Node(String name)
 	{
 		this.name = name;
+	}
+	
+	/**
+	 * Unlinks node and subtree from scene and frees any resources in subnodes and components.
+	 */
+	public void destroy()
+	{
+		// If the node is not the root node, unlink it from its parent. Otherwise, reset the scene
+		if(parent != null)
+			parent.removeChild(this);
+		else
+			scene.clear();
+		
+		// Destroy components and free component resources
+		for(Component c : components)
+		{
+			c.onDestroy();
+		}
+		
+		// Iterate destroy down tree
+		for(Node n : children)
+		{
+			n.destroy();
+		}
+		scene = null;
+		parent = null;
+	}
+	
+	public Scene getScene()
+	{
+		return scene;
 	}
 	
 	public String getName()
@@ -108,36 +135,40 @@ public class Node implements Logic, Physics, Graphics, Bounded
 		return new ArrayList<Node>(children);
 	}
 	
+	public boolean isLinked()
+	{
+		return parent != null && scene != null;
+	}
+	
+	protected void updateLinks(Node n)
+	{
+		scene = n.scene;
+		for(Node child : children)
+			child.updateLinks(this);
+	}
+	
 	public boolean addChild(Node n)
 	{
-		modifiedChildren = true;
+		if(n.isLinked())
+			return false;
+		n.parent = this;
+		n.updateLinks(this);
 		return children.add(n);
 	}
 	
 	public boolean removeChild(Node n)
 	{
-		modifiedChildren = true;
+		if(!children.contains(n))
+			return false;
+		n.parent = null;
+		n.scene = null;
 		return children.remove(n);
 	}
 	
-	public List<Node> removeChildren()
+	public void removeChildren()
 	{
-		modifiedChildren = true;
-		List<Node> list = getChildren();
-		children.clear();
-		return list;
-	}
-	
-	public List<Node> removeChildren(List<Node> list)
-	{
-		modifiedChildren = true;
-		List<Node> rem = new ArrayList<Node>();
-		for(Node n : list)
-		{
-			if(removeChild(n))
-				rem.add(n);
-		}
-		return rem;
+		for(Node n : children)
+			removeChild(n);
 	}
 	
 	public boolean hasChild(Node n)
@@ -219,8 +250,6 @@ public class Node implements Logic, Physics, Graphics, Bounded
 	{
 		if(components.contains(c))
 			return false;
-		modifiedComponent = true;
-		c.node = this;
 		if(c instanceof Graphics)
 			graphicsComponents.add((Graphics)c);
 		if(c instanceof Physics)
@@ -229,7 +258,10 @@ public class Node implements Logic, Physics, Graphics, Bounded
 			logicalComponents.add((Logic)c);
 		if(c instanceof Bounded)
 			boundedComponents.add((Bounded)c);
-		return components.add(c);
+		components.add(c);
+		c.node = this;
+		c.onCreate();
+		return true;
 	}
 
 	public boolean removeComponent(Component c)
@@ -237,8 +269,6 @@ public class Node implements Logic, Physics, Graphics, Bounded
 		boolean removed = components.remove(c);
 		if(!removed)
 			return false;
-		c.node = null;
-		modifiedComponent = true;
 		if(c instanceof Graphics)
 			graphicsComponents.remove((Graphics)c);
 		if(c instanceof Physics)
@@ -247,6 +277,8 @@ public class Node implements Logic, Physics, Graphics, Bounded
 			logicalComponents.remove((Logic)c);
 		if(c instanceof Bounded)
 			boundedComponents.remove((Bounded)c);
+		c.onDestroy();
+		c.node = null;
 		return true;
 	}
 	
@@ -254,7 +286,6 @@ public class Node implements Logic, Physics, Graphics, Bounded
 	{
 		if(components.size() == 0)
 			return Collections.emptyList();
-		modifiedComponent = true;
 		List<Component> list = getComponents();
 		components.clear();
 		graphicsComponents.clear();
@@ -294,7 +325,6 @@ public class Node implements Logic, Physics, Graphics, Bounded
 	public void setTransform(Transform t)
 	{
 		transform = t;
-		modifiedTransform = true;
 	}
 	
 	/**
@@ -330,7 +360,6 @@ public class Node implements Logic, Physics, Graphics, Bounded
 		return boundingBoxNode;
 	}
 
-
 	/**
 	 * Iteration through the tree calling logic on child nodes and components. 
 	 */
@@ -339,35 +368,21 @@ public class Node implements Logic, Physics, Graphics, Bounded
 		// Ignore if disabled
 		if(!enabled)
 			return;
-		
-		modifiedNode = modifiedComponent|modifiedTransform;	// is node modified?
 
+		boundingBoxNode = Bounds.getVoid();	// Start off with a void Bounds
 		for(Logic c : logicalComponents)
 		{
 			c.logic(delta);	
+			if(c instanceof Bounded)
+				boundingBoxNode.encompass(((Bounded)c).getBounds());
 		}
 		
-		if(modifiedComponent || modifiedTransform) // update current node bounds if changed
-		{
-			
-		}
-		
-		boundingBox.set(boundingBoxNode); // update bounding box with current Node bounds
-		
+		boundingBox.set(boundingBoxNode); // Update bounding box with calculated Node bounds
 		for(Node n : children)
 		{
-			// Things before subtree of n
-			
 			n.logic(delta);	// Call update
-			modifiedNode |= n.modifiedNode;	// if any child node is modified, this one has been too
-			
-			// things after subtree of n
-			
-			boundingBox.extend(n.getBounds());	// Update running limit box with the bounding box of this child
-		}
-		
-		modifiedComponent = false;
-		modifiedTransform = false;		  
+			boundingBox.encompass(n.getBounds());	// Extend the bounding box to include the bounds of this child
+		}	  
 	}
 	
 	/**
@@ -399,6 +414,10 @@ public class Node implements Logic, Physics, Graphics, Bounded
 		// Call graphics method on child components
 		for(Graphics rc : graphicsComponents)
 		{
+			// If the graphics component is a Renderer, then it has a RenderState we need to load in first
+			if(rc instanceof RendererComponent)
+				((RendererComponent)rc).getRenderState().load();
+			
 			rc.graphics();
 			GL11.glLoadMatrix(fb);	// Reload the node transform
 		}
@@ -430,5 +449,10 @@ public class Node implements Logic, Physics, Graphics, Bounded
 		// Call physics method on child nodes
 		for(Node n : children)
 			n.physics(delta);
+	}
+	
+	public String toString()
+	{
+		return String.format("Node[name=%s, numChildren=%d, numComponents=%d, hasParent=%b, hasScene=%b]", name, getChildren().size(), getComponents().size(), parent != null, scene != null);
 	}
 }

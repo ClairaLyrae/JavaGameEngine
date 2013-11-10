@@ -17,4 +17,12 @@ public class Camera extends Component
 	{
 		return null;
 	}
+
+	public void onDestroy()
+	{
+	}
+
+	public void onCreate()
+	{
+	}
 }

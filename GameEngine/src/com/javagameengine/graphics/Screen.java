@@ -1,5 +1,7 @@
 package com.javagameengine.graphics;
 
+import org.lwjgl.opengl.Display;
+
 //TODO Need to plan out this class and the render system
 
 /**
@@ -8,5 +10,18 @@ package com.javagameengine.graphics;
  */
 public class Screen extends RenderTarget
 {
-
+	public void load()
+	{
+		
+	}
+	
+	public void initialize()
+	{
+		
+	}
+	
+	public void finalize()
+	{
+		Display.update();
+	}
 }

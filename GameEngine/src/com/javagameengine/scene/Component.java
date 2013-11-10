@@ -22,9 +22,16 @@ public abstract class Component
 		
 	}
 	
-	protected Component(Scene scene)
+	public void destroy()
 	{
+		if(node != null)
+			node.removeComponent(this);
+		else
+			onDestroy();
 	}
+	
+	public abstract void onDestroy();
+	public abstract void onCreate();
 	
 	/**
 	 * Enables or disables updating of this component.
@@ -52,4 +59,20 @@ public abstract class Component
 	{
 		return node;
 	}	
+	
+	/**
+	 * Fetches the scene this component is in if available
+	 * @return Scene containing this component (null if unlinked)
+	 */
+	public Scene getScene()
+	{
+		if(node == null)
+			return null;
+		return node.getScene();
+	}	
+	
+	public String toString()
+	{
+		return String.format("Component[class=%s, hasNode=%b, hasScene=%b]", getClass().getName(), node != null, getScene() != null);
+	}
 }

@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL11;
 import com.javagameengine.Graphics;
 import com.javagameengine.Logic;
 import com.javagameengine.Physics;
+import com.javagameengine.events.EventManager;
 import com.javagameengine.graphics.RenderTarget;
 import com.javagameengine.graphics.ViewState;
 
@@ -26,8 +27,44 @@ import com.javagameengine.graphics.ViewState;
  */
 public class Scene
 {
-	protected Node root = new Node("scene");
-	protected List<ViewState> views = new ArrayList<ViewState>();
+	private String name;
+	private Node root;
+	private List<ViewState> views = new ArrayList<ViewState>();
+	private EventManager eventManager = new EventManager();
+	
+	public Scene(String name)
+	{
+		this.name = name;
+		root = new Node("root");
+		root.scene = this;
+	}
+	
+	public String getName()
+	{
+		return name;
+	}
+	
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+	
+	/**
+	 * Destroys the entire scene graph tree and resets the root node.
+	 */
+	public void clear()
+	{
+		if(root.getScene() != null)
+			root.destroy();
+		root = new Node("root");
+		root.scene = this;
+		views.clear();
+	}
+
+	public EventManager getEventManager()
+	{
+		return eventManager;
+	}
 	
 	public Node getRoot()
 	{
@@ -78,5 +115,24 @@ public class Scene
 			return;
 		root.physics(delta);
 	}
+	
+	// For debugging scenes
+	public void print()
+	{
+		System.out.println("Scene: " + getName());
+		print(root, " ");
+	}
 
+	// For debugging scenes
+	private void print(Node n, String spacer)
+	{
+		StringBuilder sb = new StringBuilder(spacer).append(spacer);
+		spacer = sb.toString();
+		System.out.println(spacer + "N: " + n.toString());
+		for(Component c : n.getComponents())
+			System.out.println(spacer + "|-> C: " + c.toString());
+		for(Node node : n.getChildren())
+			print(node, spacer);
+		
+	}
 }

@@ -38,17 +38,12 @@ public abstract class AbstractGame
 	public boolean closeRequested = false;
 
 	private Scene activeScene = null;
-	private EventManager eventManager = new EventManager();
 	private Screen screen = new Screen();
 
 	private int framerateCap = 60;
 	private int displayWidth = 1024;
 	private int displayHeight = 780;
 	
-	public EventManager getEventManager()
-	{
-		return eventManager;
-	}
 
 	public void loadScene(Scene s)
 	{
@@ -110,6 +105,8 @@ public abstract class AbstractGame
 	private void input()
 	{
 		// While keyboard has events in buffer
+		if(activeScene == null)
+			return;
 		while(Keyboard.next())
 		{
 			KeyEvent e;
@@ -129,7 +126,7 @@ public abstract class AbstractGame
 			}
 			else
 				e = new KeyEvent(key, c, isPress);
-			eventManager.callEvent(e);
+			activeScene.getEventManager().callEvent(e);
 		}
 		// While mouse has events in buffer
 		while(Mouse.next())
@@ -145,17 +142,17 @@ public abstract class AbstractGame
 			if(dx != 0 || dy != 0)
 			{
 				e = new MouseMoveEvent(x, y, dx, dy);
-				eventManager.callEvent(e);				
+				activeScene.getEventManager().callEvent(e);				
 			}
 			if(Mouse.hasWheel() && dw != 0)
 			{
 				e = new MouseScrollEvent(dw/120);	// LWJGL returns one scroll 'click' as +/- 120, for some reason. This normalizes it...
-				eventManager.callEvent(e);
+				activeScene.getEventManager().callEvent(e);
 			}
 			if(button >= 0)
 			{
 				e = new MouseClickEvent(button, buttonState);
-				eventManager.callEvent(e);
+				activeScene.getEventManager().callEvent(e);
 			}
 		}
 		if(Display.isCloseRequested())
@@ -181,7 +178,7 @@ public abstract class AbstractGame
 		try
 		{
 			Display.setDisplayMode(new DisplayMode(displayWidth, displayHeight));
-			Display.setVSyncEnabled(true);
+			//Display.setVSyncEnabled(true);
 			Display.create();
 		} catch (LWJGLException e)
 		{

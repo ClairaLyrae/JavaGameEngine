@@ -8,5 +8,27 @@ package com.javagameengine.graphics;
  */
 public abstract class RenderTarget
 {
-	// TODO This needs to be written and the subclasses should be determined
+	/**
+	 * Sets up openGL to draw to this renderTarget
+	 */
+	public void load()
+	{
+		
+	}
+	
+	/**
+	 * Prepares this RenderTarget for a new rendering
+	 */
+	public void initialize()
+	{
+		
+	}
+	
+	/**
+	 * Finalizes a rendering to this RenderTarget 
+	 */
+	public void finalize()
+	{
+		
+	}
 }
