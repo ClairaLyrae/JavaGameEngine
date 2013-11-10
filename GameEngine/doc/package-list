@@ -1,0 +1,7 @@
+com.simple3d
+com.simple3d.events
+com.simple3d.io
+com.simple3d.math
+com.simple3d.math.geometry
+com.simple3d.scene
+com.simple3d.scene.component
