@@ -93,7 +93,7 @@ public class Vector2f extends Vector<Vector2f>
 
 	public float magnitude()
 	{
-		return (float) MathUtil.fastSqrt(magnitudeSquared());
+		return (float) FastMath.sqrt(magnitudeSquared());
 	}
 
 	public float magnitudeSquared()

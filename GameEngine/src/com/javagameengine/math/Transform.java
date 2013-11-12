@@ -1,5 +1,7 @@
 package com.javagameengine.math;
 
+import java.nio.FloatBuffer;
+
 // TODO Not fully featured yet. A lot of methods this class might need are
 // somewhat dependent on what we actually end up using it for, so it may
 // be subject to change over time. ALSO, note that the vector/quat classes
@@ -19,24 +21,24 @@ public class Transform
 
 	public Transform()
 	{
+		position = new Vector3f(0f); 
 		scale = new Vector3f(1.0f);
-		position = new Vector3f(0.0f);
-		rotation = new Quaternion().loadIdentity();
+		rotation = new Quaternion();
 	}
 	
 	public Transform(Quaternion rotation)
 	{
-		this(new Vector3f(0, 0, 0), new Vector3f(1.0f, 1.0f, 1.0f), rotation);
+		this(new Vector3f(0f), new Vector3f(1.0f), rotation);
 	}
 
 	public Transform(Vector3f position)
 	{
-		this(position, new Vector3f(1.0f, 1.0f, 1.0f));
+		this(position, new Vector3f(1.0f));
 	}
 
 	public Transform(Vector3f position, Quaternion rotation)
 	{
-		this(position, new Vector3f(1.0f, 1.0f, 1.0f), rotation);
+		this(position, new Vector3f(1.0f), rotation);
 	}
 
 	public Transform(Vector3f position, Vector3f scale)
@@ -44,8 +46,15 @@ public class Transform
 		this(position, scale, new Quaternion());
 	}
 
+	public Transform(Transform world)
+	{
+		this();
+		set(world);
+	}
+
 	public Transform(Vector3f position, Vector3f scale, Quaternion rotation)
 	{
+		this();
 		this.setScale(scale);
 		this.setPosition(position);
 		this.setRotation(rotation);
@@ -122,52 +131,102 @@ public class Transform
 	
 	public void scale(float x, float y, float z)
 	{
-		scale = scale.scale(x, y, z);
+		scale.scale(x, y, z);
 	}
 	
 	public void translate(float x, float y, float z)
 	{
-		position = position.add(x, y, z);
+		position.add(x, y, z);
 	}
 	
-	/**
-	 * Transforms this transform by the given Transform t and stores the results back into this transform.
-	 * @param t Transform to transform by
-	 * @return This transform
-	 */
-	public Transform transform(Transform t)
+	public void rotate(float angle, float x, float y, float z)
 	{
-		return transformInto(t, this);
+		Quaternion rot = new Quaternion().fromAxisAngle(angle, x, y, z);
+		rot.multiplyInto(rotation, rotation);
 	}
 
 	/**
-	 * Transforms this transform by the given Transform t and stores the results into the given Transform r.
-	 * @param t Transform to transform by
-	 * @param r Transform to store result in
-	 * @return The given Transform r
+	 * Inherits the transform of a given parent transform.
+	 * @param parent Transform to inherit
+	 * @return This Transform
 	 */
-	public Transform transformInto(Transform t, Transform r)
+	public Transform inherit(Transform parent)
+	{
+        scale.scale(parent.scale);
+        parent.rotation.multiplyInto(rotation, rotation);
+        position.scale(parent.scale);
+        parent.rotation.multiplyInto(position, position);
+        position.add(parent.position);
+        return this;
+	}
+
+	/**
+	 * Inherits the transform of a given parent transform and stores it in a given Transform.
+	 * @param parent Transform to inherit
+	 * @param r Transform to store result in
+	 * @return This Transform
+	 */
+	public Transform inheritInto(Transform parent, Transform r)
 	{
 		if(r == null)
 			r = new Transform();
-		position.addInto(t.position, r.position);
-		scale.scaleInto(t.scale, r.scale);
-		rotation.multiplyInto(t.rotation, r.rotation);
-		return r;
+        scale.scaleInto(parent.scale, r.scale);
+        rotation.multiplyInto(parent.rotation, r.rotation);
+        position.scaleInto(parent.scale, r.scale);
+        parent.rotation.multiplyInto(position, r.position);
+        r.position.add(parent.position);
+        return r;
+	}
+	
+	public Vector3f transform(Vector3f v)
+	{
+		return transformInto(v, null);
+	}
+	
+	public Vector3f transformInto(Vector3f v, Vector3f r)
+	{
+		if(r == null)
+			r = new Vector3f();
+	    return rotation.multiplyInto(r.set(v).scale(scale), r).add(position);
+	}
+	
+	public void setPosition(Vector3f p)
+	{
+		this.position.x = p.x;
+		this.position.y = p.y;
+		this.position.z = p.z;
 	}
 
-	public void setPosition(Vector3f position)
+	public void setRotation(Quaternion q)
 	{
-		this.position = position;
+		this.rotation.w = q.w;
+		this.rotation.x = q.x;
+		this.rotation.y = q.y;
+		this.rotation.z = q.z;
 	}
 
-	public void setRotation(Quaternion rotation)
+	public void setScale(Vector3f s)
 	{
-		this.rotation = rotation;
+		this.scale.x = s.x;
+		this.scale.y = s.y;
+		this.scale.z = s.z;
 	}
 
-	public void setScale(Vector3f scale)
+	public void set(Transform world)
 	{
-		this.scale = scale;
+		setPosition(world.position);
+		setScale(world.scale);
+		setRotation(world.rotation);
+	}
+	
+	public FloatBuffer toFloatBuffer()
+	{
+		// TODO 
+		return null;
+	}
+	
+	public String toString()
+	{
+		return String.format("[Position=%s, Scale=%s, Rotation=%s]", position.toString(), scale.toString(), rotation.toString());
 	}
 }

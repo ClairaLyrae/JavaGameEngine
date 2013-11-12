@@ -111,7 +111,7 @@ public class Vector4f extends Vector<Vector4f>
 
 	public float magnitude()
 	{
-		return (float) MathUtil.fastSqrt(w * w + x * x + y * y + z * z);
+		return (float) FastMath.sqrt(w * w + x * x + y * y + z * z);
 	}
 
 	public float magnitudeSquared()

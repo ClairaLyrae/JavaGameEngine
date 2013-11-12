@@ -8,6 +8,6 @@ import com.javagameengine.io.Texture;
  * @author ClairaLyrae
  * Screenshot is a RenderTarget that writes the render to a given file in a specified image format.
  */
-public class Screenshot extends RenderTarget
+public class RenderTexture extends RenderTarget
 {
 }

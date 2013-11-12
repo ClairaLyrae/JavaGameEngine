@@ -16,14 +16,14 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.javagameengine.Graphics;
-import com.javagameengine.Logic;
-import com.javagameengine.Physics;
+import com.javagameengine.Renderable;
+import com.javagameengine.graphics.RenderOperation;
+import com.javagameengine.graphics.Renderer;
 import com.javagameengine.math.Matrix;
+import com.javagameengine.math.Quaternion;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.math.Vector4f;
-import com.javagameengine.scene.component.RendererComponent;
 
 /**
  * Node is the discrete element of the scene graph structure that comprises the heart of the game engine. It 
@@ -49,23 +49,26 @@ import com.javagameengine.scene.component.RendererComponent;
  * main game loop down the scene graph to each node in the tree and to each component the nodes contain.
  * @author ClairaLyrae
  */
-public final class Node implements Logic, Physics, Graphics, Bounded
+public final class Node implements Bounded
 {
+	private String name;
+	
 	protected Bounds boundingBox = Bounds.getVoid();
 	protected Bounds boundingBoxNode = Bounds.getVoid();
 	
 	protected Scene scene;
-	protected Node parent;
+	
 	protected Transform transform = new Transform();
+	protected Transform worldTransform = new Transform();
+
+	protected Node parent;
 	private LinkedHashSet<Node> children = new LinkedHashSet<Node>();
-	private LinkedHashSet<Logic> logicalComponents = new LinkedHashSet<Logic>();
-	private LinkedHashSet<Physics> physicsComponents = new LinkedHashSet<Physics>();
-	private LinkedHashSet<Graphics> graphicsComponents = new LinkedHashSet<Graphics>();
+	
+	private LinkedHashSet<Renderable> graphicsComponents = new LinkedHashSet<Renderable>();
 	private LinkedHashSet<Bounded> boundedComponents = new LinkedHashSet<Bounded>();
 	private LinkedHashSet<Component> components = new LinkedHashSet<Component>();
-	private String name;
-	
-	protected boolean enabled = true;	// setting to false will ignore this subtree!
+
+	protected Node node;
 	
 	protected float[] transformMatrix = new float[4];
 	
@@ -110,14 +113,9 @@ public final class Node implements Logic, Physics, Graphics, Bounded
 		return name;
 	}
 	
-	public boolean isEnabled()
+	public boolean isLinked()
 	{
-		return enabled;
-	}
-	
-	public void setEnabled(boolean b)
-	{
-		enabled = b;
+		return scene != null;
 	}
 	
 	public void setName(String name)
@@ -133,11 +131,6 @@ public final class Node implements Logic, Physics, Graphics, Bounded
 	public List<Node> getChildren()
 	{
 		return new ArrayList<Node>(children);
-	}
-	
-	public boolean isLinked()
-	{
-		return parent != null && scene != null;
 	}
 	
 	protected void updateLinks(Node n)
@@ -208,18 +201,6 @@ public final class Node implements Logic, Physics, Graphics, Bounded
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Component> getPhysicsComponents()
-	{
-		return new ArrayList<Component>((Collection<? extends Component>)physicsComponents);
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Component> getLogicComponents()
-	{
-		return new ArrayList<Component>((Collection<? extends Component>)logicalComponents);
-	}
-	
-	@SuppressWarnings("unchecked")
 	public List<Component> getBoundedComponents()
 	{
 		return new ArrayList<Component>((Collection<? extends Component>)boundedComponents);
@@ -250,14 +231,8 @@ public final class Node implements Logic, Physics, Graphics, Bounded
 	{
 		if(components.contains(c))
 			return false;
-		if(c instanceof Graphics)
-			graphicsComponents.add((Graphics)c);
-		if(c instanceof Physics)
-			physicsComponents.add((Physics)c);
-		if(c instanceof Logic)
-			logicalComponents.add((Logic)c);
-		if(c instanceof Bounded)
-			boundedComponents.add((Bounded)c);
+		if(c instanceof Renderable)
+			graphicsComponents.add((Renderable)c);
 		components.add(c);
 		c.node = this;
 		c.onCreate();
@@ -269,14 +244,8 @@ public final class Node implements Logic, Physics, Graphics, Bounded
 		boolean removed = components.remove(c);
 		if(!removed)
 			return false;
-		if(c instanceof Graphics)
-			graphicsComponents.remove((Graphics)c);
-		if(c instanceof Physics)
-			physicsComponents.remove((Physics)c);
-		if(c instanceof Logic)
-			logicalComponents.remove((Logic)c);
-		if(c instanceof Bounded)
-			boundedComponents.remove((Bounded)c);
+		if(c instanceof Renderable)
+			graphicsComponents.remove((Renderable)c);
 		c.onDestroy();
 		c.node = null;
 		return true;
@@ -289,8 +258,6 @@ public final class Node implements Logic, Physics, Graphics, Bounded
 		List<Component> list = getComponents();
 		components.clear();
 		graphicsComponents.clear();
-		physicsComponents.clear();
-		logicalComponents.clear();
 		for(Component c : list)
 			c.node = null;
 		return list;
@@ -322,24 +289,41 @@ public final class Node implements Logic, Physics, Graphics, Bounded
 		return transform;
 	}
 	
+	/**
+	 * Retrieves the Transform of this node in respect to the scene graph root identity transform. Updated once
+	 * every frame. The alternate method findWorldTransform() will force compute the world Transform, however 
+	 * this method is far more optimal.
+	 * @return Transform of node in respect to world coordinates
+	 */
+	public Transform getWorldTransform()
+	{
+		return worldTransform;
+	}
+	
 	public void setTransform(Transform t)
 	{
 		transform = t;
 	}
 	
 	/**
+	 * Forced computation of the Transform of this node in respect to the scene graph root identity transform
+	 * This method does not modify the stored world coordinate Transform. Use getWorldTransform() when
+	 * possible, as it is far faster. Only use if the instantaneous Transform is necessary.
+	 * <p>
 	 * Iterates up the tree until the root is reached, then back down applying transforms one
 	 * by one starting from the identity transform to each child's transform until back at this 
 	 * node. Returns the result.
 	 * @return Total transform in relation to origin
 	 */
-	public Transform getAbsoluteTransform()
+	public Transform findWorldTransform()
 	{
+		// TODO Untested
 		// Go up the chain to the root, then back out, applying transforms. End result will be absolute transform referenced to the identity
 		if(parent == null)
 			return new Transform();
-		Transform pt = parent.getAbsoluteTransform();
-		return pt.transformInto(transform, pt);
+		Transform wc = new Transform(worldTransform);
+		wc.set(transform);
+		return wc.inherit(parent.findWorldTransform());
 	}
 	
 	/**
@@ -365,94 +349,57 @@ public final class Node implements Logic, Physics, Graphics, Bounded
 	 */
 	public void logic(int delta)
 	{
-		// Ignore if disabled
-		if(!enabled)
-			return;
+		// Call logic method on child nodes
+		for(Component c : components)
+			c.onUpdate(delta);	
 
+		// Call logic method on child nodes
+		for(Node n : children)
+			n.logic(delta);	
+	}
+	
+	/**
+	 * Runs through the tree creating and queuing RenderOperations into the Renderer. 
+	 * <p>
+	 * First it computes the world transform for each RenderOperation based on the scene graph transform hierarchy, 
+	 * and stores it in the node. Then it computes the Bounds of the node based on the Components and the Bounds of  
+	 * the subtree. During this it will load the Renderer with RenderOperations based on the computed data.
+	 */
+	public void queueRenderOperations()
+	{
+		// Update the world space transforms
+		worldTransform.set(transform);
+		if(parent != null)
+			worldTransform.inherit(parent.worldTransform);
+		
+		// Call graphics method on child components & update node bounds
 		boundingBoxNode = Bounds.getVoid();	// Start off with a void Bounds
-		for(Logic c : logicalComponents)
+		for(Component c : components)
 		{
-			c.logic(delta);	
 			if(c instanceof Bounded)
 				boundingBoxNode.encompass(((Bounded)c).getBounds());
+			if(c instanceof Renderable)
+				Renderer.queue(new RenderOperation((Renderable)c, worldTransform));
 		}
 		
+		// Call graphics method on child nodes & update subtree bounds
 		boundingBox.set(boundingBoxNode); // Update bounding box with calculated Node bounds
 		for(Node n : children)
 		{
-			n.logic(delta);	// Call update
 			boundingBox.encompass(n.getBounds());	// Extend the bounding box to include the bounds of this child
-		}	  
-	}
-	
-	/**
-	 * Updates the MODELVIEW_MATRIX by applying the transform at this node, then iterates
-	 * through the tree calling graphics on child nodes and components.
-	 */
-	public void graphics()
-	{
-		// Ignore if disabled
-		if(!enabled)	
-			return;
-		
-		// Now we need to transform the modelview, using our Transform object. 
-		// TODO This can maybe be done more elegantly?
-		Vector3f pos = transform.getPosition();
-		Vector3f scale = transform.getScale();
-		Vector4f rot = transform.getRotation().getAxisAngle();
-		GL11.glTranslatef(pos.x, pos.y, pos.z);
-		GL11.glScalef(scale.x, scale.y, scale.z);
-		GL11.glRotatef(rot.w, rot.x, rot.y, rot.z);
-
-		// Now we need to save this transform so we can reload it later. 
-		// TODO The buffer involved shouldn't be created each time, it should be a permanent variable somewhere
-		ByteBuffer vbb = ByteBuffer.allocateDirect(64); 
-		vbb.order(ByteOrder.nativeOrder());
-		FloatBuffer fb = vbb.asFloatBuffer();
-		GL11.glGetFloat(GL_MODELVIEW_MATRIX, fb);
-		
-		// Call graphics method on child components
-		for(Graphics rc : graphicsComponents)
-		{
-			// If the graphics component is a Renderer, then it has a RenderState we need to load in first
-			if(rc instanceof RendererComponent)
-				((RendererComponent)rc).getRenderState().load();
-			
-			rc.graphics();
-			GL11.glLoadMatrix(fb);	// Reload the node transform
+			n.queueRenderOperations();
 		}
-		
-		// Call graphics method on child nodes
-		for(Node n : children)
-		{
-			n.graphics();
-			GL11.glLoadMatrix(fb);	// Reload the node transform
-		}
-	}
-	
-
-	/**
-	 * Iterates through the tree calling physics on child nodes and components. 
-	 * <p>
-	 * Don't worry about physics yet, or at all.
-	 */
-	public void physics(int delta)
-	{
-		// Ignore if disabled
-		if(!enabled)
-			return;
-		
-		// Call physics method on child nodes
-		for(Physics pc : physicsComponents)
-			pc.physics(delta);
-		
-		// Call physics method on child nodes
-		for(Node n : children)
-			n.physics(delta);
 	}
 	
 	public String toString()
 	{
-		return String.format("Node[name=%s, numChildren=%d, numComponents=%d, hasParent=%b, hasScene=%b]", name, getChildren().size(), getComponents().size(), parent != null, scene != null);
+		return String.format("Node[name=%s, " +
+				"numChildren=%d, " +
+				"numComponents=%d, " +
+				"hasParent=%b, " +
+				"hasScene=%b, " +
+				"transform=%s" +
+				"world=%s]",
+				name, getChildren().size(), getComponents().size(), parent != null, scene != null, transform, worldTransform);
 	}
 }

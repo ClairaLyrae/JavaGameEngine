@@ -11,12 +11,23 @@ import org.lwjgl.Sys;
 public abstract class Event
 {
 	long timestamp;
+	protected boolean isCancelled;
 
 	public Event()
 	{
 		timestamp = Sys.getTime();
 	}
 
+	public void cancel()
+	{
+		isCancelled = true;
+	}
+	
+	public boolean isCancelled()
+	{
+		return isCancelled;
+	}
+	
 	public long getTimestamp()
 	{
 		return timestamp;

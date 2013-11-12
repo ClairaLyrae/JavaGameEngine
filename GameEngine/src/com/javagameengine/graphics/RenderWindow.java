@@ -1,6 +1,9 @@
 package com.javagameengine.graphics;
 
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+
+import static org.lwjgl.opengl.GL11.*;
 
 //TODO Need to plan out this class and the render system
 
@@ -8,19 +11,18 @@ import org.lwjgl.opengl.Display;
  * @author ClairaLyrae
  * Screen is a RenderTarget that represents writing to the LWJGL Display.
  */
-public class Screen extends RenderTarget
-{
-	public void load()
-	{
-		
-	}
-	
+public class RenderWindow extends RenderTarget
+{	
 	public void initialize()
 	{
+	}
+	
+	public void begin()
+	{
 		
 	}
 	
-	public void finalize()
+	public void finish()
 	{
 		Display.update();
 	}

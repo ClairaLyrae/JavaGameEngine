@@ -111,38 +111,57 @@ public class Quaternion extends Vector<Quaternion>
 
 	public float magnitude()
 	{
-		return (float) MathUtil.fastSqrt(w * w + x * x + y * y + z * z);
+		return (float) FastMath.sqrt(w * w + x * x + y * y + z * z);
 	}
 
 	public float magnitudeSquared()
 	{
 		return (w * w + x * x + y * y + z * z);
 	}
+	
+	public Vector3f multiply(Vector3f v)
+	{
+		return multiplyInto(v, null);
+	}
+	
+	public Vector3f multiplyInto(Vector3f v, Vector3f r) 
+	{
+		if(r == null)
+			r = new Vector3f();
+        if (v.x == 0 && v.y == 0 && v.z == 0)
+            r.set(0, 0, 0);
+        else
+        {
+            float tempX, tempY;
+            tempX = w * w * r.x + 2 * y * w * r.z - 2 * z * w * r.y + x * x * r.x
+                    + 2 * y * x * r.y + 2 * z * x * r.z - z * z * r.x - y * y * r.x;
+            tempY = 2 * x * y * r.x + y * y * r.y + 2 * z * y * r.z + 2 * w * z
+                    * r.x - z * z * r.y + w * w * r.y - 2 * x * w * r.z - x * x
+                    * r.y;
+            r.z = 2 * x * z * r.x + 2 * y * z * r.y + z * z * r.z - 2 * w * y * r.x
+                    - y * y * r.z + 2 * w * x * r.y - x * x * r.z + w * w * r.z;
+            r.x = tempX;
+            r.y = tempY;
+        }
+        return r;
+    }
 
 	public Quaternion multiply(Quaternion m)
 	{
 		return multiplyInto(m, this);
 	}
 	
-	public Quaternion multiplyInto(Quaternion q, Quaternion r)
-	{
-		// TODO check if this works!
-		if(r == null)
-			r = new Quaternion();
-		float w1 = w;
-		float x1 = x;
-		float y1 = y;
-		float z1 = z;	
-		float w2 = q.w;
-		float x2 = q.x;
-		float y2 = q.y;
-		float z2 = q.z;	
-		r.w = w1*w2 - x1*x2 - y1*y2 - z1*z2;
-		r.x = w1*x2 + x1*w2 + y1*z2 - z1*y2;
-		r.y = w1*y2 - x1*z2 + y1*w2 + z1*x2;
-		r.z = w1*z2 + x1*y2 - y1*x2 + z1*w2;
-		return r;
-	}
+    public Quaternion multiplyInto(Quaternion q, Quaternion r) 
+    {
+        if (r == null)
+            r = new Quaternion();
+        float qw = q.w, qx = q.x, qy = q.y, qz = q.z;
+        r.x = x * qw + y * qz - z * qy + w * qx;
+        r.y = -x * qz + y * qw + z * qx + w * qy;
+        r.z = x * qy - y * qx + z * qw + w * qz;
+        r.w = -x * qx - y * qy - z * qz + w * qw;
+        return r;
+    }
 	
 	public Quaternion multiply(Matrix4f m)
 	{
@@ -267,13 +286,53 @@ public class Quaternion extends Vector<Quaternion>
 		r.z = z - v.z;
 		return r;
 	}
-	
-	public Vector4f getAxisAngle()
-	{
-		Quaternion q = normalizeInto(new Quaternion());
-		float angle = 2f*(float)Math.acos((double)q.w);
-		return new Vector4f(angle, q.x, q.y, q.z);
-	}
+
+    public Quaternion fromAxisAngle(Vector4f axis) 
+    {
+        return fromAxisAngle(axis.w, axis.x, axis.y, axis.z);
+    }
+    
+    public Quaternion fromAxisAngle(float angle, float ax, float ay, float az) 
+    {
+        if (ax == 0 && ay == 0 && az == 0)
+                loadIdentity();
+        else 
+        {
+                float halfAngle = 0.5f * angle;
+                float sin = FastMath.sin(halfAngle);
+                w = FastMath.cos(halfAngle);
+                x = sin * ax;
+                y = sin * ay;
+                z = sin * az;
+        }
+        return this;
+    }
+
+    public Vector4f toAxisAngle() 
+    {
+        return toAxisAngle(null);
+    }	
+    
+    public Vector4f toAxisAngle(Vector4f r) 
+    {
+    	if(r == null)
+			r = new Vector4f();
+        float sqrLength = x * x + y * y + z * z;
+        if (sqrLength == 0f) 
+        {
+            r.w = 0f;
+            r.x = 1f;
+            r.y = 0f;
+            r.z = 0f;
+        } else {
+            r.w = (2f * FastMath.acos(w));
+            float invLength = FastMath.invSqrt(sqrLength);
+            r.x = x * invLength;
+            r.y = y * invLength;
+            r.z = z * invLength;
+        }
+        return r;
+    }	
 
 	public Matrix4f toRotationMatrix()
 	{

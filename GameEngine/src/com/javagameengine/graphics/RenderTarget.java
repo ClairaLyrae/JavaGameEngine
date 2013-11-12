@@ -9,14 +9,6 @@ package com.javagameengine.graphics;
 public abstract class RenderTarget
 {
 	/**
-	 * Sets up openGL to draw to this renderTarget
-	 */
-	public void load()
-	{
-		
-	}
-	
-	/**
 	 * Prepares this RenderTarget for a new rendering
 	 */
 	public void initialize()
@@ -24,10 +16,15 @@ public abstract class RenderTarget
 		
 	}
 	
+	public void begin()
+	{
+		
+	}
+	
 	/**
 	 * Finalizes a rendering to this RenderTarget 
 	 */
-	public void finalize()
+	public void finish()
 	{
 		
 	}

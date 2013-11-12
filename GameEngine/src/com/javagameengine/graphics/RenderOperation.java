@@ -1,8 +1,10 @@
 package com.javagameengine.graphics;
 
 import java.lang.reflect.Method;
+import java.nio.FloatBuffer;
 
-import com.javagameengine.Graphics;
+import com.javagameengine.Renderable;
+import com.javagameengine.math.Transform;
 import com.javagameengine.scene.Bounds;
 
 /**
@@ -11,27 +13,56 @@ import com.javagameengine.scene.Bounds;
  */
 public class RenderOperation implements Comparable<RenderOperation>
 {
-	private RenderState state;
-	private Graphics object;
-	private Bounds bounds;
+	// Fullscreen layer. Are we drawing to the game layer, a fullscreen effect layer, or the HUD?
+	// Viewport. There could be multiple viewports for e.g. multiplayer splitscreen, for mirrors or portals in the scene, etc.
+ 	// Viewport layer. Each viewport could have their own skybox layer, world layer, effects layer, HUD layer.
+	// Translucency. Typically we want to sort opaque geometry and normal, additive, and subtractive translucent geometry into separate groups.
+	// Depth sorting. We want to sort translucent geometry back-to-front for proper draw ordering and perhaps opaque geometry front-to-back to aid z-culling.
+	// Material. We want to sort by material to minimize state settings (textures, shaders, constants). A material might have multiple passes.
 	
-	public RenderOperation(RenderState rs, Graphics g, Bounds b)
+	protected int windowLayer;
+	protected int viewport;
+	protected int viewLayer;
+	protected boolean isTranslucent;
+	protected float depth;
+	protected int materialID;
+	
+	public int compareTo(RenderOperation ro)
 	{
-		this.state = rs;
-		this.object = g;
-		this.bounds = b;
+		if(windowLayer > ro.windowLayer)
+			return 1;
+		if(viewport > ro.viewport)
+			return 1;
+		if(viewLayer > ro.viewLayer)
+			return 1;
+		if(isTranslucent && !ro.isTranslucent)
+			return 1;
+		if(depth > ro.depth)
+			return 1;
+		return 0;
 	}
 	
-	public RenderOperation(RenderState rs, Graphics g)
+	private RenderState state;
+	private Renderable object;
+	private Bounds bounds;
+	private Transform transform;
+	
+	public RenderOperation(Renderable g, Transform t)
 	{
-		this.state = rs;
+		this.state = g.getRenderState();
 		this.object = g;
-		this.bounds = Bounds.getVoid();
+		this.bounds = g.getRenderBounds();
+		this.transform = t;
 	}
 	
 	public void render()
 	{
-		object.graphics();
+		object.draw();
+	}
+	
+	public Transform getTransform()
+	{
+		return transform;
 	}
 	
 	public Bounds getBounds()
@@ -44,13 +75,8 @@ public class RenderOperation implements Comparable<RenderOperation>
 		return state;
 	}
 	
-	public Graphics getGraphicsObject()
+	public Renderable getGraphicsObject()
 	{
 		return object;
-	}
-
-	public int compareTo(RenderOperation ro)
-	{
-		return 0;
 	}
 }

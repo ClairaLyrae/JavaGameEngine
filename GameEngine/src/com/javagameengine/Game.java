@@ -1,11 +1,16 @@
 package com.javagameengine;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
@@ -13,6 +18,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
 import com.javagameengine.events.EventManager;
@@ -21,7 +27,9 @@ import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.events.MouseEvent;
 import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
-import com.javagameengine.graphics.Screen;
+import com.javagameengine.exceptions.GameInitializationException;
+import com.javagameengine.graphics.Renderer;
+import com.javagameengine.graphics.RenderWindow;
 import com.javagameengine.scene.Scene;
 
 /**
@@ -33,18 +41,24 @@ import com.javagameengine.scene.Scene;
  * itself. These methods are used by classes that extend AbstractGame to set up game-specific data during start-up and the loop.
  * @author ClairaLyrae
  */
-public abstract class AbstractGame
+public abstract class Game
 {
+	private static Game handle;
+		
 	public boolean closeRequested = false;
 
 	private Scene activeScene = null;
-	private Screen screen = new Screen();
+	private RenderWindow screen = new RenderWindow();
 
 	private int framerateCap = 60;
 	private int displayWidth = 1024;
 	private int displayHeight = 780;
 	
-
+	public static Game getHandle()
+	{
+		return handle;
+	}
+	
 	public void loadScene(Scene s)
 	{
 		this.activeScene = s;
@@ -105,8 +119,6 @@ public abstract class AbstractGame
 	private void input()
 	{
 		// While keyboard has events in buffer
-		if(activeScene == null)
-			return;
 		while(Keyboard.next())
 		{
 			KeyEvent e;
@@ -126,7 +138,7 @@ public abstract class AbstractGame
 			}
 			else
 				e = new KeyEvent(key, c, isPress);
-			activeScene.getEventManager().callEvent(e);
+			EventManager.global.callEvent(e);
 		}
 		// While mouse has events in buffer
 		while(Mouse.next())
@@ -142,17 +154,17 @@ public abstract class AbstractGame
 			if(dx != 0 || dy != 0)
 			{
 				e = new MouseMoveEvent(x, y, dx, dy);
-				activeScene.getEventManager().callEvent(e);				
+				EventManager.global.callEvent(e);				
 			}
 			if(Mouse.hasWheel() && dw != 0)
 			{
 				e = new MouseScrollEvent(dw/120);	// LWJGL returns one scroll 'click' as +/- 120, for some reason. This normalizes it...
-				activeScene.getEventManager().callEvent(e);
+				EventManager.global.callEvent(e);
 			}
 			if(button >= 0)
 			{
 				e = new MouseClickEvent(button, buttonState);
-				activeScene.getEventManager().callEvent(e);
+				EventManager.global.callEvent(e);
 			}
 		}
 		if(Display.isCloseRequested())
@@ -160,49 +172,30 @@ public abstract class AbstractGame
 			closeRequested = true;
 		}
 	}
-
-	private boolean isRunning = false;
 	
 	/**
 	 * Runs the game. Initializes the game engine and starts the main loop. 
 	 * @param	args	Arguments applied to game on startup
+	 * @throws GameInitializationException 
 	 */
-	public void run(String[] args)
+	public void run(String[] args) throws GameInitializationException
 	{
 		// If we are running, don't start another one
-		if(isRunning)	
-			return;
-		isRunning = true;
+		if(handle != null)	
+			throw new GameInitializationException("Another instance of a game is already running.");
+		handle = this;
 		
 		// Initialize Display
 		try
 		{
 			Display.setDisplayMode(new DisplayMode(displayWidth, displayHeight));
 			//Display.setVSyncEnabled(true);
-			Display.create();
+			Display.create(new PixelFormat().withDepthBits(24).withSamples(2).withSRGB(true));
 		} catch (LWJGLException e)
 		{
 			Sys.alert("Error", "Initialization failed!\n\n" + e.getMessage());
 			System.exit(0);
 		}
-		
-		// Initialize graphics
-		int width = Display.getDisplayMode().getWidth();
-		int height = Display.getDisplayMode().getHeight();
-
-		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
-		GL11.glMatrixMode(GL11.GL_PROJECTION); // Select The Projection Matrix
-		GL11.glLoadIdentity(); // Reset The Projection Matrix
-		GLU.gluPerspective(45.0f, ((float) width / (float) height), 0.1f, 100.0f); // Calculate The Aspect Ratio Of The Window
-		GL11.glMatrixMode(GL11.GL_MODELVIEW); // Select The Modelview Matrix
-		GL11.glLoadIdentity(); // Reset The Modelview Matrix
-
-		GL11.glShadeModel(GL11.GL_SMOOTH); // Enables Smooth Shading
-		GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Black Background
-		GL11.glClearDepth(1.0f); // Depth Buffer Setup
-		GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
-		GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
-		GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST); // Really Nice Perspective Calculations
 		
 		onCreate();
 		
@@ -217,37 +210,33 @@ public abstract class AbstractGame
 			input();
 			if (activeScene == null)
 				break;
-			activeScene.logic(delta);
-			onLogic();
-			activeScene.physics(delta);
-			onPhysics();
-			activeScene.renderTo(screen);
-			onGraphics();
+			activeScene.update(delta);
+			onUpdate();
+			Renderer.clearQueue();
+			// Load the renderer queue with the scene
+			if(activeScene.getRoot() != null)
+				activeScene.getRoot().queueRenderOperations();	
+			Renderer.render();
+			onRender();
 			
-			Display.update();	// Update the LWJGL display
 			Display.sync(framerateCap);		// If we are running at an FPS above framerateCap, idle until we are synced
 		}
 		
 		// Cleanup
 		Display.destroy();
 		onDestroy();
-		isRunning = false;
+		handle = null;
 	}
 
 	/**
 	 * Called after logic is calculated.
 	 */
-	protected abstract void onLogic();
-
-	/**
-	 * Called after physics are calculated.
-	 */
-	protected abstract void onPhysics();
+	protected abstract void onUpdate();
 
 	/**
 	 * Called after graphics are calculated.
 	 */
-	protected abstract void onGraphics();
+	protected abstract void onRender();
 	
 	/**
 	 * Called when the game quits.

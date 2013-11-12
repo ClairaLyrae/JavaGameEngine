@@ -12,16 +12,12 @@ public class TestSceneDebugger extends Component implements Listener
 	@EventMethod
 	public void onKeyEvent(KeyEvent e)
 	{
+		if(e.isCancelled())
+			return;
 		if(e.state() && e.getKey() == Keyboard.KEY_P)
 		{
-			if(getScene() != null)
-			{
-				System.out.println("Printing scene...");
-				getScene().print();
-				
-			}
-			else
-				System.out.println("Printing scene failed! Cannot find scene.");
+			System.out.println("Printing scene...");
+			getScene().print();
 		}
 	}
 
@@ -37,5 +33,9 @@ public class TestSceneDebugger extends Component implements Listener
 	{
 		if(getScene() != null)
 			getScene().getEventManager().registerListener(this);
+	}
+
+	public void onUpdate(int delta)
+	{
 	}
 }

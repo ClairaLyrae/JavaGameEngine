@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL11.glPolygonMode;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
-import com.javagameengine.Graphics;
+import com.javagameengine.Renderable;
 import com.javagameengine.math.Vector3f;
 
 /**
@@ -22,7 +22,7 @@ import com.javagameengine.math.Vector3f;
  * methods will never return true if a void bounds is used in the calculation on either side. Whether or not a Bounds
  * object is currently void can be found by using the isVoid method.
  */
-public class Bounds implements Graphics
+public class Bounds
 {	
 	public float dimX, dimY, dimZ; // Dimensions given between center and max (1/2 length)
 	public float maxX, maxY, maxZ;
@@ -243,43 +243,5 @@ public class Bounds implements Graphics
 		minX = p.x - dimX;
 		minY = p.y - dimY;
 		minZ = p.z - dimZ;
-	}
-
-	@Override
-	public void graphics()
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glTranslatef(0.0f, 0.0f, -5.0f); // Move Into The Screen
-		glBegin(GL_QUADS); // Start Drawing 
-		glVertex3f(minX, minY, minZ); 
-		glVertex3f(minX, maxY, minZ); 
-		glVertex3f(maxX, maxY, minZ); 
-		glVertex3f(maxX, minY, minZ); 
-		
-		glVertex3f(minX, minY, minZ); 
-		glVertex3f(minX, minY, maxZ); 
-		glVertex3f(maxX, minY, maxZ); 
-		glVertex3f(minX, minY, maxZ); 
-		
-		glVertex3f(minX, minY, minZ); 
-		glVertex3f(minX, minY, maxZ); 
-		glVertex3f(minX, maxY, maxZ); 
-		glVertex3f(minX, maxY, minZ);
-		
-		glVertex3f(maxX, maxY, maxZ); 
-		glVertex3f(maxX, minY, maxZ); 
-		glVertex3f(minX, minY, maxZ); 
-		glVertex3f(minX, maxY, maxZ); 
-		
-		glVertex3f(maxX, maxY, maxZ); 
-		glVertex3f(maxX, maxY, minZ); 
-		glVertex3f(minX, maxY, minZ); 
-		glVertex3f(maxX, maxY, minZ);
-		
-		glVertex3f(maxX, maxY, maxZ); 
-		glVertex3f(maxX, maxY, minZ); 
-		glVertex3f(maxX, minY, minZ); 
-		glVertex3f(maxX, minY, maxZ); 
-		glEnd();
 	}
 }

@@ -15,8 +15,37 @@ import java.util.Map;
  */
 public class EventManager
 {
+	public static final EventManager global = new EventManager();
+	
+	private List<EventManager> subManagers = new ArrayList<EventManager>();
 	private List<Listener> listeners = new ArrayList<Listener>();
 	private HashMap<Class<? extends Event>, HashMap<Listener, Method>> methodCalls = new HashMap<Class<? extends Event>, HashMap<Listener, Method>>();
+	
+	public EventManager()
+	{
+		if(global != null)
+			global.addEventManager(this);
+	}
+	
+	public List<EventManager> getEventManagers()
+	{
+		return subManagers;
+	}
+	
+	public boolean addEventManager(EventManager em)
+	{
+		return subManagers.add(em);
+	}
+	
+	public boolean removeEventManager(EventManager em)
+	{
+		return subManagers.remove(em);
+	}
+	
+	public boolean hasEventManager(EventManager em)
+	{
+		return subManagers.contains(em);
+	}
 	
 	/**
 	 * Registers an object that extends Listener to the EventManager. The Listener class' methods are scanned and if they have
@@ -99,19 +128,22 @@ public class EventManager
 	public void callEvent(Event e)
 	{
 		Map<Listener, Method> methods = methodCalls.get(e.getClass());
-		if(methods == null)
-			return;
-		Map<Listener, Method> methodsCopy = new HashMap<Listener, Method>();
-		for(Listener l : methods.keySet())
-			methodsCopy.put(l, methods.get(l));
-		for(Listener l : methodsCopy.keySet())
+		if(methods != null)
 		{
-			try {
-				methodsCopy.get(l).invoke(l, e);
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-				ex.printStackTrace();
+			Map<Listener, Method> methodsCopy = new HashMap<Listener, Method>();
+			for(Listener l : methods.keySet())
+				methodsCopy.put(l, methods.get(l));
+			for(Listener l : methodsCopy.keySet())
+			{
+				try {
+					methodsCopy.get(l).invoke(l, e);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+					ex.printStackTrace();
+				}
 			}
 		}
+		for(EventManager em : subManagers)
+			em.callEvent(e);
 	}
 	
 	public void print()

@@ -1,7 +1,5 @@
 package com.javagameengine.scene;
 
-import com.javagameengine.Logic;
-
 /**
  * Generic object used to define anything that affects the scene. All 'objects' in a scene extend Component 
  * and use the framework of component to define how they are rendered, updated, manipulated, or manipulate
@@ -13,8 +11,7 @@ import com.javagameengine.Logic;
  */
 public abstract class Component
 {
-	protected boolean enabled = true;
-	protected boolean modified = false;
+	protected boolean isEnabled = true;
 	protected Node node;
 	
 	public Component()
@@ -30,6 +27,7 @@ public abstract class Component
 			onDestroy();
 	}
 	
+	public abstract void onUpdate(int delta);
 	public abstract void onDestroy();
 	public abstract void onCreate();
 	
@@ -39,7 +37,7 @@ public abstract class Component
 	 */
 	public void setEnabled(boolean bool)
 	{
-		enabled = bool;
+		isEnabled = bool;
 	}
 	
 	/**
@@ -48,9 +46,20 @@ public abstract class Component
 	 */
 	public boolean isEnabled()
 	{
-		return enabled;
+		return isEnabled;
 	}
 	
+	/**
+	 * Determines if this component is connected to a scene graph.
+	 * @return True if component is linked to a scene graph.
+	 */
+	public boolean isLinked()
+	{
+		if(node == null)
+			return false;
+		return node.scene != null;
+	}
+
 	/**
 	 * Fetches the parent node of this component if available
 	 * @return Parent node of this component (null if unlinked)

@@ -1,6 +1,5 @@
 package com.javagameengine.scene.component;
 
-import com.javagameengine.Logic;
 import com.javagameengine.graphics.RenderState;
 import com.javagameengine.graphics.RenderTarget;
 import com.javagameengine.scene.Component;
@@ -23,6 +22,10 @@ public class Camera extends Component
 	}
 
 	public void onCreate()
+	{
+	}
+
+	public void onUpdate(int delta)
 	{
 	}
 }

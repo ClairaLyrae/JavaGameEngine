@@ -8,24 +8,39 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 import static org.lwjgl.opengl.GL11.*;
 
-import org.lwjgl.input.Keyboard;
+import java.nio.FloatBuffer;
 
-import com.javagameengine.Graphics;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
+
+import com.javagameengine.Renderable;
+import com.javagameengine.console.Console;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.KeyEvent;
 import com.javagameengine.events.Listener;
 import com.javagameengine.events.MouseScrollEvent;
+import com.javagameengine.graphics.RenderOperation;
+import com.javagameengine.graphics.RenderState;
+import com.javagameengine.math.FastMath;
+import com.javagameengine.math.Transform;
 import com.javagameengine.scene.Bounded;
 import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Component;
+import com.javagameengine.scene.Node;
 
 // This is just an example component to have something to play with and provide a rough guide for what you can do. 
 
-public class TestComponent extends Component implements Graphics, Listener, Bounded
+public class TestComponent extends Component implements Renderable, Listener, Bounded
 {
 	private Bounds bounds = Bounds.getVoid();
 	public int index = 0;
 	public boolean selected = false;
+	public boolean enableRotation = false;
+	public boolean solid = false;
+	
+	public float angle = 0.0f;
+	Transform t = new Transform();
 	
 	public TestComponent()
 	{
@@ -40,23 +55,47 @@ public class TestComponent extends Component implements Graphics, Listener, Boun
 	@EventMethod
 	public void onKeyEvent(KeyEvent e)
 	{
+		if(e.isCancelled())
+			return;
+		if(e.state() && selected && e.getKey() == Keyboard.KEY_F)
+		{
+			solid = !solid;
+			if(solid)
+				Console.println("TestComponent " + index + " is now solid!");
+			else
+				Console.println("TestComponent " + index + " is now wireframe!");
+		}
+		if(e.state() && selected && e.getKey() == Keyboard.KEY_R)
+		{
+			enableRotation = !enableRotation;
+			Console.println("TestComponent " + index + " rotation is now " + enableRotation);
+		}
 		if(e.state() && index + '0' == e.getChar())
 		{
 			selected = !selected;
-			System.out.println("Component " + index + " is " + selected);
+			if(selected)
+				Console.println("TestComponent " + index + " was selected");
+			else
+				Console.println("TestComponent " + index + " was deselected.");
 		}
 		if(e.state() && e.getKey() == Keyboard.KEY_DELETE && selected)
 		{
-			System.out.println("Component " + index + " has been destroyed");
-			this.destroy();
-			System.out.println("This is the new state of it: " + this.toString());
+			Console.println("TestComponent " + index + " has been destroyed");
+			if(node != null)
+			{
+				node.destroy();
+			}
+			else
+				this.destroy();
 		}
 		if(e.state() && e.getKey() == Keyboard.KEY_C && selected)
 		{
 			if(node != null)
 			{
-				System.out.println("Component " + index + " has been copied with index " + (index+1));
-				node.addComponent(new TestComponent(new Bounds(bounds), index+1));
+				Console.println("TestComponent " + index + " has been copied with index " + (index+1));
+				Node newnode = new Node("Box " + (index+1));
+				node.addChild(newnode);
+				newnode.addComponent(new TestComponent(new Bounds(bounds), index+1));
 			}
 		}
 	}
@@ -64,28 +103,30 @@ public class TestComponent extends Component implements Graphics, Listener, Boun
 	@EventMethod
 	public void onMouseScroll(MouseScrollEvent e)
 	{
-		if(!selected)
+		if(!selected || node == null)
 			return;
-		System.out.println("OnMouseScroll for component: " + index);
-		float s = (float)(e.getAmount())*1.1f;
+		float s = (float)(e.getAmount());
 		if(Keyboard.isKeyDown(Keyboard.KEY_S))
 		{
-			if(s < 0)
-				s = -1.0f/s;
-			System.out.println("Scale component " + index + " by " + s + " units");
-			bounds.scale(s);
+			float scaling = 1f;
+			if(s >= 0)
+				scaling = (2f*s);
+			else
+				scaling = (-0.5f*s);
+			Console.println("Scale component " + index + " by " + s + " units");
+			node.getTransform().scale(scaling);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_X))
 		{
-			bounds.translate(s, 0f, 0f);
+			node.getTransform().translate(s*0.1f, 0f, 0f);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_Y))
 		{
-			bounds.translate(0f, s, 0f);
+			node.getTransform().translate(0f, s*0.1f, 0f);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_Z))
 		{
-			bounds.translate(0f, 0f, s);
+			node.getTransform().translate(0f, 0f, s*0.1f);
 		}
 	}
 	
@@ -94,14 +135,91 @@ public class TestComponent extends Component implements Graphics, Listener, Boun
 		return bounds;
 	}
 
-	@Override
-	public void graphics()
+	public void drawGeo()
 	{
-		if(selected)
-			glColor3f(1f, 1f, 1f); 
+		glEnable(GL_NORMALIZE);
+		glBegin(GL_QUADS); // Start Drawing 
+		glNormal3f(0f, 0f, 1f); 
+		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
+		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
+		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
+		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
+
+		glNormal3f(0f, 0f, -1f);
+		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);  
+		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
+		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
+		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+		
+		glNormal3f(0f, 1f, 0f);
+		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
+		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
+		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
+
+		glNormal3f(0f, -1f, 0f);
+		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
+		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ); 
+		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
+		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
+
+		glNormal3f(1f, 0f, 0f);
+		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
+		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
+		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);  
+		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
+
+		glNormal3f(-1f, 0f, 0f);
+		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+		glVertex3f(bounds.minX, bounds.minY, bounds.minZ);  
+		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
+		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
+		glEnd();
+		glDisable(GL_NORMALIZE);
+	}
+	
+	@Override
+	public void draw()
+	{
+		
+		if(solid)
+		{ 
+		    
+			glPushAttrib( GL_ALL_ATTRIB_BITS );
+			glEnable( GL_POLYGON_OFFSET_FILL );
+			glPolygonOffset( -2.5f, -2.5f );
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			glLineWidth( 3.0f );
+			if(selected)
+				glColor3f(0f, 1f, 0f); 
+			else
+				glColor3f(0.0f, 0.5f, 0.0f);
+			drawGeo();
+
+		    // we enable lighting right before rendering
+		    GL11.glEnable(GL11.GL_LIGHTING);
+		    GL11.glEnable(GL11.GL_LIGHT0);   
+
+			glShadeModel(GL_FLAT);
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			glColor3f( 0.2f, 0.2f, 0.2f );
+			drawGeo();
+			glPopAttrib();
+
+	        GL11.glDisable(GL11.GL_LIGHT0);
+	        GL11.glDisable(GL11.GL_LIGHTING);
+		}
 		else
-			glColor3f(0.5f, 0.5f, 0.5f); 
-		bounds.graphics();
+		{
+			glPushAttrib( GL_ALL_ATTRIB_BITS );
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			if(selected)
+				glColor3f(0f, 1f, 0f); 
+			else
+				glColor3f(0.0f, 0.5f, 0.0f); 
+			drawGeo();
+			glPopAttrib();
+		}
 	}
 
 	public Bounds getBounds()
@@ -111,18 +229,35 @@ public class TestComponent extends Component implements Graphics, Listener, Boun
 	
 	public void onDestroy()
 	{
-		System.out.println("Destroying TestComponent!");
 		if(getScene() != null)
 		{
-			System.out.println("Unregistering its listener!");
 			getScene().getEventManager().unregisterListener(this);
 		}
 	}
 
 	public void onCreate()
 	{
-		System.out.println("Creating TestComponent!");
 		if(getScene() != null)
 			getScene().getEventManager().registerListener(this);
+	}
+
+	@Override
+	public RenderState getRenderState()
+	{
+		return new RenderState();
+	}
+
+	@Override
+	public Bounds getRenderBounds()
+	{
+		return bounds;
+	}
+
+	public void onUpdate(int delta)
+	{
+		if(node != null && enableRotation)
+		{
+			node.getTransform().rotate((FastMath.PI/10f)/((float)delta), 0f, 1f, 0f);
+		}
 	}
 }

@@ -48,9 +48,9 @@ public class Vector3f extends Vector<Vector3f>
 
 	public Vector3f add(float ax, float ay, float az)
 	{
-		x += ax;
-		y += ay;
-		z += az;
+		x = x + ax;
+		y = y + ay;
+		z = z + az;
 		return this;
 	}
 
@@ -120,7 +120,7 @@ public class Vector3f extends Vector<Vector3f>
 
 	public float magnitude()
 	{
-		return (float) MathUtil.fastSqrt(x * x + y * y + z * z);
+		return (float) FastMath.sqrt(x * x + y * y + z * z);
 	}
 
 	public float magnitudeSquared()
