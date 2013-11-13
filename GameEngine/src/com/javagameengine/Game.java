@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 
-import java.nio.ByteBuffer;
+import java.nio.ByteBuffer; // This is a comment that doesn't mean anything
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
