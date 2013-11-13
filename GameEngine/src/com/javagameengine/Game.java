@@ -151,8 +151,10 @@ public abstract class Game
 			}
 			if(Mouse.hasWheel() && dw != 0)
 			{
-				e = new MouseScrollEvent(dw/120);	// LWJGL returns one scroll 'click' as +/- 120, for some reason. This normalizes it...
+				e = new MouseScrollEvent(dw/28);	// LWJGL returns one scroll 'click' as +/- 120, for some reason. This normalizes it...
 				EventManager.global.callEvent(e);
+				Console.println("dw = "+dw);
+				
 			}
 			if(button >= 0)
 			{
