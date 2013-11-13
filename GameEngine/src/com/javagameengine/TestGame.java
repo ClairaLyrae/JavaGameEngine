@@ -1,9 +1,9 @@
 package com.javagameengine;
 
-import com.javagameengine.console.BoxCmd;
+import com.javagameengine.console.MeshCommand;
 import com.javagameengine.console.Console;
+import com.javagameengine.console.DisplayCommand;
 import com.javagameengine.events.EventManager;
-import com.javagameengine.exceptions.GameInitializationException;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Quaternion;
 import com.javagameengine.math.Transform;
@@ -18,43 +18,44 @@ import com.javagameengine.scene.component.TestSceneDebugger;
 
 public class TestGame extends Game
 {
+	// We want to manually put stuff in our game, so here we make a scene and load it in during startup
 	protected void onCreate()
 	{
+		// Create a new scene
+		Scene s = new Scene("TestScene");
+		Node root = s.getRoot();
+		
+		// Add some debug components to the root
+		root.addComponent(new TestSceneDebugger());
+		root.addComponent(new CoordinateGrid(2f, 8f));
+		
+		// Register the box making command
+		Console.registerCommand(new MeshCommand());
+		Console.registerCommand(new DisplayCommand());
+		
+		// Load the scene into the game
+		loadScene(s);
 	}
 
+	// Dont care about destroying it
 	protected void onDestroy()
 	{
+		
+	}
+
+	protected void onUpdate()
+	{
+		
+	}
+
+	protected void onRender()
+	{
+		
 	}
 
 	public static void main(String[] args)
 	{
 		TestGame game = new TestGame();
-		Scene s = new Scene("TestScene");
-		
-		Node root = s.getRoot();
-		Node n1 = new Node("n1");
-		Node n2 = new Node("n2");
-		Node n3 = new Node("n3");
-		Node n4 = new Node("n4");
-
-		root.addChild(n1);
-		n1.addChild(n2);
-		n1.addChild(n3);
-		root.addChild(n4);
-		
-		TestSceneDebugger deb = new TestSceneDebugger();
-		root.addComponent(deb);
-		root.addComponent(new CoordinateGrid(2f, 8f));
-		
-		TestComponent b = new TestComponent(new Bounds(1.0f, 1.0f, 1.0f), 1);
-		n4.addComponent(b);		
-		
-		game.loadScene(s);
-
-		Console.registerCommand(new BoxCmd());
-		EventManager.global.registerListener(Console.handle);
-		
-		s.print();
 		try
 		{
 			game.run(args);
@@ -63,13 +64,5 @@ public class TestGame extends Game
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-	}
-
-	protected void onUpdate()
-	{
-	}
-
-	protected void onRender()
-	{
 	}
 }

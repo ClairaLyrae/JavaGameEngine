@@ -82,6 +82,6 @@ public abstract class Component
 	
 	public String toString()
 	{
-		return String.format("Component[class=%s, hasNode=%b, hasScene=%b]", getClass().getName(), node != null, getScene() != null);
+		return String.format("Component[class=%s, hasNode=%b, hasScene=%b]", getClass().getSimpleName(), node != null, getScene() != null);
 	}
 }

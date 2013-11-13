@@ -14,7 +14,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import com.javagameengine.Renderable;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.KeyEvent;
@@ -22,6 +21,9 @@ import com.javagameengine.events.Listener;
 import com.javagameengine.events.MouseScrollEvent;
 import com.javagameengine.graphics.RenderOperation;
 import com.javagameengine.graphics.RenderState;
+import com.javagameengine.graphics.Renderable;
+import com.javagameengine.graphics.mesh.Mesh;
+import com.javagameengine.graphics.mesh.MeshUtil;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Transform;
 import com.javagameengine.scene.Bounded;
@@ -33,22 +35,24 @@ import com.javagameengine.scene.Node;
 
 public class TestComponent extends Component implements Renderable, Listener, Bounded
 {
-	private Bounds bounds = Bounds.getVoid();
+	private Mesh mesh = null;
 	public int index = 0;
 	public boolean selected = false;
 	public boolean enableRotation = false;
 	public boolean solid = false;
+	public boolean smooth = false;
 	
 	public float angle = 0.0f;
 	Transform t = new Transform();
 	
-	public TestComponent()
+	public TestComponent(int index)
 	{
+		this.index = index;
 	}
 	
-	public TestComponent(Bounds b, int index)
+	public TestComponent(Mesh m, int index)
 	{
-		this.bounds = b;
+		setMesh(m);
 		this.index = index;
 	}
 	
@@ -64,6 +68,14 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 				Console.println("TestComponent " + index + " is now solid!");
 			else
 				Console.println("TestComponent " + index + " is now wireframe!");
+		}
+		if(e.state() && selected && e.getKey() == Keyboard.KEY_M)
+		{
+			smooth = !smooth;
+			if(smooth)
+				Console.println("TestComponent " + index + " is now smooth!");
+			else
+				Console.println("TestComponent " + index + " is now flat!");
 		}
 		if(e.state() && selected && e.getKey() == Keyboard.KEY_R)
 		{
@@ -95,7 +107,7 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 				Console.println("TestComponent " + index + " has been copied with index " + (index+1));
 				Node newnode = new Node("Box " + (index+1));
 				node.addChild(newnode);
-				newnode.addComponent(new TestComponent(new Bounds(bounds), index+1));
+				newnode.addComponent(new TestComponent(mesh, index+1));
 			}
 		}
 	}
@@ -113,7 +125,7 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 				scaling = (2f*s);
 			else
 				scaling = (-0.5f*s);
-			Console.println("Scale component " + index + " by " + s + " units");
+			Console.println("TestComponent " + index + " was scaled by " + scaling + " units");
 			node.getTransform().scale(scaling);
 		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_X))
@@ -130,52 +142,59 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 		}
 	}
 	
-	public Bounds getBox()
+	public int meshHandle = -1;
+	
+	public void setMesh(Mesh m)
 	{
-		return bounds;
+		this.mesh = m;
+		meshHandle = MeshUtil.createDisplayList(m);
 	}
 
 	public void drawGeo()
 	{
-		glEnable(GL_NORMALIZE);
-		glBegin(GL_QUADS); // Start Drawing 
-		glNormal3f(0f, 0f, 1f); 
-		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
-		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
-		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
-
-		glNormal3f(0f, 0f, -1f);
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);  
-		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
-		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+		if(meshHandle < 0)
+			return;
+	    glCallList(meshHandle);
+//		glEnable(GL_NORMALIZE);
+//		glBegin(GL_QUADS); // Start Drawing 
 		
-		glNormal3f(0f, 1f, 0f);
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
-		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
-		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
-
-		glNormal3f(0f, -1f, 0f);
-		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
-		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
-
-		glNormal3f(1f, 0f, 0f);
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
-		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);  
-		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
-
-		glNormal3f(-1f, 0f, 0f);
-		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
-		glVertex3f(bounds.minX, bounds.minY, bounds.minZ);  
-		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
-		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
-		glEnd();
-		glDisable(GL_NORMALIZE);
+//		glNormal3f(0f, 0f, 1f); 
+//		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
+//		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
+//		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
+//		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
+//
+//		glNormal3f(0f, 0f, -1f);
+//		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);  
+//		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
+//		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
+//		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+//		
+//		glNormal3f(0f, 1f, 0f);
+//		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
+//		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+//		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
+//		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
+//
+//		glNormal3f(0f, -1f, 0f);
+//		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
+//		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ); 
+//		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
+//		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
+//
+//		glNormal3f(1f, 0f, 0f);
+//		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
+//		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
+//		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);  
+//		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
+//
+//		glNormal3f(-1f, 0f, 0f);
+//		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
+//		glVertex3f(bounds.minX, bounds.minY, bounds.minZ);  
+//		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
+//		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
+//		glEnd();
+//		glDisable(GL_NORMALIZE);
 	}
 	
 	@Override
@@ -200,7 +219,10 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 		    GL11.glEnable(GL11.GL_LIGHTING);
 		    GL11.glEnable(GL11.GL_LIGHT0);   
 
-			glShadeModel(GL_FLAT);
+		    if(smooth)
+		    	glShadeModel(GL_SMOOTH);
+		    else
+		    	glShadeModel(GL_FLAT);
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 			glColor3f( 0.2f, 0.2f, 0.2f );
 			drawGeo();
@@ -224,7 +246,7 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 
 	public Bounds getBounds()
 	{
-		return bounds;
+		return mesh.getBounds();
 	}
 	
 	public void onDestroy()
@@ -250,7 +272,7 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 	@Override
 	public Bounds getRenderBounds()
 	{
-		return bounds;
+		return mesh.getBounds();
 	}
 
 	public void onUpdate(int delta)

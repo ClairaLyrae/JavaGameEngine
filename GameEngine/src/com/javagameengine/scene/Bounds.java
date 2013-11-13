@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL11.glPolygonMode;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
-import com.javagameengine.Renderable;
+import com.javagameengine.graphics.Renderable;
 import com.javagameengine.math.Vector3f;
 
 /**

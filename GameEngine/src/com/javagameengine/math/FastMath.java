@@ -2,7 +2,7 @@ package com.javagameengine.math;
 
 import java.util.Random;
 
-// TODO These math operations are copied from JMonkeyEngine. Sort through them and figure out whats needed and etc
+// TODO These math operations are copied from JMonkeyEngine! Sort through them and figure out whats needed and etc
 
 /**
  * Static utility class containing math methods (mostly faster float approximations of standard math operations). 

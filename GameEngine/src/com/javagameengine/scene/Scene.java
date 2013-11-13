@@ -12,9 +12,10 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.javagameengine.Renderable;
+import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.graphics.RenderTarget;
+import com.javagameengine.graphics.Renderable;
 import com.javagameengine.graphics.Renderer;
 import com.javagameengine.math.Transform;
 
@@ -79,19 +80,19 @@ public class Scene
 	// For debugging scenes
 	public void print()
 	{
-		System.out.println("Scene: " + getName());
+		Console.println("Scene: " + getName());
 		print(root, "");
 	}
 
 	// For debugging scenes
 	private void print(Node n, String sb)
 	{
-		sb += "    ";
+		sb += "  ";
 		
-		System.out.println(sb + "N: " + n.toString());
+		Console.println(sb + "N: " + n.toString());
 		
 		for(Component c : n.getComponents())
-			System.out.println(sb + "|-> C: " + c.toString());
+			Console.println(sb + "C: " + c.toString());
 		
 		for(Node node : n.getChildren())
 			print(node, sb);

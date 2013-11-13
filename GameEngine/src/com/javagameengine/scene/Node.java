@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.javagameengine.Renderable;
 import com.javagameengine.graphics.RenderOperation;
+import com.javagameengine.graphics.Renderable;
 import com.javagameengine.graphics.Renderer;
 import com.javagameengine.math.Matrix;
 import com.javagameengine.math.Quaternion;

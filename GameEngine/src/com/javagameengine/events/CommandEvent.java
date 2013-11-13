@@ -2,6 +2,10 @@ package com.javagameengine.events;
 
 import com.javagameengine.console.Command;
 
+/**
+ * Called when a command is executed by the console. 
+ * @author ClairaLyrae
+ */
 public class CommandEvent extends Event
 {
 	private Command command;
@@ -13,11 +17,17 @@ public class CommandEvent extends Event
 		this.args = args;
 	}
 	
+	/**
+	 * @return Arguments sent to the executed command
+	 */
 	public String[] getArgs()
 	{
 		return args;
 	}
 	
+	/**
+	 * @return Command that was executed
+	 */
 	public Command getCommand()
 	{
 		return command;

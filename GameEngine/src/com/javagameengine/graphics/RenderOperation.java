@@ -3,7 +3,6 @@ package com.javagameengine.graphics;
 import java.lang.reflect.Method;
 import java.nio.FloatBuffer;
 
-import com.javagameengine.Renderable;
 import com.javagameengine.math.Transform;
 import com.javagameengine.scene.Bounds;
 

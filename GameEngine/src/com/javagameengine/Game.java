@@ -21,15 +21,14 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
+import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyEvent;
 import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.events.MouseEvent;
 import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
-import com.javagameengine.exceptions.GameInitializationException;
 import com.javagameengine.graphics.Renderer;
-import com.javagameengine.graphics.RenderWindow;
 import com.javagameengine.scene.Scene;
 
 /**
@@ -44,15 +43,9 @@ import com.javagameengine.scene.Scene;
 public abstract class Game
 {
 	private static Game handle;
-		
 	public boolean closeRequested = false;
-
 	private Scene activeScene = null;
-	private RenderWindow screen = new RenderWindow();
-
 	private int framerateCap = 60;
-	private int displayWidth = 1024;
-	private int displayHeight = 780;
 	
 	public static Game getHandle()
 	{
@@ -188,15 +181,15 @@ public abstract class Game
 		// Initialize Display
 		try
 		{
-			Display.setDisplayMode(new DisplayMode(displayWidth, displayHeight));
-			//Display.setVSyncEnabled(true);
-			Display.create(new PixelFormat().withDepthBits(24).withSamples(2).withSRGB(true));
+			Display.setDisplayMode(new DisplayMode(1600, 900));
+			Display.create(new PixelFormat().withDepthBits(24).withSamples(4).withSRGB(true));
 		} catch (LWJGLException e)
 		{
 			Sys.alert("Error", "Initialization failed!\n\n" + e.getMessage());
 			System.exit(0);
 		}
-		
+
+		EventManager.global.registerListener(Console.handle);
 		onCreate();
 		
 		while (!closeRequested)	// Main game loop
@@ -224,17 +217,18 @@ public abstract class Game
 		
 		// Cleanup
 		Display.destroy();
+		EventManager.global.unregisterListener(Console.handle);
 		onDestroy();
 		handle = null;
 	}
 
 	/**
-	 * Called after logic is calculated.
+	 * Called after the game logic is updated.
 	 */
 	protected abstract void onUpdate();
 
 	/**
-	 * Called after graphics are calculated.
+	 * Called after graphics are rendered.
 	 */
 	protected abstract void onRender();
 	

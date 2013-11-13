@@ -1,5 +1,8 @@
 package com.javagameengine.graphics;
 
+import org.lwjgl.util.Color;
+
+
 // TODO Need to plan out this class and the render system
 
 /**
@@ -13,6 +16,5 @@ public class RenderState
 	 */
 	public void load()
 	{
-		
 	}
 }

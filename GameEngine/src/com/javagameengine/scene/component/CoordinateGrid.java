@@ -12,8 +12,8 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import org.lwjgl.opengl.GL11;
 
-import com.javagameengine.Renderable;
 import com.javagameengine.graphics.RenderState;
+import com.javagameengine.graphics.Renderable;
 import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Component;
 

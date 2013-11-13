@@ -1,4 +1,4 @@
-package com.javagameengine.io;
+package com.javagameengine.graphics.mesh;
 
 // Not yet used fully
 

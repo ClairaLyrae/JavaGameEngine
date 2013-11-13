@@ -1,11 +1,7 @@
-package com.javagameengine;
+package com.javagameengine.graphics;
 
-import com.javagameengine.graphics.RenderOperation;
-import com.javagameengine.graphics.RenderState;
 import com.javagameengine.math.Transform;
 import com.javagameengine.scene.Bounds;
-
-
 
 /**
  * Describes an object that can be rendered into openGL or affects the rendering process.

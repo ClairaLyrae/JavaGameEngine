@@ -1,4 +1,4 @@
-package com.javagameengine.exceptions;
+package com.javagameengine;
 
 public class GameInitializationException extends Exception
 {

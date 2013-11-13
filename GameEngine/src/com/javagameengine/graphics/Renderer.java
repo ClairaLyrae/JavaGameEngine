@@ -28,6 +28,9 @@ import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glShadeModel;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -43,6 +46,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 
 import com.javagameengine.console.Console;
+import com.javagameengine.graphics.mesh.InvalidMeshException;
+import com.javagameengine.graphics.mesh.Mesh;
+import com.javagameengine.graphics.mesh.MeshUtil;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
@@ -84,7 +90,8 @@ public class Renderer
 	{
 		views.add(vs);
 	}
-	
+
+    
 	public static void render()
 	{
 		FloatBuffer position = BufferUtils.createFloatBuffer(4);
@@ -100,8 +107,8 @@ public class Renderer
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		int width = Display.getDisplayMode().getWidth();
-		int height = Display.getDisplayMode().getHeight();
+		int width = Display.getWidth();
+		int height = Display.getHeight();
 
 		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
 	    GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -129,14 +136,16 @@ public class Renderer
 		glVertex3f(position.get(), position.get(), position.get()); 
 		GL11.glEnd();
 		position.rewind();
+		
 	    GL11.glLight(GL11.GL_LIGHT0, GL11.GL_POSITION, position);
-
-	    // we do the rest of the light here as well
 	    GL11.glLight(GL11.GL_LIGHT0, GL11.GL_AMBIENT, ambient);
 
 	    GL11.glEnable(GL11.GL_DEPTH_TEST);
 	    GL11.glDepthMask(true);
-	    GL11.glEnable(GL11.GL_CULL_FACE);		
+	    GL11.glEnable(GL11.GL_CULL_FACE);	
+	    
+	    GL11.glEnable(GL11.GL_NORMALIZE);
+	  
 		
 		for(RenderOperation op : operations)
 		{
@@ -179,7 +188,6 @@ public class Renderer
 	    Console.draw();
 	    
 	    GL11.glPopMatrix();
-
 		Display.update();
 	}
 	
@@ -192,5 +200,5 @@ public class Renderer
 	{
 		operations.add(ro);
 		return true;
-	} 
+	}
 }

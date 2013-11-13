@@ -1,5 +1,6 @@
 package com.javagameengine.events;
 
+
 /**
  * Event describing the scroll wheel on the mouse being moved up or down. 
  * @author ClairaLyrae

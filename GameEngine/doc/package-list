@@ -1,8 +1,10 @@
 com.javagameengine
+com.javagameengine.console
 com.javagameengine.events
 com.javagameengine.graphics
-com.javagameengine.io
+com.javagameengine.graphics.mesh
 com.javagameengine.math
 com.javagameengine.math.geometry
 com.javagameengine.scene
 com.javagameengine.scene.component
+com.javagameengine.util

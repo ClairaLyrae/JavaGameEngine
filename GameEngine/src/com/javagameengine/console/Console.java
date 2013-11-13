@@ -9,7 +9,12 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +27,21 @@ import com.javagameengine.events.EventManager;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.KeyEvent;
 import com.javagameengine.events.Listener;
+import com.javagameengine.events.MouseScrollEvent;
+import com.javagameengine.util.CyclicArrayBuffer;
+import com.javagameengine.util.SimpleText;
 
+/**
+ * Console is a statically-accessed class which provides a textual input/output system for the engine. 
+ * <p>
+ * Strings printed to the console will be held in a size-limited cyclic buffer, which is drawn to the screen if the console is 
+ * set to visible. Input is handled by implementing the Listener interface and automatically registering itself to the global 
+ * EventManager at runtime. The Console listens to KeyEvents and processes the keystrokes into Commands upon an enter key press.
+ * <p>
+ * Commands are registered to the Console by the registerCommand method. Registering a command to the console will allow the console
+ * to execute the given command if entered by the user. 
+ * @author ClairaLyrae
+ */
 public class Console implements Listener
 {
 	public static final String ARG_DELIMITER = " ";
@@ -30,62 +49,162 @@ public class Console implements Listener
 	
 	public static final Console handle = new Console();
 	
-	private static Map<String, Command> commands = new HashMap<String, Command>();
+	private static Map<String, Command> commands;
 	private static StringBuilder input = new StringBuilder();
-	private static String[] buffer;
-	private static int writeIndex;
+	
+	private static CyclicArrayBuffer<String> strbuffer;
+	private static CyclicArrayBuffer<String> cmdbuffer;
+	
 	private static boolean isVisible = false;
+	private static boolean dockPosition = true;	// true is up, false is down
+	private static int percentSize = 25;
+	
+	private Console()
+	{
+		// Init vars
+		strbuffer = new CyclicArrayBuffer<String>(128);
+		cmdbuffer = new CyclicArrayBuffer<String>(10);
+		commands = new HashMap<String, Command>();
+		// Here we register the default commands for the console. Default commands are given as
+		// anonymous classes of type Command.
+		registerCommand(new Command("clear", 0) {
+			public String execute(String[] args)
+			{
+				strbuffer = new CyclicArrayBuffer<String>(128);
+				cmdbuffer = new CyclicArrayBuffer<String>(5);
+				return null;
+			}
+		});
+		registerCommand(new Command("commands", 0) {
+			public String execute(String[] args)
+			{
+				println("Command List:");
+				for(Command c : commands.values())
+				{
+					println("- " + c.toString());
+				}
+				return null;
+			}
+		});
+		registerCommand(new Command("console", 1) {
+			public String execute(String[] args)
+			{
+				if(args[0].equalsIgnoreCase("position"))
+					dockPosition = !dockPosition;
+				else if(args[0].equalsIgnoreCase("size") && args.length > 1)
+				{
+					int i = Integer.parseInt(args[1]);
+					if(i > 0 && i < 100)
+						percentSize = i;
+				}
+				return null;
+			}
+		});
+	}
 	
 	@EventMethod
-	public void onKeyEvent(KeyEvent e)
+	public void onMouseScroll(MouseScrollEvent e)
+	{
+		if(!isVisible)
+			return;
+		if(e.getAmount() > 0)
+			strbuffer.readForwards();
+		else
+			strbuffer.readBackwards();
+	}
+	
+	@EventMethod
+	public void onKey(KeyEvent e)
 	{
 		if(!e.state())	// Ignore key releases
 			return;
+		if(e.getKey() == Keyboard.KEY_RSHIFT)	// Toggle console on tilde ~ key
+			return;
+		if(e.getKey() == Keyboard.KEY_LSHIFT)	// Toggle console on tilde ~ key
+			return;
 		if(e.getKey() == Keyboard.KEY_GRAVE)	// Toggle console on tilde ~ key
+		{
 			isVisible = !isVisible;
+			strbuffer.setReadToHead();
+			return;
+		}
 		if(!isVisible)	// Ignore if console is closed
 			return;
+		
 		e.cancel();	// Cancel key event
+		
 		if(e.getKey() == Keyboard.KEY_BACK && input.length() > 0)
-		{
-			println("Deleting");
-			input.deleteCharAt(input.length() - 1);
-		}
-		if(e.getKey() == Keyboard.KEY_RETURN)
+			input.deleteCharAt(input.length()-1);
+		else if(e.getKey() == Keyboard.KEY_RETURN)	// Try to execute whatever is in the input at the moment
 		{
 			if(input.length() > 0)
 			{
-				String[] split = input.toString().split(" ");
-				if(split[0].startsWith(CMD_TOKEN))
-				{
-					String cmdName = split[0].substring(CMD_TOKEN.length());
-					Command c = commands.get(cmdName);
-					if(c == null)
-					{
-						println("Unknown command.");
-					}
-					else
-					{
-						String[] args = Arrays.copyOfRange(split, 1, split.length);
-						if(c.getMinArgs() <= args.length)
-						{
-							c.execute(args);
-							EventManager.global.callEvent(new CommandEvent(c, args));
-						}
-						else
-							println("Not enough arguments.");
-					}
-				}
-				println(input.toString());
+				execute(input.toString());
+				cmdbuffer.setReadToHead();
 		        input.delete(0, input.length());
+			}
+		}
+		else if(e.getKey() == Keyboard.KEY_UP)	// Scroll through command buffer to more current commands
+		{
+	        String s = cmdbuffer.readBackwards();
+	        if(s == null)
+	        	s = "";
+		    input.delete(0, input.length());
+	        input.append(s);
+		}
+		else if(e.getKey() == Keyboard.KEY_DOWN)	// Scroll through command buffer to past commands
+		{
+	        String s = cmdbuffer.readForwards();
+	        if(s == null)
+	        	s = "";
+		    input.delete(0, input.length());
+	        input.append(s);
+		}
+		else
+			input.append(e.getChar());
+	}
+	
+	/**
+	 * Try to parse the given string into a registered Command, and execute it. 
+	 * @param s String to parse.
+	 */
+	private static void execute(String s)
+	{	
+		String[] split = s.split(" ");
+		if(split[0].startsWith(CMD_TOKEN))
+		{
+			String cmdName = split[0].substring(CMD_TOKEN.length());
+			Command c = commands.get(cmdName);
+			if(c == null)
+			{
+				println("Unknown command.");
+			}
+			else
+			{
+				String[] args = Arrays.copyOfRange(split, 1, split.length);
+				if(c.getMinArgs() <= args.length)
+				{
+					EventManager.global.callEvent(new CommandEvent(c, args));
+					String r = c.execute(args);
+					if(r != null)
+						println(r);
+				}
+				else
+					println("Not enough arguments.");
 			}
 		}
 		else
 		{
-			input.append(e.getChar());
+			println(s);
 		}
+		cmdbuffer.write(s);
 	}
 	
+	/**
+	 * Register the given command to the Console.
+	 * @param c Command to register
+	 * @return False if command is already registered.
+	 */
 	public static boolean registerCommand(Command c)
 	{
 		if(commands.containsKey(c.getName()))
@@ -93,12 +212,22 @@ public class Console implements Listener
 		commands.put(c.getName(), c);
 		return true;
 	}
-	
+
+	/**
+	 * Unregister the given command from the Console.
+	 * @param c Command to unregister
+	 * @return False if command is not already registered.
+	 */
 	public static boolean unregisterCommand(Command c)
 	{
 		return unregisterCommand(c.getName());
 	}
-	
+
+	/**
+	 * Unregister the given command from the Console.
+	 * @param name Name of command to unregister.
+	 * @return False if command is not already registered.
+	 */
 	public static boolean unregisterCommand(String name)
 	{
 		if(!commands.containsKey(name))
@@ -107,107 +236,113 @@ public class Console implements Listener
 		return true;
 	}
 	
+	/**
+	 * @return True if console is visible and accepting commands.
+	 */
 	public static boolean isVisible()
 	{
 		return isVisible();
 	}
 	
-	
 	public static void setVisible(boolean b)
 	{
 		isVisible = b;
-		if(isVisible)
-		{
-			
-		}
-		else
-		{
-			
-		}
-			
 	}
 	
-	private Console()
-	{
-		buffer = new String[32];
-		writeIndex = 0;
-	}
-	
+	/**
+	 * Print the given string to the console buffer.
+	 * @param s String to print to console
+	 */
 	public static void println(String s)
 	{
-		if(++writeIndex >= buffer.length)
-			writeIndex = 0;
-		buffer[writeIndex] = s;
+		strbuffer.write(s);
 	}
 	
-	public static void resize(int i)
-	{
-		buffer = Arrays.copyOf(buffer, i);
-		if(writeIndex > buffer.length)
-			writeIndex = buffer.length - 1;
-	}
-	
+	/**
+	 * Draws the console to the screen. Must be called during ortho projection where 0,0 is the left corner.
+	 * Subject to change as render system is implemented.
+	 */
 	public static void draw()
 	{
-		int width = Display.getDisplayMode().getWidth();
-		int height = Display.getDisplayMode().getHeight();
+		// Get the display dimensions
+		int width = Display.getWidth();
+		int height = Display.getHeight();
+	
+		// Now we need to calculate all the positions of drawn elements
+		int yBufferLim;
+		int yBuffer;
+		int yBufferText;
+		int yInput;
+		int yInputText;
+	    int yBufferSpacing;
+	    float percent = (float)percentSize/100f;
+	    if(dockPosition)	// If the console is at the top
+	    {
+			yBufferLim = height;
+			yBuffer = (int)((float)height * (1f-percent));
+			yBufferText = yBuffer - 8;
+			yInput = yBuffer - 20;
+			yInputText = yInput + 6;
+		    yBufferSpacing = 15;
+	    }	
+	    else		// If the console is at the bottom
+	    {
+			yBufferLim = 0;
+			yBuffer = (int)((float)height * percent);
+			yBufferText = yBuffer;
+			yInput = yBuffer + 20;
+			yInputText = yBuffer + 6;
+		    yBufferSpacing = -15;
+	    }
 		
-		glEnable(GL_BLEND); //Enable blending.
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set blending function.
+	    // Draw the buffer box and border
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
 		glBegin(GL_QUADS);
 	    glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
-	    glVertex3f(0, 0, 0f);
-	    glVertex3f(width, 0, 0f);
-	    glVertex3f(width, height/4, 0f);
-	    glVertex3f(0, height/4, 0f);
+	    glVertex3f(0, yBufferLim, 0f);
+	    glVertex3f(width, yBufferLim, 0f);
+	    glVertex3f(width, yBuffer, 0f);
+	    glVertex3f(0, yBuffer, 0f);
 	    glEnd();
-	    
 		glBegin(GL_LINES);
 	    glColor4f(0.5f, 0.5f, 0.5f, 1f);
-	    glVertex3f(width, height/4, 0f);
-	    glVertex3f(0, height/4, 0f);
+	    glVertex3f(width, yBuffer, 0f);
+	    glVertex3f(0, yBuffer, 0f);
 	    glEnd();
 	    
-	    int spacing = 15;
-	    int ypos = height/4;
+	    // Draw the buffer contents
 	    glColor4f(0.6f, 0.6f, 0.6f, 1f);
-		
-	    int bpos = writeIndex;
-	    for(int i = 0; i < buffer.length; i++)
+	    int bpos = strbuffer.getReadPos();
+	    String s = strbuffer.read();
+	    while(s != null)
 	    {
-	    	if(ypos < 0)
+	    	yBufferText += yBufferSpacing;
+	    	if(yBufferText > height || yBufferText < 0)
 	    		break;
-	    	if(bpos < 0)
-	    		bpos = buffer.length - 1;
-	    	if(buffer[bpos] != null)
-	    	{
-		    	ypos -= spacing;
-	    		SimpleText.drawString(buffer[bpos], 5, ypos);
-	    	}
-	    	bpos--;
+    		SimpleText.drawString(s, 5, yBufferText);
+    		s = strbuffer.readBackwards();
 	    }
+	    strbuffer.setReadPos(bpos);
 
 	    // If console is enabled, draw the input box too
 		if(isVisible)
 		{
 		    glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
 			glBegin(GL_QUADS);
-		    glVertex3f(0, height/4, 0f);
-		    glVertex3f(width, height/4, 0f);
-		    glVertex3f(width, height/4 + 20, 0f);
-		    glVertex3f(0, height/4 + 20, 0f);
+		    glVertex3f(0, yBuffer, 0f);
+		    glVertex3f(width, yBuffer, 0f);
+		    glVertex3f(width, yInput, 0f);
+		    glVertex3f(0, yInput, 0f);
 		    glEnd();
-
 			glBegin(GL_LINES);
 		    glColor4f(0.5f, 0.5f, 0.5f, 1f);
-		    glVertex3f(width, height/4 + 20, 0f);
-		    glVertex3f(0, height/4 + 20, 0f);
+		    glVertex3f(width, yInput, 0f);
+		    glVertex3f(0, yInput, 0f);
 		    glEnd();
-
 		    glColor4f(1f, 1f, 1f, 1f);
-		    SimpleText.drawString("> " + input.toString() , 5, height/4 + 6);
+		    SimpleText.drawString("> " + input.toString() + "_" , 5, yInputText);
 		}
 	}
 }

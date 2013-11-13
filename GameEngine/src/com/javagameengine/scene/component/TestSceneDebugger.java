@@ -2,6 +2,7 @@ package com.javagameengine.scene.component;
 
 import org.lwjgl.input.Keyboard;
 
+import com.javagameengine.console.Console;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.KeyEvent;
 import com.javagameengine.events.Listener;
@@ -16,7 +17,7 @@ public class TestSceneDebugger extends Component implements Listener
 			return;
 		if(e.state() && e.getKey() == Keyboard.KEY_P)
 		{
-			System.out.println("Printing scene...");
+			Console.println("Printing scene...");
 			getScene().print();
 		}
 	}

@@ -1,7 +1,13 @@
-package com.javagameengine.console;
+package com.javagameengine.util;
 
 import org.lwjgl.opengl.GL11;
 
+/**
+ * Temporary class for drawing text in openGL. Extremely brute force! Actually draws the characters as a series of points one by one. 
+ * Will need to create a proper TextRenderer or something later on... Most likely drawing quads for each letter with textures taken from 
+ * a font image..
+ * @author ClairaLyrae
+ */
 public class SimpleText 
 {
 	public static void drawString(String s, int x, int y){
@@ -462,12 +468,13 @@ public class SimpleText
 				GL11.glVertex2f(x+1, y+0);
 				x += 8;
 			}else if(c == '.'){
-				GL11.glVertex2f(x+1, y);
-				x+=2;
+				GL11.glVertex2f(x+2, y);
+				x+=4;
 			}else if(c == ','){
-				GL11.glVertex2f(x+1, y);
-				GL11.glVertex2f(x+1, y+1);
-				x+=2;
+				GL11.glVertex2f(x+2, y);
+				GL11.glVertex2f(x+2, y-1);
+				GL11.glVertex2f(x+2, y-2);
+				x+=4;
 			}else if(c == '\n'){
 				y-=10;
 				x = startX;
@@ -488,6 +495,12 @@ public class SimpleText
 			}else if(c == ':'){
 				GL11.glVertex2f(x+2, y+5);
 				GL11.glVertex2f(x+2, y+1);
+				x+=5;
+			}else if(c == ';'){
+				GL11.glVertex2f(x+2, y+5);
+				GL11.glVertex2f(x+2, y+1);
+				GL11.glVertex2f(x+2, y);
+				GL11.glVertex2f(x+2, y-1);
 				x+=5;
 			}else if(c == '<'){
 				GL11.glVertex2f(x+5, y+8);
@@ -511,6 +524,100 @@ public class SimpleText
 				GL11.glVertex2f(x+2, y+1);
 				GL11.glVertex2f(x+1, y);
 				x+=7;
+			}else if(c == '['){
+				for(int i=0;i<=8;i++){
+					GL11.glVertex2f(x+2, y+i);
+				}
+				for(int i=2;i<=5;i++){
+					GL11.glVertex2f(x+i, y-1);
+					GL11.glVertex2f(x+i, y+9);
+				}
+				x+=8;
+			}else if(c == ']'){
+				for(int i=0;i<=8;i++){
+					GL11.glVertex2f(x+5, y+i);
+				}
+				for(int i=2;i<=5;i++){
+					GL11.glVertex2f(x+i, y-1);
+					GL11.glVertex2f(x+i, y+9);
+				}
+				x+=8;
+			}else if(c == '('){
+				for(int i=1;i<=7;i++){
+					GL11.glVertex2f(x+2, y+i);
+				}
+				GL11.glVertex2f(x+3, y+8);
+				GL11.glVertex2f(x+3, y);
+				for(int i=4;i<=5;i++){
+					GL11.glVertex2f(x+i, y-1);
+					GL11.glVertex2f(x+i, y+9);
+				}
+				x+=8;
+			}else if(c == ')'){
+				for(int i=1;i<=7;i++){
+					GL11.glVertex2f(x+5, y+i);
+				}
+				GL11.glVertex2f(x+4, y+8);
+				GL11.glVertex2f(x+4, y);
+				for(int i=2;i<=3;i++){
+					GL11.glVertex2f(x+i, y-1);
+					GL11.glVertex2f(x+i, y+9);
+				}
+				x+=8;
+			}else if(c == '{'){
+				for(int i=0;i<=8;i++){
+					if(i == 4)
+						GL11.glVertex2f(x+2, y+i);
+					else
+						GL11.glVertex2f(x+3, y+i);
+				}
+				for(int i=4;i<=5;i++){
+					GL11.glVertex2f(x+i, y-1);
+					GL11.glVertex2f(x+i, y+9);
+				}
+				x+=8;
+			}else if(c == '}'){
+				for(int i=0;i<=8;i++){
+					if(i == 4)
+						GL11.glVertex2f(x+5, y+i);
+					else
+						GL11.glVertex2f(x+4, y+i);
+				}
+				for(int i=2;i<=3;i++){
+					GL11.glVertex2f(x+i, y-1);
+					GL11.glVertex2f(x+i, y+9);
+				}
+				x+=8;
+			}else if(c == '+'){
+				for(int i=2;i<=6;i++){
+					GL11.glVertex2f(x+2, y+i);
+				}
+				for(int i=0;i<=4;i++){
+					GL11.glVertex2f(x+i, y+4);
+				}
+				x+=7;
+			}else if(c == '-'){
+				for(int i=2;i<=7;i++){
+					GL11.glVertex2f(x+i, y+4);
+				}
+				x+=9;
+			}else if(c == '='){
+				for(int i=2;i<=7;i++){
+					GL11.glVertex2f(x+i, y+6);
+					GL11.glVertex2f(x+i, y+2);
+				}
+				x+=9;
+			}else if(c == '_'){
+				for(int i=1;i<=6;i++){
+					GL11.glVertex2f(x+i, y);
+				}
+				x+=7;
+			}else if(c == '!'){
+				for(int i=3;i<=8;i++){
+					GL11.glVertex2f(x+2, y+i);
+				}
+				GL11.glVertex2f(x+2, y);
+				x+=5;
 			}
 		}
 		GL11.glEnd();
