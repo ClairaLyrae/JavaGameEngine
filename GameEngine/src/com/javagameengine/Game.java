@@ -182,7 +182,7 @@ public abstract class Game
 		try
 		{
 			Display.setDisplayMode(new DisplayMode(1600, 900));
-			Display.create(new PixelFormat().withDepthBits(24).withSRGB(true));
+			Display.create(new PixelFormat().withDepthBits(24).withSRGB(true)); // BLAH
 		} catch (LWJGLException e)
 		{
 			Sys.alert("Error", "Initialization failed!\n\n" + e.getMessage());
