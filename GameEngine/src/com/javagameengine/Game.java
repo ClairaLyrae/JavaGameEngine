@@ -6,7 +6,7 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 
-import java.nio.ByteBuffer; // This is a comment that doesn't mean anything
+import java.nio.ByteBuffer; 
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
@@ -106,7 +106,7 @@ public abstract class Game
 	private long keyPressTime = 0;
 	
 	/**
-	 * Links the LWJGL input device event system with the object-based event system of the engine. Analyzes the LWJGL
+ 	 * Links the LWJGL input device event system with the object-based event system of the engine. Analyzes the LWJGL
 	 * input event buffer and calls events on the game's main EventManager. 
 	 */
 	private void input()
@@ -151,10 +151,12 @@ public abstract class Game
 			}
 			if(Mouse.hasWheel() && dw != 0)
 			{
-				e = new MouseScrollEvent(dw/28);	// LWJGL returns one scroll 'click' as +/- 120, for some reason. This normalizes it...
+				if(dw > 0)
+					dw = 1;
+				else
+					dw = -1;
+				e = new MouseScrollEvent(dw);	// LWJGL returns one scroll 'click' as +/- 120, for some reason. This normalizes it...
 				EventManager.global.callEvent(e);
-				Console.println("dw = "+dw);
-				
 			}
 			if(button >= 0)
 			{
