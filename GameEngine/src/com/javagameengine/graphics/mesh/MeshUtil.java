@@ -31,6 +31,7 @@ import java.util.List;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
+import com.javagameengine.math.Vector2f;
 import com.javagameengine.math.Vector3f;
 
 /**
@@ -299,6 +300,13 @@ public class MeshUtil
         return new Vector3f(x, y, z);
     }
 
+    private static Vector2f parseTexCoords(String line) {
+        String[] xyz = line.split(" ");
+        float x = Float.valueOf(xyz[1]);
+        float y = Float.valueOf(xyz[2]);
+        return new Vector2f(x, y);
+    }
+
     private static Vector3f parseNormal(String line) {
         String[] xyz = line.split(" ");
         float x = Float.valueOf(xyz[1]);
@@ -327,6 +335,7 @@ public class MeshUtil
         Mesh m = new Mesh();
         List<Vector3f> verts = new ArrayList<Vector3f>();
         List<Vector3f> norms = new ArrayList<Vector3f>();
+        List<Vector2f> texcoords = new ArrayList<Vector2f>();
         List<Integer> indexes = new ArrayList<Integer>();
         List<Integer> tindexes = new ArrayList<Integer>();
         List<Integer> nindexes = new ArrayList<Integer>();
@@ -344,6 +353,11 @@ public class MeshUtil
             {
             	Vector3f r = parseNormal(line);
                 norms.add(r);
+            } 
+            else if (prefix.equals("vt")) 
+            {
+            	Vector2f r = parseTexCoords(line);
+                texcoords.add(r);
             } 
             else if (prefix.equals("f")) 
             {
@@ -381,18 +395,16 @@ public class MeshUtil
         
         FloatBuffer vertbuf = BufferUtils.createFloatBuffer(verts.size() * 3);
         FloatBuffer normbuf = BufferUtils.createFloatBuffer(norms.size() * 3);
+        FloatBuffer texcoordbuf = BufferUtils.createFloatBuffer(texcoords.size() * 2);
         IntBuffer ibuf = BufferUtils.createIntBuffer(indexes.size());
         IntBuffer tbuf = BufferUtils.createIntBuffer(tindexes.size());
         IntBuffer nbuf = BufferUtils.createIntBuffer(nindexes.size());
-        vertbuf.rewind();
-        normbuf.rewind();
-        ibuf.rewind();
-        tbuf.rewind();
-        nbuf.rewind();
         for(Vector3f v : verts)
         	vertbuf.put(v.x).put(v.y).put(v.z);
         for(Vector3f v : norms)
         	normbuf.put(v.x).put(v.y).put(v.z);
+        for(Vector2f v : texcoords)
+        	texcoordbuf.put(v.x).put(v.y);
         for(Integer i : indexes)
         	ibuf.put(i);
         for(Integer i : tindexes)
@@ -402,11 +414,14 @@ public class MeshUtil
 
         vertbuf.flip();
         normbuf.flip();
+        texcoordbuf.flip();
         ibuf.flip();
         tbuf.flip();
         nbuf.flip();
         m.setBuffer(VertexBuffer.Type.POSITION, vertbuf);
         m.setBuffer(VertexBuffer.Type.NORMAL, normbuf);
+        if(!texcoords.isEmpty())
+        	m.setBuffer(VertexBuffer.Type.TEXCOORDS, texcoordbuf);
         if(!indexes.isEmpty())
         	m.setBuffer(VertexBuffer.Type.POSITION_INDEX, ibuf);
         if(!tindexes.isEmpty())
@@ -414,7 +429,12 @@ public class MeshUtil
         if(!nindexes.isEmpty())
         	m.setBuffer(VertexBuffer.Type.NORMAL_INDEX, nbuf);
         
-        System.out.println("Vertices=" + vertbuf.limit() + " Normals=" + normbuf.limit() + " Indices=" + indexes.size() + " TIndices=" + tindexes.size() + " NIndices=" + nindexes.size());
+        System.out.println("Vertices=" + verts.size() + 
+        		" TexCoords=" + texcoords.size() + 
+        		" Normals=" + norms.size() + 
+        		" Indices=" + indexes.size() + 
+        		" TIndices=" + tindexes.size() + 
+        		" NIndices=" + nindexes.size());
         
         reader.close();
         return m;
