@@ -24,6 +24,7 @@ import com.javagameengine.graphics.RenderState;
 import com.javagameengine.graphics.Renderable;
 import com.javagameengine.graphics.mesh.Mesh;
 import com.javagameengine.graphics.mesh.MeshUtil;
+import com.javagameengine.graphics.mesh.Texture;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Transform;
 import com.javagameengine.scene.Bounded;
@@ -149,52 +150,30 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 		this.mesh = m;
 		meshHandle = MeshUtil.createDisplayList(m);
 	}
-
+	
+	public int texHandle = -1;
+	
+	public void setTexture(Texture t)
+	{
+		texHandle = t.bindTexture();
+	}
+	
 	public void drawGeo()
 	{
-		if(meshHandle < 0)
-			return;
-	    glCallList(meshHandle);
-//		glEnable(GL_NORMALIZE);
-//		glBegin(GL_QUADS); // Start Drawing 
-		
-//		glNormal3f(0f, 0f, 1f); 
-//		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ);
-//		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
-//		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-//		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
-//
-//		glNormal3f(0f, 0f, -1f);
-//		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ);  
-//		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
-//		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
-//		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
-//		
-//		glNormal3f(0f, 1f, 0f);
-//		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
-//		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
-//		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
-//		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ); 
-//
-//		glNormal3f(0f, -1f, 0f);
-//		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-//		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ); 
-//		glVertex3f(bounds.minX, bounds.minY, bounds.minZ); 
-//		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ); 
-//
-//		glNormal3f(1f, 0f, 0f);
-//		glVertex3f(bounds.maxX, bounds.maxY, bounds.maxZ);
-//		glVertex3f(bounds.maxX, bounds.minY, bounds.maxZ); 
-//		glVertex3f(bounds.maxX, bounds.minY, bounds.minZ);  
-//		glVertex3f(bounds.maxX, bounds.maxY, bounds.minZ); 
-//
-//		glNormal3f(-1f, 0f, 0f);
-//		glVertex3f(bounds.minX, bounds.maxY, bounds.minZ);
-//		glVertex3f(bounds.minX, bounds.minY, bounds.minZ);  
-//		glVertex3f(bounds.minX, bounds.minY, bounds.maxZ);
-//		glVertex3f(bounds.minX, bounds.maxY, bounds.maxZ); 
-//		glEnd();
-//		glDisable(GL_NORMALIZE);
+		if(texHandle >= 0)
+			glEnable(GL_TEXTURE_2D);
+    	switch(mesh.getMode()){
+		case LINE: glBegin(GL_LINES); break;
+		case POINT: glBegin(GL_POINTS); break;
+		case QUAD: glBegin(GL_QUADS); break;
+		case TRIANGLE: glBegin(GL_TRIANGLES); break;
+		default: break;
+    	}
+		if(texHandle >= 0)
+			glBindTexture(GL_TEXTURE_2D, texHandle); 
+		if(meshHandle >= 0)
+			glCallList(meshHandle);
+		glEnd();
 	}
 	
 	@Override

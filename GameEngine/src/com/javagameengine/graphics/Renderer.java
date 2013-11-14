@@ -43,12 +43,15 @@ import java.util.PriorityQueue;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.glu.GLU;
 
 import com.javagameengine.console.Console;
 import com.javagameengine.graphics.mesh.InvalidMeshException;
+import com.javagameengine.graphics.mesh.InvalidTextureException;
 import com.javagameengine.graphics.mesh.Mesh;
 import com.javagameengine.graphics.mesh.MeshUtil;
+import com.javagameengine.graphics.mesh.Texture;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
@@ -72,6 +75,8 @@ import com.javagameengine.math.Vector4f;
  */
 public class Renderer
 {
+	public static Renderer handle = new Renderer();
+	
 	private static List<RenderContext> views = new ArrayList<RenderContext>();
 	private static RenderTarget target;
 	private static List<RenderOperation> operations = new ArrayList<RenderOperation>();
@@ -131,7 +136,7 @@ public class Renderer
 	    // and now it's time to set the light position:
 		position.rewind();
 		GL11.glPointSize(2f);
-		GL11.glColor3f(1.0f, 0f, 0f);
+		GL11.glColor3f(1f, 0f, 0f);
 		glBegin(GL11.GL_POINTS); // Start Drawing 
 		glVertex3f(position.get(), position.get(), position.get()); 
 		GL11.glEnd();
@@ -145,8 +150,7 @@ public class Renderer
 	    GL11.glEnable(GL11.GL_CULL_FACE);	
 	    
 	    GL11.glEnable(GL11.GL_NORMALIZE);
-	  
-		
+	    
 		for(RenderOperation op : operations)
 		{
 			GL11.glPushMatrix();
@@ -200,5 +204,22 @@ public class Renderer
 	{
 		operations.add(ro);
 		return true;
+	}
+	
+	private static int texid = -1;
+	private Renderer()
+	{
+		File f = new File("texture.png");
+		Texture t = null;
+		try
+		{
+			t = Texture.loadTexture(f);
+		} catch (IOException | InvalidTextureException e)
+		{
+			System.out.println("Failed to bind texture");
+			e.printStackTrace();
+		}
+		texid = t.bindTexture();
+		System.out.println("Bound texture to id= " + texid);
 	}
 }
