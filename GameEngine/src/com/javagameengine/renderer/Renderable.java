@@ -1,4 +1,4 @@
-package com.javagameengine.graphics;
+package com.javagameengine.renderer;
 
 import com.javagameengine.math.Transform;
 import com.javagameengine.scene.Bounds;

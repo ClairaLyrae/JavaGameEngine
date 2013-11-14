@@ -1,4 +1,4 @@
-package com.javagameengine.graphics;
+package com.javagameengine.renderer;
 
 public enum RenderBucket
 {

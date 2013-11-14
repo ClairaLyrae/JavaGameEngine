@@ -1,4 +1,4 @@
-package com.javagameengine.graphics;
+package com.javagameengine.renderer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
@@ -46,12 +46,12 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.glu.GLU;
 
+import com.javagameengine.assets.mesh.InvalidMeshException;
+import com.javagameengine.assets.mesh.Mesh;
+import com.javagameengine.assets.mesh.MeshUtil;
+import com.javagameengine.assets.texture.InvalidTextureException;
+import com.javagameengine.assets.texture.Texture;
 import com.javagameengine.console.Console;
-import com.javagameengine.graphics.mesh.InvalidMeshException;
-import com.javagameengine.graphics.mesh.InvalidTextureException;
-import com.javagameengine.graphics.mesh.Mesh;
-import com.javagameengine.graphics.mesh.MeshUtil;
-import com.javagameengine.graphics.mesh.Texture;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;

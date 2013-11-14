@@ -1,4 +1,4 @@
-package com.javagameengine.graphics.mesh;
+package com.javagameengine.assets.texture;
 
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_RGBA;

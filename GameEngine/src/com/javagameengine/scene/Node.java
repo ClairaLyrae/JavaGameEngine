@@ -16,14 +16,14 @@ import java.util.List;
 
 import org.lwjgl.opengl.GL11;
 
-import com.javagameengine.graphics.RenderOperation;
-import com.javagameengine.graphics.Renderable;
-import com.javagameengine.graphics.Renderer;
 import com.javagameengine.math.Matrix;
 import com.javagameengine.math.Quaternion;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.math.Vector4f;
+import com.javagameengine.renderer.RenderOperation;
+import com.javagameengine.renderer.Renderable;
+import com.javagameengine.renderer.Renderer;
 
 /**
  * Node is the discrete element of the scene graph structure that comprises the heart of the game engine. It 

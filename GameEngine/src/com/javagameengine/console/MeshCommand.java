@@ -5,10 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.javagameengine.Game;
-import com.javagameengine.graphics.mesh.InvalidTextureException;
-import com.javagameengine.graphics.mesh.Mesh;
-import com.javagameengine.graphics.mesh.MeshUtil;
-import com.javagameengine.graphics.mesh.Texture;
+import com.javagameengine.assets.mesh.Mesh;
+import com.javagameengine.assets.mesh.MeshUtil;
+import com.javagameengine.assets.texture.InvalidTextureException;
+import com.javagameengine.assets.texture.Texture;
 import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;

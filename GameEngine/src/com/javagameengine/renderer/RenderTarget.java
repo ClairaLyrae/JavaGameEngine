@@ -1,4 +1,4 @@
-package com.javagameengine.graphics;
+package com.javagameengine.renderer;
 
 //TODO Need to plan out this class and the render system
 

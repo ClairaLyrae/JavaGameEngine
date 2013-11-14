@@ -1,4 +1,4 @@
-package com.javagameengine.graphics;
+package com.javagameengine.renderer;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;

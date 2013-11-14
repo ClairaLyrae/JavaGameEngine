@@ -1,6 +1,6 @@
-package com.javagameengine.graphics;
+package com.javagameengine.renderer;
 
-import com.javagameengine.graphics.mesh.Texture;
+import com.javagameengine.assets.texture.Texture;
 
 //TODO Need to plan out this class and the render system
 

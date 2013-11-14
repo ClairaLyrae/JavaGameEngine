@@ -1,4 +1,4 @@
-package com.javagameengine.graphics.mesh;
+package com.javagameengine.assets.mesh;
 
 /**
  * Describes a native object. An encapsulation of a certain object 

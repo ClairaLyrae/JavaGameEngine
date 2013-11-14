@@ -28,7 +28,7 @@ import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.events.MouseEvent;
 import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
-import com.javagameengine.graphics.Renderer;
+import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.Scene;
 
 /**

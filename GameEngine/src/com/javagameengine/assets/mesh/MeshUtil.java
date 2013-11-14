@@ -1,4 +1,4 @@
-package com.javagameengine.graphics.mesh;
+package com.javagameengine.assets.mesh;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
