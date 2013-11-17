@@ -1,4 +1,4 @@
-package com.javagameengine.graphics.mesh;
+package com.javagameengine.assets.texture;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;

@@ -14,10 +14,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
-import com.javagameengine.graphics.RenderTarget;
-import com.javagameengine.graphics.Renderable;
-import com.javagameengine.graphics.Renderer;
 import com.javagameengine.math.Transform;
+import com.javagameengine.renderer.RenderTarget;
+import com.javagameengine.renderer.Renderable;
+import com.javagameengine.renderer.Renderer;
 
 /**
  * A Scene object describes a particular state of the game world, and manages a scene graph comprised of Node objects.

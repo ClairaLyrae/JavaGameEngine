@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.javagameengine.Game;
-import com.javagameengine.graphics.mesh.Mesh;
-import com.javagameengine.graphics.mesh.MeshUtil;
+import com.javagameengine.assets.mesh.Mesh;
+import com.javagameengine.assets.mesh.MeshUtil;
+import com.javagameengine.assets.texture.InvalidTextureException;
+import com.javagameengine.assets.texture.Texture;
 import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
@@ -24,6 +26,7 @@ public class MeshCommand extends Command
 	{
 		int index = 0;
 		Mesh m;
+		Texture t = null;
 		try
 		{
 			index = Integer.parseInt(args[1]);
@@ -33,18 +36,16 @@ public class MeshCommand extends Command
 		}
 		try
 		{
-			File f = new File(".");
-			for(File n : f.listFiles())
-				System.out.println(n.getName());
 			m = MeshUtil.loadModel(new File(args[0]));
-		} catch (FileNotFoundException e)
+			if(args.length > 2)
+			{
+				t = Texture.loadTexture(new File(args[2]));
+			}
+		} catch (IOException | InvalidTextureException e)
 		{
 			System.out.println(args[0]);
-			return "Mesh file '" + args[0] + "' not found.";
-		} catch (IOException e)
-		{
-			return "Error reading from file.";
-		} 
+			return "Error loading.";
+		}
 		if(m == null)
 			return "Mesh file not found.";
 		Game g = Game.getHandle();
@@ -55,7 +56,11 @@ public class MeshCommand extends Command
 			{
 				Node n = new Node("Mesh " + index);
 				s.getRoot().addChild(n);
+				
 				TestComponent b = new TestComponent(m, index);
+				if(t != null)
+					b.setTexture(t);
+				
 				n.addComponent(b);
 				return "Mesh created";
 			}

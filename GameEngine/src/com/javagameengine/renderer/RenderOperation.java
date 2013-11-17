@@ -1,4 +1,4 @@
-package com.javagameengine.graphics;
+package com.javagameengine.renderer;
 
 import java.lang.reflect.Method;
 import java.nio.FloatBuffer;

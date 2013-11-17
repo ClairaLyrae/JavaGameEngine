@@ -1,4 +1,4 @@
-package com.javagameengine.graphics.mesh;
+package com.javagameengine.assets.mesh;
 
 import java.io.IOException;
 import java.nio.Buffer;

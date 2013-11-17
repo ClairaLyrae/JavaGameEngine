@@ -1,4 +1,4 @@
-package com.javagameengine.graphics.mesh;
+package com.javagameengine.assets.mesh;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -246,30 +246,33 @@ public class MeshUtil
         int displayList = glGenLists(1);
         glNewList(displayList, GL_COMPILE);
         {
-        	switch(m.getMode()){
-    		case LINE: glBegin(GL_LINES); break;
-    		case POINT: glBegin(GL_POINTS); break;
-    		case QUAD: glBegin(GL_QUADS); break;
-    		case TRIANGLE: glBegin(GL_TRIANGLES); break;
-    		default: break;
-        	}
-        	
         	FloatBuffer vb = m.getFloatBuffer(VertexBuffer.Type.POSITION);
         	FloatBuffer nb = m.getFloatBuffer(VertexBuffer.Type.NORMAL);
+        	FloatBuffer tb = m.getFloatBuffer(VertexBuffer.Type.TEXCOORDS);
         	IntBuffer ib = m.getIndexBuffer(VertexBuffer.Type.POSITION_INDEX);
+        	IntBuffer tib = m.getIndexBuffer(VertexBuffer.Type.TEXCOORDS_INDEX);
         	IntBuffer nib = m.getIndexBuffer(VertexBuffer.Type.NORMAL_INDEX);
-        	
+        	boolean hastc = true;
+        	if(tib == null || ib == null)
+        		hastc = false;
         	vb.rewind();
         	nb.rewind();
         	ib.rewind();
         	nib.rewind();
+        	if(hastc)
+        	{
+            	tb.rewind();
+            	tib.rewind();
+        		
+        	}
 
         	for(int i = 0; i < ib.limit(); i++)
         	{
         		int index = ib.get(i)*3;
         		int in = nib.get(i)*3;
+        		int intc = tib.get(i)*2;
         		float x, y, z = 0f;
-        		float nx, ny, nz = 0f;
+        		float nx, ny, nz, tx, ty = 0f;
 
         		x = vb.get(index); 
         		y = vb.get(index+1); 
@@ -279,9 +282,14 @@ public class MeshUtil
         		nz = nb.get(in+2);
         		
         		glNormal3f(nx, ny, nz);
+        		if(hastc)
+        		{
+            		tx = tb.get(intc);
+            		ty = tb.get(intc+1);
+            		glTexCoord2f(tx, ty);
+        		}
         		glVertex3f(x, y, z);
         	}
-    		glEnd();
         }
         glEndList();
         return displayList;
