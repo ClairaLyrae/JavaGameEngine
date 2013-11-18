@@ -7,6 +7,8 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL20.glUseProgram;
 
 import java.nio.FloatBuffer;
 
@@ -14,9 +16,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.assets.mesh.MeshUtil;
-import com.javagameengine.assets.texture.Texture;
+import com.javagameengine.assets.mesh.VertexBuffer;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.KeyEvent;
@@ -27,6 +30,7 @@ import com.javagameengine.math.Transform;
 import com.javagameengine.renderer.RenderOperation;
 import com.javagameengine.renderer.RenderState;
 import com.javagameengine.renderer.Renderable;
+import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.Bounded;
 import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Component;
@@ -116,19 +120,9 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 	@EventMethod
 	public void onMouseScroll(MouseScrollEvent e)
 	{
-		if(!selected || node == null)
+		if(!selected || node == null || e.isCancelled())
 			return;
 		float s = (float)(e.getAmount());
-		if(Keyboard.isKeyDown(Keyboard.KEY_S))
-		{
-			float scaling = 1f;
-			if(s >= 0)
-				scaling = (2f*s);
-			else
-				scaling = (-0.5f*s);
-			Console.println("TestComponent " + index + " was scaled by " + scaling + " units");
-			node.getTransform().scale(scaling);
-		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_X))
 		{
 			node.getTransform().translate(s*0.1f, 0f, 0f);
@@ -148,51 +142,37 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 	public void setMesh(Mesh m)
 	{
 		this.mesh = m;
-		meshHandle = MeshUtil.createDisplayList(m);
+		m.create();
 	}
 	
-	public int texHandle = -1;
+	public Texture tex = null;
 	
-	public void setTexture(Texture t)
+	public void setTexture(Texture tex)
 	{
-		texHandle = t.bindTexture();
-	}
-	
-	public void drawGeo()
-	{
-		if(texHandle >= 0)
-			glEnable(GL_TEXTURE_2D);
-    	switch(mesh.getMode()){
-		case LINE: glBegin(GL_LINES); break;
-		case POINT: glBegin(GL_POINTS); break;
-		case QUAD: glBegin(GL_QUADS); break;
-		case TRIANGLE: glBegin(GL_TRIANGLES); break;
-		default: break;
-    	}
-		if(texHandle >= 0)
-			glBindTexture(GL_TEXTURE_2D, texHandle); 
-		if(meshHandle >= 0)
-			glCallList(meshHandle);
-		glEnd();
+		this.tex = tex;
 	}
 	
 	@Override
 	public void draw()
 	{
-		
+
 		if(solid)
 		{ 
-		    
 			glPushAttrib( GL_ALL_ATTRIB_BITS );
 			glEnable( GL_POLYGON_OFFSET_FILL );
 			glPolygonOffset( -2.5f, -2.5f );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			glLineWidth( 3.0f );
+			glLineWidth( 2.0f );
 			if(selected)
+			{
 				glColor3f(0f, 1f, 0f); 
+			}
 			else
-				glColor3f(0.0f, 0.5f, 0.0f);
-			drawGeo();
+			{
+				glColor3f(0.0f, 0.0f, 0.0f);
+			}
+			glDisable(GL_TEXTURE_2D);
+			mesh.draw();
 
 		    // we enable lighting right before rendering
 		    GL11.glEnable(GL11.GL_LIGHTING);
@@ -203,12 +183,16 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 		    else
 		    	glShadeModel(GL_FLAT);
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			glColor3f( 0.2f, 0.2f, 0.2f );
-			drawGeo();
-			glPopAttrib();
-
+			if(tex != null && tex.getId() >= 0)
+			{
+				glBindTexture(GL_TEXTURE_2D, tex.getId());
+				glEnable(GL_TEXTURE_2D); 
+			}
+			mesh.draw();
 	        GL11.glDisable(GL11.GL_LIGHT0);
 	        GL11.glDisable(GL11.GL_LIGHTING);
+			glPopAttrib();
+
 		}
 		else
 		{
@@ -217,8 +201,8 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 			if(selected)
 				glColor3f(0f, 1f, 0f); 
 			else
-				glColor3f(0.0f, 0.5f, 0.0f); 
-			drawGeo();
+				glColor3f(1f, 1f, 1f); 
+			mesh.draw();
 			glPopAttrib();
 		}
 	}
@@ -240,18 +224,6 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 	{
 		if(getScene() != null)
 			getScene().getEventManager().registerListener(this);
-	}
-
-	@Override
-	public RenderState getRenderState()
-	{
-		return new RenderState();
-	}
-
-	@Override
-	public Bounds getRenderBounds()
-	{
-		return mesh.getBounds();
 	}
 
 	public void onUpdate(int delta)

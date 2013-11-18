@@ -6,6 +6,9 @@ import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -27,6 +30,7 @@ import com.javagameengine.events.EventManager;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.KeyEvent;
 import com.javagameengine.events.Listener;
+import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
 import com.javagameengine.util.CyclicArrayBuffer;
 import com.javagameengine.util.SimpleText;
@@ -44,10 +48,10 @@ import com.javagameengine.util.SimpleText;
  */
 public class Console implements Listener
 {
+	public static final Console handle = new Console();
+	
 	public static final String ARG_DELIMITER = " ";
 	public static final String CMD_TOKEN = "/";
-	
-	public static final Console handle = new Console();
 	
 	private static Map<String, Command> commands;
 	private static StringBuilder input = new StringBuilder();
@@ -100,6 +104,16 @@ public class Console implements Listener
 				return null;
 			}
 		});
+		registerCommand(new DisplayCommand());
+		registerCommand(new AssetCommand());
+	}
+
+	@EventMethod
+	public void onMouseMove(MouseMoveEvent e)
+	{
+		if(!isVisible)
+			return;
+		e.cancel();
 	}
 	
 	@EventMethod
@@ -107,6 +121,7 @@ public class Console implements Listener
 	{
 		if(!isVisible)
 			return;
+		e.cancel();
 		if(e.getAmount() > 0)
 			strbuffer.readForwards();
 		else
@@ -168,7 +183,7 @@ public class Console implements Listener
 	 * Try to parse the given string into a registered Command, and execute it. 
 	 * @param s String to parse.
 	 */
-	private static void execute(String s)
+	public static void execute(String s)
 	{	
 		String[] split = s.split(" ");
 		if(split[0].startsWith(CMD_TOKEN))
@@ -343,6 +358,20 @@ public class Console implements Listener
 		    glEnd();
 		    glColor4f(1f, 1f, 1f, 1f);
 		    SimpleText.drawString("> " + input.toString() + "_" , 5, yInputText);
+		}
+	}
+	
+	public static void executeFromFile(File f)
+	{
+		try
+		{
+			BufferedReader reader = new BufferedReader(new FileReader(f));
+			String line = null;
+			while((line = reader.readLine()) != null)
+				Console.execute(line);
+		} catch (IOException e)
+		{
+			Console.println("Could not parse commands from " + f.getName());
 		}
 	}
 }

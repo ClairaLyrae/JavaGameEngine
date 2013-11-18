@@ -3,9 +3,13 @@ package com.javagameengine.assets.mesh;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
 
 import org.lwjgl.BufferUtils;
 
@@ -32,6 +36,7 @@ public class VertexBuffer extends NativeObject
         POSITION(3),	// 3 floats
         SIZE(1),	// 1 float (points)
         NORMAL(3),	// normal vector (normalized) 3 floats
+        TANGENT(3),	// tangent vector (normalized) 3 floats
         COLOR(4),	// 4 floats (r, g, b, a)
         POSITION_INDEX(1), 	// index buffer, must be integer!
         TEXCOORDS_INDEX(1), 	// index buffer, must be integer!
@@ -54,10 +59,21 @@ public class VertexBuffer extends NativeObject
     // Hints to GPU what the mesh is used for (guides GPU to place it in the optimal spot)
     public static enum Usage 
     {
-        STATIC,	// Mesh data is rarely changed
-        DYNAMIC,	// Mesh data is updated occasionally
-        STREAM,		// Updated every frame
-        CPU;	// CPU only, dont send to GPU
+        STATIC(GL_STATIC_DRAW),	// Mesh data is rarely changed
+        DYNAMIC(GL_DYNAMIC_DRAW),	// Mesh data is updated occasionally
+        STREAM(GL_STREAM_DRAW);		// Updated every frame
+        
+		private int gl;
+		
+		private Usage(int gl)
+		{
+			this.gl = gl;
+		}
+		
+		public int getGLParam()
+		{
+			return gl;
+		}
     }
 
     // Format of the data that is stored in the buffer.
@@ -91,9 +107,6 @@ public class VertexBuffer extends NativeObject
     protected int stride = 0;	// Number of bytes to skip between format data
     protected int components = 0;	// Number of format data
 
-    /**
-     * derived from components * format.getComponentSize()
-     */
     protected transient int componentsLength = 0;	// 
     protected Buffer data = null;	// NIO buffer holding the data
     protected Usage usage;	// Usage of the data
@@ -139,6 +152,11 @@ public class VertexBuffer extends NativeObject
         return stride;
     }
 
+    public Type getType()
+    {
+    	return bufType;
+    }
+    
     /**
      * Set the stride (in bytes) for the data. 
      * <p>
@@ -215,15 +233,6 @@ public class VertexBuffer extends NativeObject
     public Format getFormat()
     {
         return format;
-    }
-
-    /**
-     * @return The number of components of the given {@link Format format} per
-     * element.
-     */
-    public int getNumComponents()
-    {
-        return components;
     }
 
     /**
@@ -584,15 +593,28 @@ public class VertexBuffer extends NativeObject
     }
 
     @Override
-    public void resetObject() 
+    public void destroy() 
     {
-        this.id = -1;
-        setUpdateNeeded();
+    	if(id != -1)
+    		glDeleteBuffers(id);
     }
 
-    @Override
-    public void deleteObject(Object rendererObject) 
-    {
-    	// TODO delete this from the GPU
-    }
+	@Override
+	public void create()
+	{
+    	if(id != -1)
+    		throw new IllegalStateException("Buffer is already bound to GPU");
+		id = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, id);
+		if(data instanceof FloatBuffer)
+			glBufferData(GL_ARRAY_BUFFER, (FloatBuffer)data, usage.getGLParam());
+		if(data instanceof ShortBuffer)
+			glBufferData(GL_ARRAY_BUFFER, (ShortBuffer)data, usage.getGLParam());
+		if(data instanceof IntBuffer)
+			glBufferData(GL_ARRAY_BUFFER, (IntBuffer)data, usage.getGLParam());
+		if(data instanceof DoubleBuffer)
+			glBufferData(GL_ARRAY_BUFFER, (DoubleBuffer)data, usage.getGLParam());
+		if(data instanceof ByteBuffer)
+			glBufferData(GL_ARRAY_BUFFER, (ByteBuffer)data, usage.getGLParam());
+	}
 }

@@ -180,14 +180,24 @@ public abstract class Game
 		handle = this;
 		
 		// Initialize Display
+		PixelFormat pixelf;
 		try
 		{
-			Display.setDisplayMode(new DisplayMode(1600, 900));
-			Display.create(new PixelFormat().withDepthBits(24).withSRGB(true)); // BLAH
-		} catch (LWJGLException e)
+			pixelf = new PixelFormat().withSamples(4).withDepthBits(24).withSRGB(true);
+			Display.setDisplayMode(new DisplayMode(1280, 768));
+			Display.create(pixelf); // BLAH
+		} 
+		catch (LWJGLException e)
 		{
-			Sys.alert("Error", "Initialization failed!\n\n" + e.getMessage());
-			System.exit(0);
+			pixelf = new PixelFormat().withDepthBits(24).withSRGB(true);
+			try
+			{
+				Display.create(pixelf);
+			} catch (LWJGLException e1)
+			{
+				Sys.alert("Error", "Initialization failed!\n\n" + e1.getMessage());
+				System.exit(0);
+			}
 		}
 
 		EventManager.global.registerListener(Console.handle);
