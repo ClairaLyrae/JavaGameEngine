@@ -1,10 +1,6 @@
 package com.javagameengine;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 import java.nio.ByteBuffer; 
 import java.nio.ByteOrder;
@@ -28,6 +24,7 @@ import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.events.MouseEvent;
 import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
+import com.javagameengine.gui.Window;
 import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.Scene;
 
@@ -195,6 +192,8 @@ public abstract class Game
 
 		EventManager.global.registerListener(Console.handle);
 		onCreate();
+		
+		Window startWindow = new Window();
 		
 		while (!closeRequested)	// Main game loop
 		{

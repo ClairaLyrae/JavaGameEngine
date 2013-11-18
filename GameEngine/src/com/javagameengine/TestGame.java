@@ -15,6 +15,7 @@ import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.CoordinateGrid;
 import com.javagameengine.scene.component.TestComponent;
 import com.javagameengine.scene.component.TestSceneDebugger;
+import com.javagameengine.gui.*;
 
 public class TestGame extends Game
 {
@@ -56,6 +57,7 @@ public class TestGame extends Game
 	public static void main(String[] args)
 	{
 		TestGame game = new TestGame();
+
 		try
 		{
 			game.run(args);
