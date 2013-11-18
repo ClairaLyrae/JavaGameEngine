@@ -75,6 +75,19 @@ public class Transform
 		return scale;
 	}
 
+	public Transform inverse()
+	{
+		return inverseInto(this);
+	}
+	
+	public Transform inverseInto(Transform t)
+	{
+		
+		
+		
+		return t;
+	}
+	
 	public Matrix4f getScaleMatrix()
 	{
 		Matrix4f r = new Matrix4f();

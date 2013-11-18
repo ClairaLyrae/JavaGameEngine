@@ -10,8 +10,4 @@ import com.javagameengine.scene.Bounds;
 public interface Renderable
 {
 	public void draw();
-	
-	public RenderState getRenderState();
-	
-	public Bounds getRenderBounds();
 }

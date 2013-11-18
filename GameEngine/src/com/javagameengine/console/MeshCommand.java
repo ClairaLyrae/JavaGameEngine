@@ -5,10 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.javagameengine.Game;
+import com.javagameengine.assets.AssetManager;
+import com.javagameengine.assets.material.InvalidTextureException;
+import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.assets.mesh.MeshUtil;
-import com.javagameengine.assets.texture.InvalidTextureException;
-import com.javagameengine.assets.texture.Texture;
 import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
@@ -25,8 +26,10 @@ public class MeshCommand extends Command
 	public String execute(String[] args)
 	{
 		int index = 0;
-		Mesh m;
+		Mesh m = AssetManager.getMesh(args[0]);
 		Texture t = null;
+		if(args.length > 2)
+			t = AssetManager.getTexture(args[2]);
 		try
 		{
 			index = Integer.parseInt(args[1]);
@@ -34,18 +37,18 @@ public class MeshCommand extends Command
 		{
 			return "Invalid index specified.";
 		}
-		try
-		{
-			m = MeshUtil.loadModel(new File(args[0]));
-			if(args.length > 2)
-			{
-				t = Texture.loadTexture(new File(args[2]));
-			}
-		} catch (IOException | InvalidTextureException e)
-		{
-			System.out.println(args[0]);
-			return "Error loading.";
-		}
+//		try
+//		{
+//			m = MeshUtil.loadModel(new File(args[0]));
+//			if(args.length > 2)
+//			{
+//				t = Texture.loadFromFile(new File(args[2]));
+//			}
+//		} catch (IOException | InvalidTextureException e)
+//		{
+//			System.out.println(args[0]);
+//			return "Error loading.";
+//		}
 		if(m == null)
 			return "Mesh file not found.";
 		Game g = Game.getHandle();

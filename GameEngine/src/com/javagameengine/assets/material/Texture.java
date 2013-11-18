@@ -1,4 +1,4 @@
-package com.javagameengine.assets.texture;
+package com.javagameengine.assets.material;
 
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
@@ -32,12 +32,15 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
 
+import com.javagameengine.assets.mesh.NativeObject;
+
 /**
  * @author ClairaLyrae
  * A Texture object represents a 2D image.
  */
-public class Texture
-{
+public class Texture extends NativeObject
+{	
+	
 	public enum Mode {
 		RGB(3),
 		RGBA(4);
@@ -113,7 +116,6 @@ public class Texture
 		}
     }
     
-	private int id = -1;
 	private Mode mode;
 	private WrapMode wrap = WrapMode.CLAMP_TO_EDGE;
 	private MinFilter minfilter = MinFilter.LINEAR;
@@ -124,6 +126,7 @@ public class Texture
 	
 	public Texture(int width, int height, Mode mode)
 	{
+		super(Texture.class);
 		this.mode = mode;
 		this.width = width;
 		this.height = height;
@@ -132,6 +135,7 @@ public class Texture
 	
 	private Texture(int width, int height, Mode mode, ByteBuffer data)
 	{
+		super(Texture.class);
 		this.mode = mode;
 		this.width = width;
 		this.height = height;
@@ -162,41 +166,27 @@ public class Texture
 	{
 		return id;
 	}
-	
-	public int bindTexture()
-	{
-		if(id >= 0)
-			throw new UnsupportedOperationException("Texture is already bound to the GPU");
-		id = glGenTextures(); //Generate texture ID
-
-	    glBindTexture(GL_TEXTURE_2D, id); //Bind texture ID
-
-	    //Setup wrap mode
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap.getGLParam());
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap.getGLParam());
-
-	    //Setup texture scaling filtering
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minfilter.getGLParam());
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magfilter.getGLParam());
-        
-	    GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
-
-	    //Send texel data to OpenGL
-	    glTexImage2D(GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	    //Return the texture ID so we can bind it later again
-	    return id;
-	}
 
     private static final int BYTES_PER_PIXEL = 4;//3 for RGB, 4 for RGBA
 
-    public static Texture loadTexture(File f) throws FileNotFoundException, IOException, InvalidTextureException
+    private static BufferedImage verticalflip(BufferedImage img) 
+    {
+        int w = img.getWidth();
+        int h = img.getHeight();
+        BufferedImage dimg = new BufferedImage(w, h, img.getColorModel().getTransparency());
+        Graphics2D g = dimg.createGraphics();
+        g.drawImage(img, 0, 0, w, h, 0, h, w, 0, null);
+        g.dispose();
+        return dimg;
+    }
+    
+    public static Texture loadFromFile(File f) throws FileNotFoundException, IOException, InvalidTextureException
     {
     	 BufferedImage image = null;
          image = ImageIO.read(f);
-         
+         image = verticalflip(image);
          if(image.getWidth() > GL11.GL_MAX_TEXTURE_SIZE || image.getHeight() > GL11.GL_MAX_TEXTURE_SIZE)
-        	 throw new InvalidTextureException();
+        	 throw new InvalidTextureException("Texture " + f.getName() + " exceeds the maximum texture size");
          int[] pixels = new int[image.getWidth() * image.getHeight()];
          image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
          
@@ -245,5 +235,31 @@ public class Texture
 	public void setWrapMode(WrapMode wrap)
 	{
 		this.wrap = wrap;
+	}
+
+	@Override
+	public void destroy()
+	{
+		if(id != -1)
+			GL11.glDeleteTextures(id);
+	}
+
+	@Override
+	public void create()
+	{
+		if(id != -1)
+			throw new UnsupportedOperationException("Texture is already loaded to the GPU");
+		id = glGenTextures(); //Generate texture ID
+	    glBindTexture(GL_TEXTURE_2D, id); //Bind texture ID
+
+	    //Setup wrap mode
+	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap.getGLParam());
+	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap.getGLParam());
+
+	    //Setup texture scaling filtering
+	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minfilter.getGLParam());
+	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magfilter.getGLParam());
+	    
+	    glTexImage2D(GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data);
 	}
 }

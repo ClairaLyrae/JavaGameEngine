@@ -10,18 +10,25 @@ import static org.lwjgl.opengl.GL11.glPolygonMode;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import com.javagameengine.console.Console;
+import com.javagameengine.events.EventMethod;
+import com.javagameengine.events.KeyEvent;
+import com.javagameengine.events.Listener;
 import com.javagameengine.renderer.RenderState;
 import com.javagameengine.renderer.Renderable;
 import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Component;
+import com.javagameengine.scene.Scene;
 
-public class CoordinateGrid extends Component implements Renderable
+public class CoordinateGrid extends Component implements Renderable, Listener
 {
 
 	private float tick;
 	private float size;
+	private boolean visible = true;
 	
 	public CoordinateGrid(float tick, float size)
 	{
@@ -29,9 +36,20 @@ public class CoordinateGrid extends Component implements Renderable
 		this.size = size;
 	}
 	
+	@EventMethod
+	public void onKey(KeyEvent e)
+	{
+		if(e.isCancelled() || !e.state() || e.getKey() != Keyboard.KEY_G)
+			return;
+		visible = !visible;
+		Console.println("Coordinate grid visibility is set to: " + visible);
+	}
+	
 	@Override
 	public void draw()
 	{
+		if(!visible)
+			return;
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glColor3f(0.3f, 0.3f, 0.3f); 
 		glBegin(GL11.GL_LINES); // Start Drawing 
@@ -85,27 +103,19 @@ public class CoordinateGrid extends Component implements Renderable
 	}
 
 	@Override
-	public RenderState getRenderState()
-	{
-		return null;
-	}
-
-	@Override
-	public Bounds getRenderBounds()
-	{
-		return null;
-	}
-
-	@Override
 	public void onDestroy()
 	{
-		
+		Scene s = getScene();
+		if(s != null)
+			s.getEventManager().unregisterListener(this);
 	}
 
 	@Override
 	public void onCreate()
 	{
-		
+		Scene s = getScene();
+		if(s != null)
+			s.getEventManager().registerListener(this);
 	}
 
 	public void onUpdate(int delta)
