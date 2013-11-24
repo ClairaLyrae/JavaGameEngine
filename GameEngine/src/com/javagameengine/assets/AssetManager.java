@@ -27,6 +27,7 @@ public class AssetManager
 	public static final String[] meshExtensions = {"obj"};
 	public static final String[] shaderExtensions = {"vert", "frag", "geom", "geo", "vs", "fs", "gs", "glsl"};
 	public static final String[] textureExtensions = {"bmp", "jpg", "jpeg", "gif"};
+	public static final String[] materialExtensions = {"mtl"};
 	
 	public static final String dir = "assets";
 	public static final String meshDir = "assets/meshes";
@@ -86,24 +87,32 @@ public class AssetManager
 		{
 			Mesh m = Mesh.loadFromFile(f);
 			meshes.put(fname, m);
-			Console.println("Mesh '" + fname + "' loaded.");
+			m.create();
+			System.out.println("Mesh '" + fname + "' loaded: " + m.toString());
 		}
 		else if(isFileType(ext, textureExtensions))
 		{
 			Texture t = Texture.loadFromFile(f);
 			t.create();
 			textures.put(fname, t);
-			Console.println("Texture '" + fname + "' loaded.");
+			System.out.println("Texture '" + fname + "' loaded: " + t.toString());
 		}
 		else if(isFileType(ext, shaderExtensions))
 		{
 			Shader s = Shader.loadFromFile(f);
 			s.create();
 			shaders.put(fname, s);
-			Console.println("Shader '" + fname + "' loaded.");
+			System.out.println("Shader '" + fname + "' loaded: " + s.toString());
+		}
+		else if(isFileType(ext, materialExtensions))
+		{
+			Material m = Material.loadFromFile(f);
+			m.create();
+			materials.put(fname, m);
+			System.out.println("Material '" + fname + "' loaded: " + m.toString());
 		}
 		else
-			Console.println("Unknown filetype");
+			System.out.println("Unknown filetype");
 			// Generic file
 	}
 	
@@ -134,7 +143,7 @@ public class AssetManager
 			} catch (Exception e)
 			{
 				e.printStackTrace();
-				Console.println("Error loading asset '" + f.getName() + "'. " + e.getClass());
+				System.out.println("Error loading asset '" + f.getName() + "'. " + e.getClass());
 			} 
 		}
 	}
@@ -151,5 +160,10 @@ public class AssetManager
 	public static Shader getShader(String s)
 	{
 		return shaders.get(s);
+	}
+
+	public static Material getMaterial(String string)
+	{
+		return materials.get(string);
 	}
 }

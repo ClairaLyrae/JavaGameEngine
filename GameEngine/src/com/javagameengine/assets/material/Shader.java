@@ -65,15 +65,15 @@ public class Shader extends NativeObject
     
     public static Shader loadFromFile(File f) throws IOException, InvalidShaderException
     {
-    	Type type = null;
+    	 Type type = null;
     	 String[] fsplit = f.getName().split("\\.");
-    	 if(fsplit.length >= 2)
-    	 {
-    		 if(fsplit[fsplit.length-1].equalsIgnoreCase("vert"))
-    			 type = Type.VERTEX;
-    		 if(fsplit[fsplit.length-1].equalsIgnoreCase("frag"))
-    			 type = Type.FRAGMENT;
-    	 }
+
+		 if(f.getName().contains("vert"))
+			 type = Type.VERTEX;
+		 else if(f.getName().contains("frag"))
+			 type = Type.FRAGMENT;
+		 else if(f.getName().contains("geom"))
+			 type = Type.GEOMETRY;
     	 if(type == null)
     		 throw new InvalidShaderException("Shader is of unknown type");
     	 
@@ -106,7 +106,7 @@ public class Shader extends NativeObject
 	}
 
 	@Override
-	public void create()
+	public boolean create()
 	{
 		if(id != -1)
 			destroy();
@@ -114,6 +114,16 @@ public class Shader extends NativeObject
         glShaderSource(id, source);
         glCompileShader(id);
         if(GL20.glGetShader(id, GL_COMPILE_STATUS) == GL_FALSE) 
+        {
+            System.out.println(glGetShaderInfoLog(id, 1024));
             id = -1;
+            return false;
+        }
+        return true;
+	}
+	
+	public String toString()
+	{
+		return "type=" + type.toString();
 	}
 }

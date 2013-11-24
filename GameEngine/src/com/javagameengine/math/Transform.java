@@ -83,7 +83,7 @@ public class Transform
 	public Transform inverseInto(Transform t)
 	{
 		
-		
+		// TODO
 		
 		return t;
 	}
@@ -106,21 +106,18 @@ public class Transform
 		return r;
 	}
 
-	public Matrix4f getTranslationScaleMatrix()
+
+	public Matrix4f getRotationMatrix()
 	{
-		Matrix4f r = new Matrix4f();
-		r.f00 = scale.x;
-		r.f11 = scale.y;
-		r.f22 = scale.z;
-		r.f03 = position.x;
-		r.f13 = position.y;
-		r.f23 = position.z;
-		return r;
+		return rotation.toRotationMatrix();
 	}
 
 	public Matrix4f getTransformMatrix()
 	{
-		return getTranslationScaleMatrix().multiply(rotation.toRotationMatrix());
+		Matrix4f rm = getRotationMatrix();
+		Matrix4f sm = getScaleMatrix();
+		Matrix4f tm = getTranslationMatrix();
+		return (sm.multiply(rm)).multiply(tm).set(3, 3, 1f);
 	}
 
 	public void lerp(Transform t, float f)
@@ -234,8 +231,8 @@ public class Transform
 	
 	public FloatBuffer toFloatBuffer()
 	{
-		// TODO 
-		return null;
+		Matrix4f mat = this.getTransformMatrix();
+		return mat.toBuffer();
 	}
 	
 	public String toString()

@@ -3,6 +3,10 @@ package com.javagameengine.assets.mesh;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL14.*;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_POINTS;
@@ -35,9 +39,13 @@ import java.util.List;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 
+import com.javagameengine.assets.material.InvalidAssetException;
+import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Vector2f;
 import com.javagameengine.math.Vector3f;
+import com.javagameengine.math.Vector4f;
 import com.javagameengine.scene.Bounds;
 
 // TODO What is already here is not really anything. Before making this class, we have to figure out
@@ -187,19 +195,7 @@ public class Mesh extends NativeObject
     {
         return elementCount;
     }
-
-    /**
-     * @return Number of vertices on the mesh
-     */
-    public int getVertexCount()
-    {
-        return vertexCount;
-    }
     
-    
-    
-    
-
 
     /**
      * Sets the buffer on this mesh to the buffer given. 
@@ -303,18 +299,6 @@ public class Mesh extends NativeObject
         return (FloatBuffer) vb.getData();
     }
     
-    public IntBuffer getIndexBuffer(VertexBuffer.Type t) 
-    {
-    	if(t != VertexBuffer.Type.NORMAL_INDEX && t != VertexBuffer.Type.POSITION_INDEX && t != VertexBuffer.Type.TEXCOORDS_INDEX)
-            throw new UnsupportedOperationException("Given buffer type is not an integer buffer.");
-        VertexBuffer vb = getBuffer(t);
-        if (vb == null)
-            return null;
-        
-        Buffer buf = vb.getData();
-        return (IntBuffer)buf;
-    }
-    
     public static int parseIntSafe(String s)
     {
     	s = s.replaceAll("[^\\d]", "");
@@ -388,34 +372,14 @@ public class Mesh extends NativeObject
         
         FloatBuffer vertbuf = BufferUtils.createFloatBuffer(indexes.size() * 3);
         FloatBuffer normbuf = BufferUtils.createFloatBuffer(nindexes.size() * 3);
-        FloatBuffer tangentbuf = BufferUtils.createFloatBuffer(nindexes.size() * 3);
+        FloatBuffer tangentbuf = BufferUtils.createFloatBuffer(nindexes.size() * 4);
         FloatBuffer texcoordbuf = BufferUtils.createFloatBuffer(tindexes.size() * 2);
         
-//        for(Integer i : indexes)
-//        {
-//        	Vector3f v = verts.get(i);
-//        	vertbuf.put(v.x).put(v.y).put(v.z);
-//        }
-//        for(Integer i : tindexes)
-//        {
-//        	Vector2f v = texcoords.get(i);
-//        	texcoordbuf.put(v.x).put(v.y);
-//        }
-//        for(Integer i : nindexes)
-//        {
-//        	Vector3f v = norms.get(i);
-//        	normbuf.put(v.x).put(v.y).put(v.z);
-//        	// TODO Calculate tangents
-//        	//Vector3f tangent;
-//        	//tangentbuf.put(tangent.x).put(tangent.y).put(tangent.z);
-//        };
         int numVerts = m.getMode().getNumVertices();
         int numFloats = m.getMode().getNumVertices();
     	Vector3f[] tri_verts = new Vector3f[numVerts];
     	Vector3f[] tri_norms = new Vector3f[numVerts];
     	Vector2f[] tri_texcoords = new Vector2f[numVerts];
-    	Vector3f[] tri_tan1 = new Vector3f[numVerts];
-    	Vector3f[] tri_tan2 = new Vector3f[numVerts];
         
         int vertCounter = 0;
         for(int i = 0; i < indexes.size(); i++)
@@ -437,9 +401,14 @@ public class Mesh extends NativeObject
         	vertCounter++;
         	if(vertCounter >= numVerts)
         	{
+        		//System.out.println("Triangle:");
 				vertCounter = 0;
-            	// TODO Calculate tangents
-            	// Now we have a quad/tri, and we need to loop through the stored verts and calculate each tangent
+				Vector4f[] tangent = calculateTangents(tri_verts, tri_norms, tri_texcoords);
+				for(int j = 0; j < 3; j++)
+				{
+					//System.out.println("Normal: " + tri_norms[j] + " Tangent: " + tangent[j]);
+					tangentbuf.put(tangent[j].x).put(tangent[j].y).put(tangent[j].z).put(tangent[j].w);
+				}
         	}
         }
 
@@ -450,7 +419,7 @@ public class Mesh extends NativeObject
         
         m.setBuffer(VertexBuffer.Type.POSITION, vertbuf);
         m.setBuffer(VertexBuffer.Type.NORMAL, normbuf);
-        m.setBuffer(VertexBuffer.Type.TANGENT, normbuf);
+        m.setBuffer(VertexBuffer.Type.TANGENT, tangentbuf);
         m.setBuffer(VertexBuffer.Type.TEXCOORDS, texcoordbuf);
         
         System.out.println("Vertices=" + verts.size() + 
@@ -463,41 +432,73 @@ public class Mesh extends NativeObject
         reader.close();
         return m;
     }
+    
+	public static Vector4f[] calculateTangents(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texcoords)
+	{
+		Vector4f[] result = new Vector4f[3];
+	    
+	    Vector3f v1 = vertices[0];
+	    Vector3f v2 = vertices[1];
+	    Vector3f v3 = vertices[2];
+	    
+	    Vector2f w1 = texcoords[0];
+	    Vector2f w2 = texcoords[1];
+	    Vector2f w3 = texcoords[2];
+	    
+	    float x1 = v2.x - v1.x;
+	    float y1 = v2.y - v1.y;
+	    float z1 = v2.z - v1.z;
+	
+	    float x2 = v3.x - v1.x;
+	    float y2 = v3.y - v1.y;
+	    float z2 = v3.z - v1.z;
+	    
+	    float s1 = w2.x - w1.x;
+	    float s2 = w3.x - w1.x;
+	    float t1 = w2.y - w1.y;
+	    float t2 = w3.y - w1.y;
+	    
+	    float r = 1.0F / (s1 * t2 - s2 * t1);
+	    Vector3f sdir = new Vector3f((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
+	            (t2 * z1 - t1 * z2) * r);
+	    Vector3f tdir = new Vector3f((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
+	            (s1 * z2 - s2 * z1) * r);
+	    
+        for (int i = 0; i < 3; i++)
+        {
+            Vector3f normal = normals[i];
+            Vector3f tan = new Vector3f(sdir);
+            Vector3f tan2 = new Vector3f(tdir);
 
+            // Gram-Schmidt orthogonalize
+            Vector3f tangent = (tan.subtractInto(normal.scaleInto(normal.dot(tan), null), null)).normalize();
+
+            //tangent[i] = tan.crossInto(normal, null).crossInto(normal, null).normalize();
+            
+	        result[i] = new Vector4f(normal.crossInto(tan, null).dot(tan2) < 0.0f ? -1.0F : 1.0F, 
+	        		tangent.x, 
+	        		tangent.y, 
+	        		tangent.z);
+        }
+	    return result;
+	}
+    
+    public int getVertexCount()
+    {
+    	VertexBuffer vb = getBuffer(VertexBuffer.Type.POSITION);
+    	if(vb == null)
+    		return 0;
+    	return vb.getNumElements();
+    }
+    
     public void draw()
     {
-		VertexBuffer vbuf = getBuffer(VertexBuffer.Type.POSITION);
-		VertexBuffer nbuf = getBuffer(VertexBuffer.Type.NORMAL);
-		VertexBuffer tanbuf = getBuffer(VertexBuffer.Type.TANGENT);
-		VertexBuffer tbuf = getBuffer(VertexBuffer.Type.TEXCOORDS);
-		VertexBuffer cbuf = getBuffer(VertexBuffer.Type.COLOR);
-	    if(vbuf != null){
-		    GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-		    glBindBuffer(GL_ARRAY_BUFFER, vbuf.getId());
-		    GL11.glVertexPointer(nbuf.getType().getComponentSize(), GL11.GL_FLOAT, 0, 0);
-	    }
-	    if(nbuf != null){
-		    GL11.glEnableClientState(GL11.GL_NORMAL_ARRAY);
-		    glBindBuffer(GL_ARRAY_BUFFER, nbuf.getId());
-		    GL11.glNormalPointer(GL11.GL_FLOAT, 0, 0);
-	    }
-	    if(tbuf != null){
-		    GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
-		    glBindBuffer(GL_ARRAY_BUFFER, tbuf.getId());
-		    GL11.glTexCoordPointer(tbuf.getType().getComponentSize(), GL11.GL_FLOAT, 0, 0);
-	    }
-	    if(cbuf != null){
-		    GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
-		    glBindBuffer(GL_ARRAY_BUFFER, cbuf.getId());
-		    GL11.glColorPointer(cbuf.getType().getComponentSize(), GL11.GL_FLOAT, 0, 0);
-	    }
-	    if(tanbuf != null){
-		    //hrm
-	    }
-	    
+
+		glBindVertexArray(id);
 	    //If you are not using IBOs:
-	    GL11.glDrawArrays(mode.getGLParam(), 0, vbuf.getData().limit()/3);
-	    
+	    GL11.glDrawArrays(mode.getGLParam(), 0, getVertexCount());
+
+		glBindVertexArray(0);
 //	    //If you are using IBOs:
 //	    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
 //	    GL11.glDrawElements(GL11.GL_TRIANGLES, numberIndices, GL11.GL_UNSIGNED_INT, 0);
@@ -508,19 +509,29 @@ public class Mesh extends NativeObject
     }
     
 	@Override
-	public void create()
+	public boolean create()
 	{
+		id = glGenVertexArrays();
+		glBindVertexArray(id);
 		for(VertexBuffer vb : buffers)
 		{
-			if(vb == null || vb.getId() != -1)
+			if(vb == null)
 				continue;
-			vb.create();
+			if(vb.getId() == -1)
+				vb.create();
+			VertexBuffer.Type type = vb.getType();
+		    glBindBuffer(GL15.GL_ARRAY_BUFFER, vb.getId());
+		    glEnableVertexAttribArray(type.ordinal());
+		    glVertexAttribPointer(type.ordinal(), type.getComponentSize(), vb.getFormat().getGLParam(), vb.isNormalized(), vb.getStride(), vb.getOffset()); 
 		}
+		glBindVertexArray(0);
+		return true;
 	}
 
 	@Override
 	public void destroy()
 	{
+		glDeleteVertexArrays(id);
 		for(VertexBuffer vb : buffers)
 		{
 			if(vb == null || vb.getId() != -1)
@@ -529,3 +540,8 @@ public class Mesh extends NativeObject
 		}
 	}
 }
+
+
+
+
+

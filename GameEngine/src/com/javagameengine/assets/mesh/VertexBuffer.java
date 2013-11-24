@@ -12,6 +12,8 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 
 import com.javagameengine.math.FastMath;
 
@@ -33,21 +35,25 @@ public class VertexBuffer extends NativeObject
 {
 	// Type of data in this buffer
     public static enum Type {
-        POSITION(3),	// 3 floats
-        SIZE(1),	// 1 float (points)
-        NORMAL(3),	// normal vector (normalized) 3 floats
-        TANGENT(3),	// tangent vector (normalized) 3 floats
-        COLOR(4),	// 4 floats (r, g, b, a)
-        POSITION_INDEX(1), 	// index buffer, must be integer!
-        TEXCOORDS_INDEX(1), 	// index buffer, must be integer!
-        NORMAL_INDEX(1), 	// index buffer, must be integer!
-        TEXCOORDS(2); // 2 floats. Hardware supports multiple, if needed
+        POSITION(3, "in_position"),	// 3 floats
+        SIZE(1, "in_point_size"),	// 1 float (points)
+        NORMAL(3, "in_normal"),	// normal vector (normalized) 3 floats
+        TANGENT(4, "in_tangent"),	// tangent vector (normalized) 3 floats
+        COLOR(4, "in_color"),	// 4 floats (r, g, b, a)
+        TEXCOORDS(2, "in_texcoord"); // 2 floats. Hardware supports multiple, if needed
 
         private int componentSize = 0;
+        private String name;
 
-        Type(int componentSize)
+        Type(int componentSize, String name)
         {
+        	this.name = name;
             this.componentSize = componentSize;
+        }
+        
+        public String getAttribName()
+        {
+        	return name;
         }
         
         public int getComponentSize()
@@ -79,20 +85,22 @@ public class VertexBuffer extends NativeObject
     // Format of the data that is stored in the buffer.
     public static enum Format 
     {
-        HALF_FLOAT(2),
-        FLOAT(4),
-        DOUBLE(8),
-        BYTE(1),
-        UNSIGNED_BYTE(1),
-        SHORT_INT(2),
-        SHORT_INT_UNSIGNED(2),
-        INT(4),
-        INT_UNSIGNED(4);
+        HALF_FLOAT(2, GL30.GL_HALF_FLOAT),
+        FLOAT(4, GL11.GL_FLOAT),
+        DOUBLE(8, GL11.GL_DOUBLE),
+        BYTE(1, GL11.GL_BYTE),
+        UNSIGNED_BYTE(1, GL11.GL_UNSIGNED_BYTE),
+        SHORT_INT(2, GL11.GL_SHORT),
+        SHORT_INT_UNSIGNED(2, GL11.GL_UNSIGNED_SHORT),
+        INT(4, GL11.GL_INT),
+        INT_UNSIGNED(4, GL11.GL_UNSIGNED_INT);
 
+        private int gl;
         private int byteSize = 0;
 
-        Format(int byteSize)
+        Format(int byteSize, int gl)
         {
+        	this.gl = gl;
             this.byteSize = byteSize;
         }
         
@@ -100,6 +108,11 @@ public class VertexBuffer extends NativeObject
         {
             return byteSize;
         }
+        
+		public int getGLParam()
+		{
+			return gl;
+		}
     }
 
     protected int offset = 0;	// Offset of data from start of buffer
@@ -240,7 +253,7 @@ public class VertexBuffer extends NativeObject
      */
     public int getNumElements()
     {
-        int elements = data.capacity() / components;
+        int elements = data.limit() / bufType.getComponentSize();
         if (format == Format.HALF_FLOAT)
             elements /= 2;
         return elements;
@@ -600,7 +613,7 @@ public class VertexBuffer extends NativeObject
     }
 
 	@Override
-	public void create()
+	public boolean create()
 	{
     	if(id != -1)
     		throw new IllegalStateException("Buffer is already bound to GPU");
@@ -616,5 +629,6 @@ public class VertexBuffer extends NativeObject
 			glBufferData(GL_ARRAY_BUFFER, (DoubleBuffer)data, usage.getGLParam());
 		if(data instanceof ByteBuffer)
 			glBufferData(GL_ARRAY_BUFFER, (ByteBuffer)data, usage.getGLParam());
+		return true;
 	}
 }

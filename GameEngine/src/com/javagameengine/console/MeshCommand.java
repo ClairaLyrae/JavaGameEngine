@@ -7,6 +7,7 @@ import java.io.IOException;
 import com.javagameengine.Game;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.material.InvalidTextureException;
+import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.assets.mesh.MeshUtil;
@@ -27,9 +28,9 @@ public class MeshCommand extends Command
 	{
 		int index = 0;
 		Mesh m = AssetManager.getMesh(args[0]);
-		Texture t = null;
+		Material mat = null;
 		if(args.length > 2)
-			t = AssetManager.getTexture(args[2]);
+			mat = AssetManager.getMaterial(args[2]);
 		try
 		{
 			index = Integer.parseInt(args[1]);
@@ -61,8 +62,7 @@ public class MeshCommand extends Command
 				s.getRoot().addChild(n);
 				
 				TestComponent b = new TestComponent(m, index);
-				if(t != null)
-					b.setTexture(t);
+				b.setMaterial(mat);
 				
 				n.addComponent(b);
 				return "Mesh created";

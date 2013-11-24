@@ -1,6 +1,14 @@
 package com.javagameengine.math;
 
+import static org.lwjgl.opengl.GL11.glMultMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.glu.Project;
 
 /**
  * 4x4 square matrix class implemented using floats.
@@ -38,6 +46,16 @@ public class Matrix4f extends Matrix<Matrix4f>
 		f33 = f16;
 	}
 
+	public Matrix4f(float f)
+	{
+		set(f);
+	}
+
+	public Matrix4f set(float f)
+	{
+		return set(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
+	}
+	
 	public Matrix4f add(Matrix4f m)
 	{
 		return addInto(m, this);
@@ -98,8 +116,10 @@ public class Matrix4f extends Matrix<Matrix4f>
 
 	public Matrix4f loadIdentity()
 	{
-		return set(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f,
-				1f);
+		return set(1f, 0f, 0f, 0f, 
+				0f, 1f, 0f, 0f, 
+				0f, 0f, 1f, 0f, 
+				0f, 0f, 0f, 1f);
 	}
 
 	public Matrix4f multiply(Matrix4f m)
@@ -111,25 +131,25 @@ public class Matrix4f extends Matrix<Matrix4f>
 	{
 		if (r == null)
 			r = new Matrix4f();
-		float m00 = f00 * m.f00 + f01 * m.f10 + f02 * m.f20;
-		float m01 = f00 * m.f01 + f01 * m.f11 + f02 * m.f21;
-		float m02 = f00 * m.f02 + f01 * m.f12 + f02 * m.f22;
-		float m03 = f00 * m.f03 + f01 * m.f13 + f02 * m.f23;
+		float m00 = f00 * m.f00 + f01 * m.f10 + f02 * m.f20 + f03 * m.f30;
+		float m01 = f00 * m.f01 + f01 * m.f11 + f02 * m.f21 + f03 * m.f31;
+		float m02 = f00 * m.f02 + f01 * m.f12 + f02 * m.f22 + f03 * m.f32;
+		float m03 = f00 * m.f03 + f01 * m.f13 + f02 * m.f23 + f03 * m.f33;
 
-		float m10 = f10 * m.f00 + f11 * m.f10 + f12 * m.f20;
-		float m11 = f10 * m.f01 + f11 * m.f11 + f12 * m.f21;
-		float m12 = f10 * m.f02 + f11 * m.f12 + f12 * m.f22;
-		float m13 = f10 * m.f03 + f11 * m.f13 + f12 * m.f23;
+		float m10 = f10 * m.f00 + f11 * m.f10 + f12 * m.f20 + f13 * m.f30;
+		float m11 = f10 * m.f01 + f11 * m.f11 + f12 * m.f21 + f13 * m.f31;
+		float m12 = f10 * m.f02 + f11 * m.f12 + f12 * m.f22 + f13 * m.f32;
+		float m13 = f10 * m.f03 + f11 * m.f13 + f12 * m.f23 + f13 * m.f33;
 
-		float m20 = f20 * m.f00 + f21 * m.f10 + f22 * m.f20;
-		float m21 = f20 * m.f01 + f21 * m.f11 + f22 * m.f21;
-		float m22 = f20 * m.f02 + f21 * m.f12 + f22 * m.f22;
-		float m23 = f20 * m.f03 + f21 * m.f13 + f22 * m.f23;
+		float m20 = f20 * m.f00 + f21 * m.f10 + f22 * m.f20 + f23 * m.f30;
+		float m21 = f20 * m.f01 + f21 * m.f11 + f22 * m.f21 + f23 * m.f31;
+		float m22 = f20 * m.f02 + f21 * m.f12 + f22 * m.f22 + f23 * m.f32;
+		float m23 = f20 * m.f03 + f21 * m.f13 + f22 * m.f23 + f23 * m.f33;
 
-		float m30 = f30 * m.f00 + f31 * m.f10 + f32 * m.f20;
-		float m31 = f30 * m.f01 + f31 * m.f11 + f32 * m.f21;
-		float m32 = f30 * m.f02 + f31 * m.f12 + f32 * m.f22;
-		float m33 = f30 * m.f03 + f31 * m.f13 + f32 * m.f23;
+		float m30 = f30 * m.f00 + f31 * m.f10 + f32 * m.f20 + f33 * m.f30;
+		float m31 = f30 * m.f01 + f31 * m.f11 + f32 * m.f21 + f33 * m.f31;
+		float m32 = f30 * m.f02 + f31 * m.f12 + f32 * m.f22 + f33 * m.f32;
+		float m33 = f30 * m.f03 + f31 * m.f13 + f32 * m.f23 + f33 * m.f33;
 		
 		r.f00 = m00;
 		r.f01 = m01;
@@ -251,8 +271,10 @@ public class Matrix4f extends Matrix<Matrix4f>
 
 	public Matrix4f set(Matrix4f m)
 	{
-		return set(m.f00, m.f01, m.f02, m.f03, m.f10, m.f11, m.f12, m.f13,
-				m.f20, m.f21, m.f22, m.f23, m.f30, m.f31, m.f32, m.f33);
+		return set(m.f00, m.f01, m.f02, m.f03, 
+				m.f10, m.f11, m.f12, m.f13,
+				m.f20, m.f21, m.f22, m.f23, 
+				m.f30, m.f31, m.f32, m.f33);
 	}
 
 	public Matrix4f subtract(Matrix4f m)
@@ -283,59 +305,14 @@ public class Matrix4f extends Matrix<Matrix4f>
 		return r;
 	}
 
-	public float[] toFloatArray(int major)
-	{
-		return toFloatArray(major, new float[16]);
-	}
-
-	public float[] toFloatArray(int major, float[] a)
-	{
-		if (a.length != 16)
-			return a;
-		if (major == Matrix.ROW_MAJOR)
-		{
-			a[0] = f00;
-			a[1] = f01;
-			a[2] = f02;
-			a[3] = f03;
-			a[4] = f10;
-			a[5] = f11;
-			a[6] = f12;
-			a[7] = f13;
-			a[8] = f20;
-			a[9] = f21;
-			a[10] = f22;
-			a[11] = f23;
-			a[12] = f30;
-			a[13] = f31;
-			a[14] = f32;
-			a[15] = f33;
-		} else
-		{
-			a[0] = f00;
-			a[1] = f10;
-			a[2] = f20;
-			a[3] = f30;
-			a[4] = f01;
-			a[5] = f11;
-			a[6] = f21;
-			a[7] = f31;
-			a[8] = f02;
-			a[9] = f12;
-			a[10] = f22;
-			a[11] = f32;
-			a[12] = f03;
-			a[13] = f13;
-			a[14] = f23;
-			a[15] = f33;
-		}
-		return a;
-	}
-
 	public String toString()
 	{
 		return String.format(
-				"[%f,%f,%f,%f;%f,%f,%f,%f;%f,%f,%f,%f;%f,%f,%f,%f;]", f00, f01,
+				"matrix=\n" +
+				"%.4f %.4f %.4f %.4f;\n" +
+				"%.4f %.4f %.4f %.4f;\n" +
+				"%.4f %.4f %.4f %.4f;\n" +
+				"%.4f %.4f %.4f %.4f;\n", f00, f01,
 				f02, f03, f10, f11, f12, f13, f20, f21, f22, f23, f30, f31,
 				f32, f33);
 	}
@@ -347,31 +324,304 @@ public class Matrix4f extends Matrix<Matrix4f>
 
 	public Matrix4f transposeInto(Matrix4f r)
 	{
+		if(r == null)
+			r = new Matrix4f();
 		return r.set(f00, f10, f20, f30, f01, f11, f21, f31, f02, f12, f22,
 				f32, f03, f13, f23, f33);
 	}
+
+	public FloatBuffer toBuffer()
+	{
+		FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+		fb.put(f00).put(f01).put(f02).put(f03)
+			.put(f10).put(f11).put(f12).put(f13)
+			.put(f20).put(f21).put(f22).put(f23)
+			.put(f30).put(f31).put(f32).put(f33);
+		fb.flip();
+		return fb;
+	}
 	
-	public Matrix4f loadFromBuffer(FloatBuffer fb)
+	public Matrix4f fromBuffer(FloatBuffer fb)
 	{
-		// TODO Auto-generated method stub
+		if(fb == null)
+			return null;
+		f00 = fb.get();
+		f01 = fb.get();
+		f02 = fb.get();
+		f03 = fb.get();
+		f10 = fb.get();
+		f11 = fb.get();
+		f12 = fb.get();
+		f13 = fb.get();
+		f20 = fb.get();
+		f21 = fb.get();
+		f22 = fb.get();
+		f23 = fb.get();
+		f30 = fb.get();
+		f31 = fb.get();
+		f32 = fb.get();
+		f33 = fb.get();
+		return this;
+	}
+
+	public Matrix4f fromArray(float[] f)
+	{
+		if(f == null || f.length < 16)
+			return null;
+		f00 = f[0];
+		f01 = f[1];
+		f02 = f[2];
+		f03 = f[3];
+		f10 = f[4];
+		f11 = f[5];
+		f12 = f[6];
+		f13 = f[7];
+		f20 = f[8];
+		f21 = f[9];
+		f22 = f[10];
+		f23 = f[11];
+		f30 = f[12];
+		f31 = f[13];
+		f32 = f[14];
+		f33 = f[15];
+		return this;
+	}
+
+	public float[] toArray()
+	{
+		float[] a = new float[4];
+		a[0] = f00;
+		a[1] = f01;
+		a[2] = f10;
+		a[3] = f11;
+		return a;
+	}
+
+	@Override
+	public Matrix4f set(int i, int j, float f)
+	{
+		switch(i)
+		{
+		case 0:
+			switch(j){
+			case 0: f00 = f; break;
+			case 1: f01 = f; break;
+			case 2: f02 = f; break;
+			case 3: f03 = f; break;
+			} break;
+		case 1:
+			switch(j){
+			case 0: f10 = f; break;
+			case 1: f11 = f; break;
+			case 2: f12 = f; break;
+			case 3: f13 = f; break;
+			} break;
+		case 2:
+			switch(j){
+			case 0: f20 = f; break;
+			case 1: f21 = f; break;
+			case 2: f22 = f; break;
+			case 3: f23 = f; break;
+			} break;
+		case 3:
+			switch(j){
+			case 0: f30 = f; break;
+			case 1: f31 = f; break;
+			case 2: f32 = f; break;
+			case 3: f33 = f; break;
+			} break;
+		}
+		return this;
+	}
+	
+	public Matrix4f scaleTransform(float x, float y, float z)
+	{
+		f00 = f00 * x;
+		f01 = f01 * x;
+		f02 = f02 * x;
+		f03 = f03 * x;
+		f10 = f10 * y;
+		f11 = f11 * y;
+		f12 = f12 * y;
+		f13 = f13 * y;
+		f20 = f20 * z;
+		f21 = f21 * z;
+		f22 = f22 * z;
+		f23 = f23 * z;
+		return this;
+	}
+	
+	public Matrix4f translateTransform(float x, float y, float z)
+	{
+		f30 += f00 * x + f10 * y + f20 * z;
+		f31 += f01 * x + f11 * y + f21 * z;
+		f32 += f02 * x + f12 * y + f22 * z;
+		f33 += f03 * x + f13 * y + f23 * z;
+		return this;
+	}
+	
+	public static Matrix4f lookAtMatrix()
+	{
 		return null;
 	}
 
-	public Matrix4f loadFromArray(float[] f)
+	public static Matrix4f orthoMatrix(float left, float right, float top, float bottom, float znear, float zfar)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		  Matrix4f m = new Matrix4f();
+		  m.f00 = 2f/(right-left); 
+		  m.f11 = 2f/(top-bottom); 
+		  m.f22 = -2f/(zfar-znear); 
+		  m.f03 = -1*((right+left)/(right-left));
+		  m.f13 = -1*((top+bottom)/(top-bottom));
+		  m.f23 = -1*((zfar+znear)/(zfar-znear));
+		  return m;
+	}
+	
+	public static Matrix4f perspectiveMatrix(float fovy, float aspect, float zNear, float zFar)
+	{
+		float cotangent, deltaZ;
+		float radians = fovy*(FastMath.PI / 360f);
+
+		deltaZ = zFar - zNear;
+
+		float tan = FastMath.tan(radians);
+		if ((deltaZ == 0) || (tan == 0) || (aspect == 0)) {
+			return null;
+		}
+
+		cotangent = 1.0f/tan;
+
+		Matrix4f m = new Matrix4f();
+		
+		m.f00 = cotangent / aspect;
+		m.f11 = cotangent;
+		m.f22 =  - (zFar + zNear) / deltaZ;
+		m.f23 =  -1;
+		m.f32 =  -2 * zNear * zFar / deltaZ;
+		m.f33 =  0;
+
+		return m.transpose();
+	}
+	
+	public static Matrix4f lookAt(
+		float eyex,
+		float eyey,
+		float eyez,
+		float centerx,
+		float centery,
+		float centerz,
+		float upx,
+		float upy,
+		float upz) 
+	{
+		Vector3f forward = new Vector3f();
+		Vector3f side = new Vector3f();
+		Vector3f up = new Vector3f();
+
+		forward.x = centerx - eyex;
+		forward.y = centery - eyey;
+		forward.z = centerz - eyez;
+
+		up.x = upx;
+		up.y = upy;
+		up.z = upz;
+
+		forward.normalize();
+
+		/* Side = forward x up */
+		forward.crossInto(up, side);
+		side.normalize();
+
+		/* Recompute up as: up = side x forward */
+		side.crossInto(forward, up);
+
+		Matrix4f matrix = new Matrix4f();
+		matrix.f00 = side.x;
+		matrix.f10 = side.y;
+		matrix.f20 = side.z;
+
+		matrix.f01 = up.x;
+		matrix.f11 = up.y;
+		matrix.f21 = up.z;
+
+		matrix.f02 = -forward.x;
+		matrix.f12 = -forward.y;
+		matrix.f22 = -forward.z;
+		
+		matrix.f03 = -eyex;
+		matrix.f13 = -eyey;
+		matrix.f23 = -eyez;
+		return matrix;
+	}
+	
+	public static Matrix4f lookAtMatrix(
+			float eyex,
+			float eyey,
+			float eyez,
+			float centerx,
+			float centery,
+			float centerz,
+			float upx,
+			float upy,
+			float upz)
+	{
+		Vector3f position = new Vector3f(eyex, eyey, eyez);
+		Vector3f target = new Vector3f(centerx, centery, centerz);
+		Vector3f upVector = new Vector3f(upx, upy, upz);
+	  Vector3f forward = target.subtractInto(position, null);
+	  forward.normalize();
+	  Vector3f right = forward.crossInto(upVector, null);
+	  right.normalize();
+	  Vector3f up = right.crossInto(forward, null);
+	  up.normalize();  
+	  Matrix4f mat = new Matrix4f();
+	 
+	  mat.f00 = right.x;
+	  mat.f01 = right.y;
+	  mat.f02 = right.z;
+
+	  mat.f10 = up.x;
+	  mat.f11 = up.y;
+	  mat.f12 = up.z;
+
+	  mat.f20 = -forward.x;
+	  mat.f21 = -forward.y;
+	  mat.f22 = -forward.z;
+
+	  mat.f03 = -right.dot(position);
+	  mat.f13 = -up.dot(position);
+	  mat.f23 = forward.dot(position);
+	  return mat;
+	}
+	
+	public static Matrix4f rotationMatrix(float angle, float x, float y, float z) 
+	{
+		Matrix4f m = new Matrix4f(0f);
+        m.f33 = 1;
+
+        float fCos = FastMath.cos(angle);
+        float fSin = FastMath.sin(angle);
+        float fOneMinusCos = ((float) 1.0) - fCos;
+        float fX2 = x * x;
+        float fY2 = y * y;
+        float fZ2 = z * z;
+        float fXYM = x * y * fOneMinusCos;
+        float fXZM = x * z * fOneMinusCos;
+        float fYZM = y * z * fOneMinusCos;
+        float fXSin = x * fSin;
+        float fYSin = y * fSin;
+        float fZSin = z * fSin;
+
+        m.f00 = fX2 * fOneMinusCos + fCos;
+        m.f01 = fXYM - fZSin;
+        m.f02 = fXZM + fYSin;
+        m.f10 = fXYM + fZSin;
+        m.f11 = fY2 * fOneMinusCos + fCos;
+        m.f12 = fYZM - fXSin;
+        m.f20 = fXZM - fYSin;
+        m.f21 = fYZM + fXSin;
+        m.f22 = fZ2 * fOneMinusCos + fCos;
+		return m;
 	}
 
-	public FloatBuffer toBuffer(FloatBuffer fb)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public float[] toArray(float[] f)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

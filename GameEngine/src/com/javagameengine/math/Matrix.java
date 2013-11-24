@@ -50,25 +50,19 @@ public abstract class Matrix<T  extends Matrix<T>>
 
 	public abstract T subtractInto(T m, T r);
 
-	public abstract float[] toFloatArray(int major);
-
-	public abstract float[] toFloatArray(int major, float[] r);
-
 	public abstract T transpose();
 
 	public abstract T transposeInto(T r);
 	
 	public abstract T fill(float f);
 	
-	public abstract T loadFromBuffer(FloatBuffer fb);
+	public abstract T fromBuffer(FloatBuffer fb);
 	
-	public abstract T loadFromArray(float[] f);
+	public abstract T fromArray(float[] f);
+	
+	public abstract T set(int i, int j, float f);
 
-	public abstract FloatBuffer toBuffer(FloatBuffer fb);
+	public abstract FloatBuffer toBuffer();
 	
-	public FloatBuffer toBuffer() { return toBuffer(null); }
-	
-	public abstract float[] toArray(float[] f);
-	
-	public float[] toArray() { return toArray(null); }
+	public abstract float[] toArray();
 }

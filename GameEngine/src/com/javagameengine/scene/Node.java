@@ -82,25 +82,17 @@ public final class Node implements Bounded
 	 */
 	public void destroy()
 	{
-		// If the node is not the root node, unlink it from its parent. Otherwise, reset the scene
-		if(parent != null)
-			parent.removeChild(this);
-		else
-			scene.clear();
-		
-		// Destroy components and free component resources
-		for(Component c : components)
-		{
-			c.onDestroy();
-		}
-		
-		// Iterate destroy down tree
 		for(Node n : children)
-		{
 			n.destroy();
+		for(Component c : components)
+			c.destroy(); 
+		if(parent != null)
+		{
+			parent.removeChild(this);
+			parent = null;
 		}
-		scene = null;
-		parent = null;
+		if(scene != null && scene.getRoot() != this)
+			scene = null;
 	}
 	
 	public Scene getScene()
@@ -246,8 +238,6 @@ public final class Node implements Bounded
 			return false;
 		if(c instanceof Renderable)
 			graphicsComponents.remove((Renderable)c);
-		c.onDestroy();
-		c.node = null;
 		return true;
 	}
 	

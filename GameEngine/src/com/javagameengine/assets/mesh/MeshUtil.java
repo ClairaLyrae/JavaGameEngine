@@ -100,58 +100,6 @@ public class MeshUtil
         return buff;
     }
     
-    public static void drawMesh(Mesh m)
-    {
-
-    	VertexBuffer verts = m.getBuffer(VertexBuffer.Type.POSITION);
-    	VertexBuffer norms = m.getBuffer(VertexBuffer.Type.NORMAL);
-    	VertexBuffer ind = m.getBuffer(VertexBuffer.Type.POSITION_INDEX);
-
-    	glPushAttrib(GL_ALL_ATTRIB_BITS);
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glEnable(GL11.GL_LIGHT0);   
-
-		glShadeModel(GL_FLAT);
-		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		glColor3f( 0.2f, 0.2f, 0.2f );
-
-		glEnable(GL_NORMALIZE);
-
-    	switch(m.getMode()){
-		case LINE: glBegin(GL_LINES); break;
-		case POINT: glBegin(GL_POINTS); break;
-		case QUAD: glBegin(GL_QUADS); break;
-		case TRIANGLE: glBegin(GL_TRIANGLES); break;
-		default: break;
-    	}
-    	
-    	FloatBuffer vb = (FloatBuffer)verts.getData();
-    	FloatBuffer nb = (FloatBuffer)norms.getData();
-    	IntBuffer ib = (IntBuffer)ind.getData();
-    	//draw the mesh here
-    	ib.rewind();
-		//System.out.println("Starting");
-    	while(true)
-    	{
-    		int i = ib.get();
-    		float x, y, z = 0f;
-    		float nx, ny, nz = 0f;
-    		x = vb.get(i*3); y = vb.get((i*3)+1); z = vb.get((i*3)+2);
-    		nx = nb.get(i*3); ny = nb.get((i*3)+1); nz = nb.get((i*3)+2);
-    		glNormal3f(nx, ny, nz);
-    		glVertex3f(x, y, z);
-    		//System.out.println(String.format("I: %d  V: %f, %f, %f  N: %f, %f, %f", i, x, y, z, nx, ny, nz));
-    		if(!ib.hasRemaining())
-    			break;
-    	}
-		glEnd();
-		glDisable(GL_NORMALIZE);
-
-	    glDisable(GL11.GL_LIGHT0);
-	    glDisable(GL11.GL_LIGHTING);
-		glPopAttrib();
-    }
-    
     public static Mesh getBox()
     {
 		Mesh m = new Mesh(Mesh.Mode.QUAD);
@@ -178,16 +126,6 @@ public class MeshUtil
 				-1.0f, 1.0f, 1.0f 
 		};
 		m.setBuffer(VertexBuffer.Type.NORMAL, normal);
-		
-		int[] index = new int[] { 
-			3, 2, 1, 0, 
-			4, 5, 6, 7,
-			5, 1, 2, 6,
-			7, 3, 0, 4,
-			7, 6, 2, 3,
-			0, 1, 5, 4
-		};
-		m.setBuffer(VertexBuffer.Type.POSITION_INDEX, index);
 		m.updateBounds();
 		return m;
     }
@@ -209,60 +147,6 @@ public class MeshUtil
         return new int[]{vboVertexHandle, vboNormalHandle};
     }
     
-    // Creates a GPU display list
-    public static int createDisplayList(Mesh m) 
-    {
-        int displayList = glGenLists(1);
-        glNewList(displayList, GL_COMPILE);
-        {
-        	FloatBuffer vb = m.getFloatBuffer(VertexBuffer.Type.POSITION);
-        	FloatBuffer nb = m.getFloatBuffer(VertexBuffer.Type.NORMAL);
-        	FloatBuffer tb = m.getFloatBuffer(VertexBuffer.Type.TEXCOORDS);
-        	IntBuffer ib = m.getIndexBuffer(VertexBuffer.Type.POSITION_INDEX);
-        	IntBuffer tib = m.getIndexBuffer(VertexBuffer.Type.TEXCOORDS_INDEX);
-        	IntBuffer nib = m.getIndexBuffer(VertexBuffer.Type.NORMAL_INDEX);
-        	boolean hastc = true;
-        	if(tib == null || ib == null)
-        		hastc = false;
-        	vb.rewind();
-        	nb.rewind();
-        	ib.rewind();
-        	nib.rewind();
-        	if(hastc)
-        	{
-            	tb.rewind();
-            	tib.rewind();
-        		
-        	}
-
-        	for(int i = 0; i < ib.limit(); i++)
-        	{
-        		int index = ib.get(i)*3;
-        		int in = nib.get(i)*3;
-        		float x, y, z = 0f;
-        		float nx, ny, nz, tx, ty = 0f;
-
-        		x = vb.get(index); 
-        		y = vb.get(index+1); 
-        		z = vb.get(index+2);
-        		nx = nb.get(in); 
-        		ny = nb.get(in+1); 
-        		nz = nb.get(in+2);
-        		
-        		glNormal3f(nx, ny, nz);
-        		if(hastc)
-        		{
-            		int intc = tib.get(i)*2;
-            		tx = tb.get(intc);
-            		ty = tb.get(intc+1);
-            		glTexCoord2f(tx, ty);
-        		}
-        		glVertex3f(x, y, z);
-        	}
-        }
-        glEndList();
-        return displayList;
-    }
 
     private static float[] asFloats(Vector3f v) 
     {
@@ -399,12 +283,6 @@ public class MeshUtil
         m.setBuffer(VertexBuffer.Type.NORMAL, normbuf);
         if(!texcoords.isEmpty())
         	m.setBuffer(VertexBuffer.Type.TEXCOORDS, texcoordbuf);
-        if(!indexes.isEmpty())
-        	m.setBuffer(VertexBuffer.Type.POSITION_INDEX, ibuf);
-        if(!tindexes.isEmpty())
-        	m.setBuffer(VertexBuffer.Type.TEXCOORDS_INDEX, tbuf);
-        if(!nindexes.isEmpty())
-        	m.setBuffer(VertexBuffer.Type.NORMAL_INDEX, nbuf);
         
         System.out.println("Vertices=" + verts.size() + 
         		" TexCoords=" + texcoords.size() + 

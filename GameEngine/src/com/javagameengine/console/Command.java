@@ -14,13 +14,14 @@ public abstract class Command
 {
 	private int minargs;
 	private String name;
-	
+
+
 	public Command(String name, int minargs)
 	{
 		this.minargs = minargs;
 		this.name = name;
 	}
-	
+
 	/**
 	 * @return Minimum number of arguments this command takes
 	 */

@@ -30,7 +30,7 @@ public abstract class Vector<T extends Vector<T>>
 	public abstract float magnitude();
 
 	public abstract float magnitudeSquared();
-
+	
 	public abstract T normalize();
 
 	public abstract T normalizeInto(T r);

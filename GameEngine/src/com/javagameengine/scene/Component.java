@@ -32,10 +32,10 @@ public abstract class Component
 	
 	public void destroy()
 	{
+		onDestroy();
 		if(node != null)
 			node.removeComponent(this);
-		else
-			onDestroy();
+		node = null;
 	}
 	
 	public abstract void onUpdate(int delta);
