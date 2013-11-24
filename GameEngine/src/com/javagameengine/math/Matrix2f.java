@@ -1,6 +1,9 @@
 package com.javagameengine.math;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 
 /**
  * 2x2 square matrix class implemented using floats.
@@ -196,31 +199,6 @@ public class Matrix2f extends Matrix<Matrix2f>
 		return r;
 	}
 
-	public float[] toFloatArray(int major)
-	{
-		return toFloatArray(major, new float[4]);
-	}
-
-	public float[] toFloatArray(int major, float[] a)
-	{
-		if (a.length != 4)
-			return a;
-		if (major == Matrix.ROW_MAJOR)
-		{
-			a[0] = f00;
-			a[1] = f01;
-			a[2] = f10;
-			a[3] = f11;
-		} else
-		{
-			a[0] = f00;
-			a[1] = f10;
-			a[2] = f01;
-			a[3] = f11;
-		}
-		return a;
-	}
-
 	public String toString()
 	{
 		return String.format("[%f,%f;%f,%f]", f00, f01, f10, f11);
@@ -243,27 +221,63 @@ public class Matrix2f extends Matrix<Matrix2f>
 		return r;
 	}
 
-	public Matrix2f loadFromBuffer(FloatBuffer fb)
+	public Matrix2f fromBuffer(FloatBuffer fb)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if(fb == null)
+			return null;
+		f00 = fb.get();
+		f01 = fb.get();
+		f10 = fb.get();
+		f11 = fb.get();
+		return this;
 	}
 
-	public Matrix2f loadFromArray(float[] f)
+	public Matrix2f fromArray(float[] f)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if(f == null || f.length < 4)
+			return null;
+		f00 = f[0];
+		f01 = f[1];
+		f10 = f[2];
+		f11 = f[3];
+		return this;
 	}
 
-	public FloatBuffer toBuffer(FloatBuffer fb)
+	public FloatBuffer toBuffer()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		FloatBuffer fb = ByteBuffer.allocateDirect(4*8).asFloatBuffer();
+		fb.put(f00).put(f01)
+			.put(f10).put(f11);
+		fb.flip();
+		return fb;
 	}
 
-	public float[] toArray(float[] f)
+	public float[] toArray()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		float[] a = new float[4];
+		a[0] = f00;
+		a[1] = f01;
+		a[2] = f10;
+		a[3] = f11;
+		return a;
+	}
+
+	@Override
+	public Matrix2f set(int i, int j, float f)
+	{
+		switch(i)
+		{
+		case 0:
+			switch(j){
+			case 0: f00 = f; break;
+			case 1: f01 = f; break;
+			} break;
+		case 1:
+			switch(j){
+			case 0: f00 = f; break;
+			case 1: f01 = f; break;
+			} break;
+		}
+		return this;
 	}
 }

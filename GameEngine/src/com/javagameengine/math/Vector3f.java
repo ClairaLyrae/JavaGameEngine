@@ -277,4 +277,22 @@ public class Vector3f extends Vector<Vector3f>
 	{
 		return String.format("[%f,%f,%f]", x, y, z);
 	}
+
+	public Vector3f cross(Vector3f v)
+	{
+		return crossInto(v, this);
+	}
+
+	public Vector3f crossInto(Vector3f v, Vector3f r)
+	{
+		if(r == null)
+			r = new Vector3f();
+		float i = y*v.z - z*v.y;
+		float j = z*v.x - x*v.z;
+		float k = x*v.y - y*v.x;
+		r.x = i;
+		r.y = j;
+		r.z = k;
+		return r;
+	}
 }

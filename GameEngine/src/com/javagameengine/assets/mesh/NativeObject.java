@@ -1,5 +1,7 @@
 package com.javagameengine.assets.mesh;
 
+import com.javagameengine.assets.material.InvalidAssetException;
+
 /**
  * NativeObject describes an object that is loaded into the native GL or AL. These objects are
  * kept in GL/AL memory until they are explicitely destroyed.
@@ -54,7 +56,7 @@ public abstract class NativeObject
         return updateNeeded;
     }
 
-    public abstract void create();
+    public abstract boolean create();
     
     public abstract void destroy();
 }

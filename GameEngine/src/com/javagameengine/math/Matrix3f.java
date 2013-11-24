@@ -1,6 +1,9 @@
 package com.javagameengine.math;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 
 /**
  * 3x3 square matrix class implemented using floats.
@@ -278,27 +281,82 @@ public class Matrix3f extends Matrix<Matrix3f>
 		return r.set(f00, f10, f20, f01, f11, f21, f02, f12, f22);
 	}
 
-	public Matrix3f loadFromBuffer(FloatBuffer fb)
+	public Matrix3f fromBuffer(FloatBuffer fb)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if(fb == null)
+			return null;
+		f00 = fb.get();
+		f01 = fb.get();
+		f02 = fb.get();
+		f10 = fb.get();
+		f11 = fb.get();
+		f12 = fb.get();
+		f20 = fb.get();
+		f21 = fb.get();
+		f22 = fb.get();
+		return this;
 	}
 
-	public Matrix3f loadFromArray(float[] f)
+	public Matrix3f fromArray(float[] f)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		if(f == null || f.length < 9)
+			return null;
+		f00 = f[0];
+		f01 = f[1];
+		f02 = f[2];
+		f10 = f[3];
+		f11 = f[4];
+		f12 = f[5];
+		f20 = f[6];
+		f21 = f[7];
+		f22 = f[8];
+		return this;
 	}
 
-	public FloatBuffer toBuffer(FloatBuffer fb)
+	public FloatBuffer toBuffer()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		FloatBuffer fb = ByteBuffer.allocateDirect(9*8).asFloatBuffer();
+		fb.put(f00).put(f01).put(f02)
+			.put(f10).put(f11).put(f12)
+			.put(f20).put(f21).put(f22);
+		fb.flip();
+		return fb;
 	}
 
-	public float[] toArray(float[] f)
+	public float[] toArray()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		float[] a = new float[4];
+		a[0] = f00;
+		a[1] = f01;
+		a[2] = f10;
+		a[3] = f11;
+		return a;
+	}
+
+	@Override
+	public Matrix3f set(int i, int j, float f)
+	{
+		switch(i)
+		{
+		case 0:
+			switch(j){
+			case 0: f00 = f; break;
+			case 1: f01 = f; break;
+			case 2: f02 = f; break;
+			} break;
+		case 1:
+			switch(j){
+			case 0: f10 = f; break;
+			case 1: f11 = f; break;
+			case 2: f12 = f; break;
+			} break;
+		case 2:
+			switch(j){
+			case 0: f20 = f; break;
+			case 1: f21 = f; break;
+			case 2: f22 = f; break;
+			} break;
+		}
+		return this;
 	}
 }

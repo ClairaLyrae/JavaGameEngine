@@ -278,4 +278,15 @@ public class Vector4f extends Vector<Vector4f>
 	{
 		return String.format("[%f,%f,%f,%f]", w, x, y, z);
 	}
+
+	public Vector4f cross(Vector4f v)
+	{
+		return crossInto(v, this);
+	}
+
+	public Vector4f crossInto(Vector4f v, Vector4f r)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

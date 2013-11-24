@@ -55,14 +55,24 @@ public class MeshRenderer extends Component implements Renderable, Listener, Bou
 	@Override
 	public void draw()
 	{
-		// TEMP This is for loading materials before we have render sorting
-		if(material != null)
-			material.bind();
 		// Draw the mesh
 		if(mesh != null)
 			mesh.draw();
 	}
 
+	
+	@Override
+	public int bind()
+	{
+		// TEMP This is for loading materials before we have render sorting
+		if(material != null)
+		{
+			material.bind();
+			return material.getId();
+		}
+		return -1;
+	}
+	
 	public Bounds getBounds()
 	{
 		if(mesh == null)

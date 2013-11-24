@@ -122,4 +122,10 @@ public class CoordinateGrid extends Component implements Renderable, Listener
 	{
 	}
 
+	@Override
+	public int bind()
+	{
+		return -1;
+	}
+
 }

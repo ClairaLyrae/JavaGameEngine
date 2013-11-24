@@ -1,3 +1,5 @@
+#version 430
+
 uniform sampler2D TextureUnit0;
 uniform sampler2D TextureUnit1;
 uniform sampler2D TextureUnit2;

@@ -16,6 +16,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
+import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.assets.mesh.MeshUtil;
@@ -145,66 +146,20 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 		m.create();
 	}
 	
-	public Texture tex = null;
+	public Material mat = null;
 	
-	public void setTexture(Texture tex)
+	public void setMaterial(Material m)
 	{
-		this.tex = tex;
+		this.mat = m;
 	}
 	
 	@Override
 	public void draw()
-	{
-
-		if(solid)
-		{ 
-			glPushAttrib( GL_ALL_ATTRIB_BITS );
-			glEnable( GL_POLYGON_OFFSET_FILL );
-			glPolygonOffset( -2.5f, -2.5f );
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			glLineWidth( 2.0f );
-			if(selected)
-			{
-				glColor3f(0f, 1f, 0f); 
-			}
-			else
-			{
-				glColor3f(0.0f, 0.0f, 0.0f);
-			}
-			glDisable(GL_TEXTURE_2D);
-			mesh.draw();
-
-		    // we enable lighting right before rendering
-		    GL11.glEnable(GL11.GL_LIGHTING);
-		    GL11.glEnable(GL11.GL_LIGHT0);   
-
-		    if(smooth)
-		    	glShadeModel(GL_SMOOTH);
-		    else
-		    	glShadeModel(GL_FLAT);
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			if(tex != null && tex.getId() >= 0)
-			{
-				glBindTexture(GL_TEXTURE_2D, tex.getId());
-				glEnable(GL_TEXTURE_2D); 
-			}
-			mesh.draw();
-	        GL11.glDisable(GL11.GL_LIGHT0);
-	        GL11.glDisable(GL11.GL_LIGHTING);
-			glPopAttrib();
-
-		}
-		else
-		{
-			glPushAttrib( GL_ALL_ATTRIB_BITS );
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			if(selected)
-				glColor3f(0f, 1f, 0f); 
-			else
-				glColor3f(1f, 1f, 1f); 
-			mesh.draw();
-			glPopAttrib();
-		}
+	{	    
+		glShadeModel(GL_SMOOTH);
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			
+		mesh.draw();
 	}
 
 	public Bounds getBounds()
@@ -232,5 +187,17 @@ public class TestComponent extends Component implements Renderable, Listener, Bo
 		{
 			node.getTransform().rotate((FastMath.PI/10f)/((float)delta), 0f, 1f, 0f);
 		}
+	}
+
+	@Override
+	public int bind()
+	{
+		// TEMP This is for loading materials before we have render sorting
+		if(mat != null)
+		{
+			mat.bind();
+			return mat.getId();
+		}
+		return -1;
 	}
 }

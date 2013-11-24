@@ -245,7 +245,7 @@ public class Texture extends NativeObject
 	}
 
 	@Override
-	public void create()
+	public boolean create()
 	{
 		if(id != -1)
 			throw new UnsupportedOperationException("Texture is already loaded to the GPU");
@@ -261,5 +261,11 @@ public class Texture extends NativeObject
 	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magfilter.getGLParam());
 	    
 	    glTexImage2D(GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data);
+	    return true;
+	}
+	
+	public String toString()
+	{
+		return "mode=" + mode.toString() + ", wrap=" + wrap.toString() + ", minfilter=" + minfilter + ", magfilter=" + magfilter +", size=[" + width + "," + height + "]";
 	}
 }
