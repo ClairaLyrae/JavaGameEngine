@@ -203,7 +203,7 @@ public abstract class Game
 		EventManager.global.registerListener(Console.handle);
 		onCreate();
 		
-		Window startWindow = new Window();
+//		Window startWindow = new Window();
 		
 		while (!closeRequested)	// Main game loop
 		{
