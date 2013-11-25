@@ -10,7 +10,6 @@ import com.javagameengine.events.Listener;
 import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
 import com.javagameengine.renderer.RenderState;
-import com.javagameengine.renderer.RenderTarget;
 import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.Component;
 import com.javagameengine.scene.Scene;

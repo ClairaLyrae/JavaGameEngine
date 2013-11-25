@@ -15,7 +15,6 @@ import org.lwjgl.opengl.GL11;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.math.Transform;
-import com.javagameengine.renderer.RenderTarget;
 import com.javagameengine.renderer.Renderable;
 import com.javagameengine.renderer.Renderer;
 

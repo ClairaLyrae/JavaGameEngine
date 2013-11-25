@@ -146,7 +146,7 @@ public class EventManager
 			em.callEvent(e);
 	}
 	
-	public void print()
+	public void debugPrint()
 	{
 		System.out.println("Method Map:");
 		for(Class<? extends Event> c : methodCalls.keySet())

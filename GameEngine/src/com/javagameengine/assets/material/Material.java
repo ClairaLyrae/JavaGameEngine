@@ -24,9 +24,9 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 
 import com.javagameengine.assets.AssetManager;
+import com.javagameengine.assets.NativeObject;
 import com.javagameengine.assets.material.Shader.Type;
-import com.javagameengine.assets.mesh.NativeObject;
-import com.javagameengine.assets.mesh.VertexBuffer;
+import com.javagameengine.assets.mesh.GLBuffer;
 import com.javagameengine.renderer.Renderer;
 
 /**
@@ -183,7 +183,7 @@ public class Material extends NativeObject
         	
         }
         // Make sure all attributes are bound correctly
-        for(VertexBuffer.Type type : VertexBuffer.Type.values())
+        for(GLBuffer.Type type : GLBuffer.Type.values())
         {
         	glBindAttribLocation(id, type.ordinal(), type.getAttribName());
         	int l = glGetAttribLocation(id, type.getAttribName());
@@ -206,7 +206,7 @@ public class Material extends NativeObject
         	System.out.println(GL20.glGetProgramInfoLog(id, 1024));
         }
         // TEMP Sanity check
-        for(VertexBuffer.Type type : VertexBuffer.Type.values())
+        for(GLBuffer.Type type : GLBuffer.Type.values())
         	System.out.println("Attribute " + type.getAttribName() + " bound to index " + glGetAttribLocation(id, type.getAttribName()));
         for(TextureType type : TextureType.values())
         	System.out.println("Uniform " + type.getUniformName() + " bound to index " + glGetUniformLocation(id, type.getUniformName()));

@@ -26,9 +26,9 @@ public abstract class Matrix<T  extends Matrix<T>>
 
 	public abstract float det();
 
-	public abstract T inverse() throws MatrixOperationException;
+	public abstract T inverse();
 
-	public abstract T inverseInto(T s) throws MatrixOperationException;
+	public abstract T inverseInto(T s);
 
 	public abstract T loadIdentity();
 

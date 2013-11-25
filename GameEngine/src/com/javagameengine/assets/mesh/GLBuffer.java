@@ -10,11 +10,12 @@ import java.nio.ShortBuffer;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
+import org.lwjgl.opengl.GL30;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 
+import com.javagameengine.assets.NativeObject;
 import com.javagameengine.math.FastMath;
 
 /**
@@ -31,7 +32,7 @@ import com.javagameengine.math.FastMath;
  * For a 3D vector, a single component is one of the dimensions, X, Y or Z.</li>
  * </ul>
  */
-public class VertexBuffer extends NativeObject
+public class GLBuffer extends NativeObject
 {
 	// Type of data in this buffer
     public static enum Type {
@@ -132,9 +133,9 @@ public class VertexBuffer extends NativeObject
      * Creates an empty, uninitialized buffer.
      * Must call setupData() to initialize.
      */
-    public VertexBuffer(Type type)
+    public GLBuffer(Type type)
     {
-    	super(VertexBuffer.class);
+    	super(GLBuffer.class);
         this.bufType = type;
     }
 
@@ -225,7 +226,7 @@ public class VertexBuffer extends NativeObject
 
     /**
      * @return True if integer components should be converted to the range 0-1.
-     * @see VertexBuffer#setNormalized(boolean) 
+     * @see GLBuffer#setNormalized(boolean) 
      */
     public boolean isNormalized()
     {
@@ -287,7 +288,6 @@ public class VertexBuffer extends NativeObject
         this.format = format;
         this.componentsLength = components * format.getByteSize();
         this.lastLimit = data.limit();
-        setUpdateNeeded();
     }
 
     /**
@@ -314,7 +314,6 @@ public class VertexBuffer extends NativeObject
         }
         
         this.data = data;
-        setUpdateNeeded();
     }
 
     /**
@@ -325,13 +324,6 @@ public class VertexBuffer extends NativeObject
     public boolean hasDataSizeChanged() 
     {
         return dataSizeChanged;
-    }
-
-    @Override
-    public void clearUpdateNeeded()
-    {
-        super.clearUpdateNeeded();
-        dataSizeChanged = false;
     }
 
     /**
@@ -360,7 +352,6 @@ public class VertexBuffer extends NativeObject
             halfData.putShort(half);
         }
         this.data = halfData;
-        setUpdateNeeded();
         dataSizeChanged = true;
     }
 
@@ -411,7 +402,6 @@ public class VertexBuffer extends NativeObject
                 throw new UnsupportedOperationException("Unrecognized buffer format: "+format);
         }
         data.clear();
-        setUpdateNeeded();
         dataSizeChanged = true;
     }
 
@@ -514,7 +504,7 @@ public class VertexBuffer extends NativeObject
      * @throws IllegalArgumentException If the formats of the buffers do not
      * match.
      */
-    public void copyElement(int inIndex, VertexBuffer outVb, int outIndex){
+    public void copyElement(int inIndex, GLBuffer outVb, int outIndex){
         if (outVb.format != format || outVb.components != components)
             throw new IllegalArgumentException("Buffer format mismatch. Cannot copy");
 
@@ -617,8 +607,10 @@ public class VertexBuffer extends NativeObject
 	{
     	if(id != -1)
     		throw new IllegalStateException("Buffer is already bound to GPU");
+    	
 		id = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, id);
+		
 		if(data instanceof FloatBuffer)
 			glBufferData(GL_ARRAY_BUFFER, (FloatBuffer)data, usage.getGLParam());
 		if(data instanceof ShortBuffer)

@@ -6,12 +6,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.console.MeshCommand;
 import com.javagameengine.console.Console;
 import com.javagameengine.console.DisplayCommand;
+import com.javagameengine.console.SceneCommand;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyEvent;
 import com.javagameengine.math.FastMath;
@@ -35,7 +37,8 @@ public class TestGame extends Game
 		AssetManager.loadAll();
 		
 		// Create a new scene
-		Scene s = new Scene("TestScene");
+		Scene s = new Scene("3d");
+		Scene s2 = new Scene("menu");
 		Node root = s.getRoot();
 		
 		// Add some debug components to the root
@@ -45,9 +48,12 @@ public class TestGame extends Game
 		
 		// Register the box making command
 		Console.registerCommand(new MeshCommand());
+		Console.registerCommand(new SceneCommand());
 		
 		// Load the scene into the game
-		loadScene(s);
+		addScene(s);
+		addScene(s2);
+		setActiveScene(s.getName());
 		
 		// Auto load commands to console from file! Also we are manually firing some events
 		Console.executeFromFile(new File("commands.txt"));
@@ -78,7 +84,7 @@ public class TestGame extends Game
 		try
 		{
 			game.run(args);
-		} catch (GameInitializationException e)
+		} catch (LWJGLException e)
 		{
 			System.out.println(e.getMessage());
 			e.printStackTrace();

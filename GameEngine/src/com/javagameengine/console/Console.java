@@ -314,17 +314,23 @@ public class Console implements Listener
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		
 		glBegin(GL_QUADS);
 	    	glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
+	    	
 	    	glVertex3f(0, yBufferLim, 0f);
 	    	glVertex3f(width, yBufferLim, 0f);
+	    	
 	    	glVertex3f(width, yBuffer, 0f);
 	    	glVertex3f(0, yBuffer, 0f);
+	    	
 	    glEnd();
+	    
+	    
 		glBegin(GL_LINES);
-	    glColor4f(0.5f, 0.5f, 0.5f, 1f);
-	    glVertex3f(width, yBuffer, 0f);
-	    glVertex3f(0, yBuffer, 0f);
+			glColor4f(0.5f, 0.5f, 0.5f, 1f);
+			glVertex3f(width, yBuffer, 0f);
+			glVertex3f(0, yBuffer, 0f);
 	    glEnd();
 	    
 	    // Draw the buffer contents

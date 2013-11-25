@@ -1,4 +1,4 @@
-#version 330
+#version 150
 
 uniform vec4 light_position;
 uniform vec4 light_diffuse;

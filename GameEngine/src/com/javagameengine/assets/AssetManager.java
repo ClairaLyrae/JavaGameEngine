@@ -4,16 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.javagameengine.assets.material.InvalidShaderException;
-import com.javagameengine.assets.material.InvalidTextureException;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Shader;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
-import com.javagameengine.assets.mesh.MeshUtil;
 import com.javagameengine.console.Console;
 
 /**
@@ -42,8 +41,12 @@ public class AssetManager
 	private static Map<String, Material> materials;
 	private static Map<String, Texture> audio;
 	
+	private static Set<NativeObject> nativeObjects;
+	
 	private AssetManager()
 	{
+		nativeObjects = new HashSet<NativeObject>();
+		
 		meshes = new HashMap<String, Mesh>();
 		textures = new HashMap<String, Texture>();
 		shaders = new HashMap<String, Shader>();
@@ -76,7 +79,7 @@ public class AssetManager
 		loadDir(materialDir);
 	}	
 	
-	public static void loadFile(File f) throws IOException, InvalidTextureException, InvalidShaderException
+	public static void loadFile(File f) throws IOException
 	{
 		String[] name = f.getName().split("\\.");
 		if(name.length <= 1)
@@ -165,5 +168,10 @@ public class AssetManager
 	public static Material getMaterial(String string)
 	{
 		return materials.get(string);
+	}
+	
+	public static void addNativeObject(NativeObject no)
+	{
+		nativeObjects.add(no);
 	}
 }

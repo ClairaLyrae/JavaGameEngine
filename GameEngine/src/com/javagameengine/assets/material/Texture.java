@@ -31,8 +31,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL15;
 
-import com.javagameengine.assets.mesh.NativeObject;
+import com.javagameengine.assets.NativeObject;
 
 /**
  * @author ClairaLyrae
@@ -180,13 +181,13 @@ public class Texture extends NativeObject
         return dimg;
     }
     
-    public static Texture loadFromFile(File f) throws FileNotFoundException, IOException, InvalidTextureException
+    public static Texture loadFromFile(File f) throws FileNotFoundException, IOException
     {
     	 BufferedImage image = null;
          image = ImageIO.read(f);
          image = verticalflip(image);
          if(image.getWidth() > GL11.GL_MAX_TEXTURE_SIZE || image.getHeight() > GL11.GL_MAX_TEXTURE_SIZE)
-        	 throw new InvalidTextureException("Texture " + f.getName() + " exceeds the maximum texture size");
+        	 throw new IllegalStateException("Texture " + f.getName() + " exceeds the maximum texture size");
          int[] pixels = new int[image.getWidth() * image.getHeight()];
          image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
          
@@ -267,5 +268,23 @@ public class Texture extends NativeObject
 	public String toString()
 	{
 		return "mode=" + mode.toString() + ", wrap=" + wrap.toString() + ", minfilter=" + minfilter + ", magfilter=" + magfilter +", size=[" + width + "," + height + "]";
+	}
+	
+	/**
+	 * Binds a texture for fixed-function use. Following fixed function calls will draw with texture.
+	 */
+	public void bind()
+	{
+		glEnable(GL_TEXTURE_2D);
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, id);
+	}
+	
+	/**
+	 * Unbinds a texture for fixed-function use.
+	 */
+	public void unbind()
+	{
+		GL11.glDisable(GL_TEXTURE_2D);
 	}
 }

@@ -41,7 +41,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
-import com.javagameengine.assets.material.InvalidAssetException;
+import com.javagameengine.assets.NativeObject;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Vector2f;
 import com.javagameengine.math.Vector3f;
@@ -58,7 +58,6 @@ import com.javagameengine.scene.Bounds;
  */
 public class Mesh extends NativeObject
 {
-	
     private int meshID = -1;
     
 	public enum Mode {
@@ -93,7 +92,8 @@ public class Mesh extends NativeObject
 	
 	private Bounds bounds =  Bounds.getVoid();
 
-    private VertexBuffer[] buffers = new VertexBuffer[VertexBuffer.Type.values().length];
+    private GLBuffer[] buffers = new GLBuffer[GLBuffer.Type.values().length];
+    
     private FloatBuffer interleaved_data = null;
     private float pointSize = 1f;
     private float lineWidth = 1f;
@@ -202,7 +202,7 @@ public class Mesh extends NativeObject
      * @param vb The buffer to set
      * @throws IllegalArgumentException If the buffer type is already set
      */
-    public void setBuffer(VertexBuffer vb)
+    public void setBuffer(GLBuffer vb)
     {
         if (buffers[vb.getBufferType().ordinal()] != null)
             throw new IllegalArgumentException("Buffer type already set: "+vb.getBufferType());
@@ -213,9 +213,9 @@ public class Mesh extends NativeObject
      * Clears the buffer of the given type on this mesh
      * @param type The buffer type to clear
      */
-    public void clearBuffer(VertexBuffer.Type type)
+    public void clearBuffer(GLBuffer.Type type)
     {
-        VertexBuffer vb = buffers[type.ordinal()];
+        GLBuffer vb = buffers[type.ordinal()];
         buffers[type.ordinal()] = null;
     }
     
@@ -226,13 +226,13 @@ public class Mesh extends NativeObject
      * @param format The format of the given buffer data
      * @param data The data to set the buffer to
      */
-    public void setBuffer(VertexBuffer.Type type, VertexBuffer.Format format, Buffer data)
+    public void setBuffer(GLBuffer.Type type, GLBuffer.Format format, Buffer data)
     {
-        VertexBuffer vb = buffers[type.ordinal()];
+        GLBuffer vb = buffers[type.ordinal()];
         if (vb == null)
         {
-            vb = new VertexBuffer(type);
-            vb.setupData(VertexBuffer.Usage.DYNAMIC, type.getComponentSize(), format, data);
+            vb = new GLBuffer(type);
+            vb.setupData(GLBuffer.Usage.DYNAMIC, type.getComponentSize(), format, data);
             setBuffer(vb);
         }
         else
@@ -241,42 +241,42 @@ public class Mesh extends NativeObject
         }
     }
     
-    public void setBuffer(VertexBuffer.Type type, FloatBuffer buf) 
+    public void setBuffer(GLBuffer.Type type, FloatBuffer buf) 
     {
-        setBuffer(type, VertexBuffer.Format.FLOAT, buf);
+        setBuffer(type, GLBuffer.Format.FLOAT, buf);
     }
 
-    public void setBuffer(VertexBuffer.Type type, float[] buf)
+    public void setBuffer(GLBuffer.Type type, float[] buf)
     {
         setBuffer(type, MeshUtil.createFloatBuffer(buf));
     }
 
-    public void setBuffer(VertexBuffer.Type type, IntBuffer buf) 
+    public void setBuffer(GLBuffer.Type type, IntBuffer buf) 
     {
-        setBuffer(type, VertexBuffer.Format.INT_UNSIGNED, buf);
+        setBuffer(type, GLBuffer.Format.INT_UNSIGNED, buf);
     }
 
-    public void setBuffer(VertexBuffer.Type type, int[] buf)
+    public void setBuffer(GLBuffer.Type type, int[] buf)
     {
         setBuffer(type, MeshUtil.createIntBuffer(buf));
     }
 
-    public void setBuffer(VertexBuffer.Type type, ShortBuffer buf) 
+    public void setBuffer(GLBuffer.Type type, ShortBuffer buf) 
     {
-        setBuffer(type, VertexBuffer.Format.SHORT_INT_UNSIGNED, buf);
+        setBuffer(type, GLBuffer.Format.SHORT_INT_UNSIGNED, buf);
     }
 
-    public void setBuffer(VertexBuffer.Type type, int components, byte[] buf)
+    public void setBuffer(GLBuffer.Type type, int components, byte[] buf)
     {
         setBuffer(type, MeshUtil.createByteBuffer(buf));
     }
 
-    public void setBuffer(VertexBuffer.Type type, ByteBuffer buf) 
+    public void setBuffer(GLBuffer.Type type, ByteBuffer buf) 
     {
-        setBuffer(type, VertexBuffer.Format.UNSIGNED_BYTE, buf);
+        setBuffer(type, GLBuffer.Format.UNSIGNED_BYTE, buf);
     }
 
-    public void setBuffer(VertexBuffer.Type type, short[] buf)
+    public void setBuffer(GLBuffer.Type type, short[] buf)
     {
         setBuffer(type, MeshUtil.createShortBuffer(buf));
     }
@@ -286,14 +286,14 @@ public class Mesh extends NativeObject
      * @param type The type of VertexBuffer
      * @return The VertexBuffer (null if not set)
      */
-    public VertexBuffer getBuffer(VertexBuffer.Type type)
+    public GLBuffer getBuffer(GLBuffer.Type type)
     {
         return buffers[type.ordinal()];
     }
     
-    public FloatBuffer getFloatBuffer(VertexBuffer.Type type) 
+    public FloatBuffer getFloatBuffer(GLBuffer.Type type) 
     {
-        VertexBuffer vb = getBuffer(type);
+        GLBuffer vb = getBuffer(type);
         if (vb == null)
             return null;
         return (FloatBuffer) vb.getData();
@@ -417,10 +417,10 @@ public class Mesh extends NativeObject
         tangentbuf.flip();
         texcoordbuf.flip();
         
-        m.setBuffer(VertexBuffer.Type.POSITION, vertbuf);
-        m.setBuffer(VertexBuffer.Type.NORMAL, normbuf);
-        m.setBuffer(VertexBuffer.Type.TANGENT, tangentbuf);
-        m.setBuffer(VertexBuffer.Type.TEXCOORDS, texcoordbuf);
+        m.setBuffer(GLBuffer.Type.POSITION, vertbuf);
+        m.setBuffer(GLBuffer.Type.NORMAL, normbuf);
+        m.setBuffer(GLBuffer.Type.TANGENT, tangentbuf);
+        m.setBuffer(GLBuffer.Type.TEXCOORDS, texcoordbuf);
         
         System.out.println("Vertices=" + verts.size() + 
         		" TexCoords=" + texcoords.size() + 
@@ -485,7 +485,7 @@ public class Mesh extends NativeObject
     
     public int getVertexCount()
     {
-    	VertexBuffer vb = getBuffer(VertexBuffer.Type.POSITION);
+    	GLBuffer vb = getBuffer(GLBuffer.Type.POSITION);
     	if(vb == null)
     		return 0;
     	return vb.getNumElements();
@@ -499,6 +499,11 @@ public class Mesh extends NativeObject
 	    GL11.glDrawArrays(mode.getGLParam(), 0, getVertexCount());
 
 		glBindVertexArray(0);
+		
+		
+		
+		
+		
 //	    //If you are using IBOs:
 //	    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
 //	    GL11.glDrawElements(GL11.GL_TRIANGLES, numberIndices, GL11.GL_UNSIGNED_INT, 0);
@@ -513,13 +518,13 @@ public class Mesh extends NativeObject
 	{
 		id = glGenVertexArrays();
 		glBindVertexArray(id);
-		for(VertexBuffer vb : buffers)
+		for(GLBuffer vb : buffers)
 		{
 			if(vb == null)
 				continue;
 			if(vb.getId() == -1)
 				vb.create();
-			VertexBuffer.Type type = vb.getType();
+			GLBuffer.Type type = vb.getType();
 		    glBindBuffer(GL15.GL_ARRAY_BUFFER, vb.getId());
 		    glEnableVertexAttribArray(type.ordinal());
 		    glVertexAttribPointer(type.ordinal(), type.getComponentSize(), vb.getFormat().getGLParam(), vb.isNormalized(), vb.getStride(), vb.getOffset()); 
@@ -532,7 +537,7 @@ public class Mesh extends NativeObject
 	public void destroy()
 	{
 		glDeleteVertexArrays(id);
-		for(VertexBuffer vb : buffers)
+		for(GLBuffer vb : buffers)
 		{
 			if(vb == null || vb.getId() != -1)
 				continue;

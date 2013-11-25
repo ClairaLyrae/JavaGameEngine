@@ -103,12 +103,12 @@ public class Matrix4f extends Matrix<Matrix4f>
 		return 0.0f;
 	}
 
-	public Matrix4f inverse() throws MatrixOperationException
+	public Matrix4f inverse()
 	{
 		return inverseInto(this);
 	}
 
-	public Matrix4f inverseInto(Matrix4f r) throws MatrixOperationException
+	public Matrix4f inverseInto(Matrix4f r)
 	{
 		// TODO Need to do a 4x4 inverse and store it in r
 		return null;

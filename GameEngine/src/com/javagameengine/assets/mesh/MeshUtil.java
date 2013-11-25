@@ -113,7 +113,7 @@ public class MeshUtil
 			1.0f, 1.0f, 1.0f, 
 			-1.0f, 1.0f, 1.0f 
 		};
-		m.setBuffer(VertexBuffer.Type.POSITION, vertex);
+		m.setBuffer(GLBuffer.Type.POSITION, vertex);
 
 		float[] normal = { 
 				-1.0f, -1.0f, -1.0f, 
@@ -125,7 +125,7 @@ public class MeshUtil
 				1.0f, 1.0f, 1.0f, 
 				-1.0f, 1.0f, 1.0f 
 		};
-		m.setBuffer(VertexBuffer.Type.NORMAL, normal);
+		m.setBuffer(GLBuffer.Type.NORMAL, normal);
 		m.updateBounds();
 		return m;
     }
@@ -135,8 +135,8 @@ public class MeshUtil
     {
         int vboVertexHandle = glGenBuffers();
         int vboNormalHandle = glGenBuffers();
-        FloatBuffer vertices = model.getFloatBuffer(VertexBuffer.Type.POSITION);
-        FloatBuffer normals = model.getFloatBuffer(VertexBuffer.Type.NORMAL);
+        FloatBuffer vertices = model.getFloatBuffer(GLBuffer.Type.POSITION);
+        FloatBuffer normals = model.getFloatBuffer(GLBuffer.Type.NORMAL);
         glBindBuffer(GL_ARRAY_BUFFER, vboVertexHandle);
         glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
         glVertexPointer(3, GL_FLOAT, 0, 0L);
@@ -279,10 +279,10 @@ public class MeshUtil
         ibuf.flip();
         tbuf.flip();
         nbuf.flip();
-        m.setBuffer(VertexBuffer.Type.POSITION, vertbuf);
-        m.setBuffer(VertexBuffer.Type.NORMAL, normbuf);
+        m.setBuffer(GLBuffer.Type.POSITION, vertbuf);
+        m.setBuffer(GLBuffer.Type.NORMAL, normbuf);
         if(!texcoords.isEmpty())
-        	m.setBuffer(VertexBuffer.Type.TEXCOORDS, texcoordbuf);
+        	m.setBuffer(GLBuffer.Type.TEXCOORDS, texcoordbuf);
         
         System.out.println("Vertices=" + verts.size() + 
         		" TexCoords=" + texcoords.size() + 

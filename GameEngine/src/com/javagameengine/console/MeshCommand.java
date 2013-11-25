@@ -6,11 +6,9 @@ import java.io.IOException;
 
 import com.javagameengine.Game;
 import com.javagameengine.assets.AssetManager;
-import com.javagameengine.assets.material.InvalidTextureException;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
-import com.javagameengine.assets.mesh.MeshUtil;
 import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
