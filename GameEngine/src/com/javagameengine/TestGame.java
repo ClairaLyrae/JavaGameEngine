@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.console.MeshCommand;
@@ -43,6 +45,9 @@ public class TestGame extends Game
 		root.addComponent(new TestSceneDebugger());
 		root.addComponent(new CoordinateGrid(2f, 8f));
 		root.addComponent(new Camera());
+		root.addComponent(new GLMenuWindow(Display.getHeight(),Display.getWidth()));
+
+	
 		
 		// Register the box making command
 		Console.registerCommand(new MeshCommand());

@@ -80,7 +80,8 @@ public class SimpleOGLRenderer {
         // Upper-Left:  (-1,+1) Upper-Right:  (+1,+1)
         // Bottom-Left: (-1,-1) Bottom-Right: (+1,-1)
         glMatrixMode(GL_PROJECTION);
-        glOrtho(0, displayWidth, displayHeight, 0, 1, -1);
+        // left, right, bottom, top
+        glOrtho(0, displayWidth, 0, displayHeight, 1, -1);
         glMatrixMode(GL_MODELVIEW);
         // While we aren't pressing the red button on the display
         while (!Display.isCloseRequested()) {

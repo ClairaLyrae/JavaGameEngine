@@ -1,33 +1,6 @@
 package com.javagameengine.renderer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_COLOR_MATERIAL;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DIFFUSE;
-import static org.lwjgl.opengl.GL11.GL_FRONT;
-import static org.lwjgl.opengl.GL11.GL_LIGHT0;
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.GL_LIGHT_MODEL_AMBIENT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.GL_POSITION;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_SHININESS;
-import static org.lwjgl.opengl.GL11.GL_SMOOTH;
-import static org.lwjgl.opengl.GL11.GL_SPECULAR;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glColorMaterial;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glLight;
-import static org.lwjgl.opengl.GL11.glLightModel;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMaterial;
-import static org.lwjgl.opengl.GL11.glMaterialf;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glShadeModel;
-import static org.lwjgl.opengl.GL11.glVertex3f;
-import static org.lwjgl.opengl.GL20.glUseProgram;
 import static org.lwjgl.opengl.GL20.*;
 
 import java.io.File;
@@ -50,6 +23,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.GLU;
 
+import com.javagameengine.Game;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.lights.Light;
 import com.javagameengine.assets.material.InvalidTextureException;
@@ -65,7 +39,9 @@ import com.javagameengine.math.Matrix4f;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.math.Vector4f;
+import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.component.CoordinateGrid;
+import com.javagameengine.gui.GLMenuWindow;
 
 /**
  * Renderer is the main class that handles the rendering pipeline. The Renderer holds a ViewState which describes the
@@ -193,6 +169,13 @@ public class Renderer
 	    GL11.glPushMatrix();
 	    Console.draw();
 	    GL11.glPopMatrix();
+	    
+	    GL11.glPushMatrix();
+	    // draw gui
+//	    Scene s = Game.getHandle().getActiveScene();
+	    GL11.glPopMatrix();
+	    
+	    
 		Display.update();
 	}
 	
