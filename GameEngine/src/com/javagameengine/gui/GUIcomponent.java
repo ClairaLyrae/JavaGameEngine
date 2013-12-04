@@ -49,8 +49,7 @@ public abstract class GUIcomponent {
 		children = new ArrayList<GUIcomponent>();
 	}
 	
-	public void addChild(int w, int h, int x, int y, 
-			Color4f borC, Color4f bgC, GUIcomponent newChild)
+	public void addChild(GUIcomponent newChild)
 	{
 		newChild.parent = this;
 		this.children.add(newChild);

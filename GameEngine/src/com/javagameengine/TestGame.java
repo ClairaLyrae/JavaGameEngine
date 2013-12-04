@@ -51,9 +51,7 @@ public class TestGame extends Game
 		root.addComponent(new Camera());
 		
 		// Add gui components to root
-		root.addComponent(new GLMenuWindow(Display.getHeight(),Display.getWidth()));
-
-	
+		
 		
 		// Register the box making command
 		Console.registerCommand(new MeshCommand());

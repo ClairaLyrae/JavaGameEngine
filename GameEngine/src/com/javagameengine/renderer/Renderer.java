@@ -40,7 +40,6 @@ import com.javagameengine.math.Vector3f;
 import com.javagameengine.math.Vector4f;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.component.CoordinateGrid;
-import com.javagameengine.gui.GLMenuWindow;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.gui.WelcomeGUI;
 

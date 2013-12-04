@@ -13,6 +13,8 @@ public class Color4f
 	public static final Color4f purple = new Color4f(1f, 0f, 1f, 1f);
 	public static final Color4f cyan = new Color4f(0f, 1f, 1f, 1f);
 	public static final Color4f yellow = new Color4f(1f, 1f, 0f, 1f);
+	public static final Color4f transRed = new Color4f(1f, 0f, 0f, 0.5f);
+	public static final Color4f transBlack = new Color4f(0f, 0f, 0f, 0.5f);
 	
 	public final float r, g, b, a;
 	
@@ -35,4 +37,6 @@ public class Color4f
 	{
 		return new Color4f(v.w, v.x, v.y, v.z);
 	}
+	
+
 }
