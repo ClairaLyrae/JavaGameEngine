@@ -5,6 +5,8 @@ import java.util.Random;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.material.Material;
@@ -69,10 +71,7 @@ public class TestGame extends Game
 		root.addChild(skybox_node);
 		skybox_node.addComponent(mrsky);
 		skybox_node.getTransform().scale(5000f);
-		
-		
-		
-		// Add some debug components to the root
+
 		//root.addComponent(new CoordinateGrid(5f, 50f));
 		root.addComponent(new CameraStatic());
 		
@@ -135,6 +134,7 @@ public class TestGame extends Game
 	public static void main(String[] args)
 	{
 		TestGame game = new TestGame();
+
 		try
 		{
 			game.run(args);

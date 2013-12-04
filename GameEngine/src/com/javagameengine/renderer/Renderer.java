@@ -13,6 +13,7 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
@@ -116,6 +117,17 @@ public class Renderer
 	    GL11.glPushMatrix();
 	    Console.draw();
 	    GL11.glPopMatrix();
+	    
+	    GL11.glPushMatrix();
+	    // draw gui
+	    //  Scene s = Game.getHandle().getActiveScene();
+	    //WelcomeGUI welcome = new WelcomeGUI();
+	    //welcome.draw();
+	    
+	    //  GLMenuWindow.draw();
+	    GL11.glPopMatrix();
+	    
+	    
 		Display.update();
 	}
 	
