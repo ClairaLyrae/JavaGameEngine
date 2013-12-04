@@ -17,7 +17,6 @@ import org.lwjgl.opengl.GL11;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
-import com.javagameengine.assets.mesh.MeshUtil;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.KeyEvent;

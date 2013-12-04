@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.*;
 
-import com.javagameengine.assets.mesh.NativeObject;
+import com.javagameengine.assets.NativeObject;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -63,7 +63,7 @@ public class Shader extends NativeObject
     	this.source = data;
     }
     
-    public static Shader loadFromFile(File f) throws IOException, InvalidShaderException
+    public static Shader loadFromFile(File f) throws IOException
     {
     	 Type type = null;
     	 String[] fsplit = f.getName().split("\\.");
@@ -75,7 +75,7 @@ public class Shader extends NativeObject
 		 else if(f.getName().contains("geom"))
 			 type = Type.GEOMETRY;
     	 if(type == null)
-    		 throw new InvalidShaderException("Shader is of unknown type");
+    		 throw new IllegalStateException("Shader is of unknown type");
     	 
     	 StringBuilder shaderSource = new StringBuilder();
          BufferedReader reader = null;

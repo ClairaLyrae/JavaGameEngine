@@ -1,10 +1,18 @@
 package com.javagameengine;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
 
 import java.nio.ByteBuffer; 
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
@@ -24,7 +32,7 @@ import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.events.MouseEvent;
 import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
-import com.javagameengine.gui.Window;
+import com.javagameengine.events.SceneSwitchEvent;
 import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.Scene;
 
@@ -41,38 +49,142 @@ public abstract class Game
 {
 	private static Game handle;
 	public boolean closeRequested = false;
+	private Map<String, Scene> scenes = new HashMap<String, Scene>();
 	private Scene activeScene = null;
 	private int framerateCap = 60;
 	
+	/**
+	 * Obtains the Game instance that is currently running.
+	 * @return Null if game is not running, otherwise current game
+	 */
 	public static Game getHandle()
 	{
 		return handle;
 	}
 	
-	public void loadScene(Scene s)
+	/**
+	 * Gets the list of all the scenes in the game.
+	 * @return List of all scenes loaded in the game
+	 */
+	public final List<Scene> getScenes()
 	{
-		this.activeScene = s;
+		return new ArrayList<Scene>(scenes.values());
+	}
+
+	/**
+	 * Get the names of all loaded scenes.
+	 * @return List of loaded scene's names
+	 */
+	public final List<String> getSceneList()
+	{
+		return new ArrayList<String>(scenes.keySet());
 	}
 	
+	/**
+	 * Add the scene to the game instance.
+	 * @param Scene to add
+	 * @return True if scene was added
+	 */
+	public boolean addScene(Scene s)
+	{
+		if(scenes.containsKey(s.getName()))
+			throw new IllegalStateException("Scene with same name is already loaded");
+		scenes.put(s.getName(), s);
+		return true;
+	}
+
+	/**
+	 * @param Scene to remove
+	 * @return True if scene was removed 
+	 */
+	public boolean removeScene(Scene s)
+	{
+		return removeScene(s.getName());
+	}
+
+	/**
+	 * @param Name of scene to remove
+	 * @return True if scene was removed
+	 */
+	public boolean removeScene(String s)
+	{
+		Scene scene = scenes.get(s);
+		if(scene == null)
+			return false;
+		if(activeScene == scene)
+			throw new IllegalStateException("Cannot remove active scene");
+		return scenes.remove(s) != null;
+	}
+	
+	/**
+	 * @param Name of scene to set as active
+	 * @return True if scene was set as active
+	 */
+	public boolean setActiveScene(String s)
+	{
+		Scene scene = scenes.get(s);
+		if(scene == null)
+			return false;
+		if(scene == activeScene)
+			return false;
+		EventManager.global.callEvent(new SceneSwitchEvent(activeScene, scene));
+		this.activeScene = scene;
+		return true;
+	}
+	
+	/**
+	 * @return The active scene. (null if no scenes are active)
+	 */
 	public Scene getActiveScene()
 	{
 		return activeScene;
+	}
+	
+	/**
+	 * @param Scene to check
+	 * @return True if given scene is the active scene
+	 */
+	public boolean isActiveScene(Scene s)
+	{
+		if(s == null)
+			return false;
+		return s == activeScene;
+	}
+	
+	/**
+	 * @param Name of scene to check
+	 * @return True if given scene is the active scene
+	 */
+	public boolean isActiveScene(String s)
+	{
+		if(s == null || activeScene == null)
+			return false;
+		return activeScene.getName().equals(s);
 	}
 	
 	private long lastFrameTime; // used to calculate delta
 	private float fps;
 	private int delta = 0; // Time since last frame
 
+	/**
+	 * @return System time (milliseconds)
+	 */
 	public long getTime()
 	{
 		return (Sys.getTime() * 1000) / Sys.getTimerResolution();
 	}
 	
+	/**
+	 * @return Time between last two frames (milliseconds)
+	 */
 	public int getDelta()
 	{
 		return delta;
 	}
 	
+	/**
+	 * Updates the time between last two frames (called only during game loop)
+	 */
 	private void updateDelta()
 	{
 		long time = getTime();
@@ -85,6 +197,9 @@ public abstract class Game
 	private int deltaBufferPointer = 0;
 	private int deltaBufferSum = 0;
 
+	/**
+	 * Updates the FPS calculation between the last two frames (called only during game loop)
+	 */
 	private void updateFPS()
 	{
 		deltaBufferSum-=deltaBuffer[deltaBufferPointer];
@@ -95,6 +210,9 @@ public abstract class Game
 		fps = 1000f/((float)deltaBufferSum/(float)deltaBufferSize);
 	}
 	
+	/**
+	 * @return The average FPS of the game
+	 */
 	public float getFPS()
 	{
 		return fps;
@@ -172,11 +290,11 @@ public abstract class Game
 	 * @param	args	Arguments applied to game on startup
 	 * @throws GameInitializationException 
 	 */
-	public void run(String[] args) throws GameInitializationException
+	public void run(String[] args) throws LWJGLException
 	{
 		// If we are running, don't start another one
 		if(handle != null)	
-			throw new GameInitializationException("Another instance of a game is already running.");
+			throw new LWJGLException("Another instance of a game is already running.");
 		handle = this;
 		
 		// Initialize Display
@@ -203,8 +321,6 @@ public abstract class Game
 		EventManager.global.registerListener(Console.handle);
 		onCreate();
 		
-//		Window startWindow = new Window();
-		
 		while (!closeRequested)	// Main game loop
 		{
 			// Update timing information
@@ -212,16 +328,25 @@ public abstract class Game
 			updateFPS();
 			Display.setTitle("FPS: " + fps + " Delta: " + delta);
 			
+			
+			
 			// Call loop update methods that trickle down the hierarchy
 			input();
+			
+			
+			
+			
 			if (activeScene == null)
 				break;
+			
+			
 			activeScene.update(delta);
 			onUpdate();
 			Renderer.clearQueue();
 			// Load the renderer queue with the scene
 			if(activeScene.getRoot() != null)
 				activeScene.getRoot().queueRenderOperations();	
+			
 			Renderer.render();
 			onRender();
 			

@@ -80,12 +80,12 @@ public class Matrix3f extends Matrix<Matrix3f>
 				* (f01 * f12 - f11 * f02));
 	}
 
-	public Matrix3f inverse() throws MatrixOperationException
+	public Matrix3f inverse()
 	{
 		return inverseInto(this);
 	}
 
-	public Matrix3f inverseInto(Matrix3f r) throws MatrixOperationException
+	public Matrix3f inverseInto(Matrix3f r)
 	{
 		// TODO Auto-generated method stub
 		return null;

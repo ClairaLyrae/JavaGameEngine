@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import javax.swing.RootPaneContainer;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
@@ -26,12 +28,9 @@ import org.lwjgl.util.glu.GLU;
 import com.javagameengine.Game;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.lights.Light;
-import com.javagameengine.assets.material.InvalidTextureException;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Texture;
-import com.javagameengine.assets.mesh.InvalidMeshException;
 import com.javagameengine.assets.mesh.Mesh;
-import com.javagameengine.assets.mesh.MeshUtil;
 import com.javagameengine.console.Console;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.FastMath;
@@ -42,6 +41,8 @@ import com.javagameengine.math.Vector4f;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.component.CoordinateGrid;
 import com.javagameengine.gui.GLMenuWindow;
+import com.javagameengine.gui.GUI;
+import com.javagameengine.gui.WelcomeGUI;
 
 /**
  * Renderer is the main class that handles the rendering pipeline. The Renderer holds a ViewState which describes the
@@ -64,34 +65,19 @@ public class Renderer
 	public static Renderer handle = new Renderer();
 	public static Matrix4f modelview_matrix = new Matrix4f();
 	public static Matrix4f projection_matrix = new Matrix4f();
-	private static List<RenderContext> views = new ArrayList<RenderContext>();
-	private static RenderTarget target;
 	private static List<RenderOperation> operations = new ArrayList<RenderOperation>();
 	
-	public static RenderTarget getRenderTarget()
-	{
-		return target;
-	}
-	
-	public static void setRenderTarget(RenderTarget rt)
-	{
-		target = rt;
-	}
-	
-	public static void registerViewState(RenderContext vs)
-	{
-		views.add(vs);
-	}
-
-    
 	public static void render()
 	{
 		int width = Display.getWidth();
 		int height = Display.getHeight();
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
+		
 		GL11.glClearColor(0.2f, 0.2f, 0.2f, 0.2f); // Black Background
 		GL11.glClearDepth(1.0f); // Depth Buffer Setup
+		
 		GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
 		GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
 	    GL11.glEnable(GL11.GL_CULL_FACE);
@@ -125,7 +111,6 @@ public class Renderer
 		modelview_matrix = Matrix4f.lookAtMatrix(0f,5f,10f,0f,0f,0f,0f,1f,0f);
 		modelview_matrix.multiply(cam.getTransformMatrix());
 		
-		
 		//Material mat = AssetManager.getMaterial("ship");
 		glShadeModel(GL_SMOOTH);
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);
@@ -135,9 +120,11 @@ public class Renderer
 		{
 			// Load the render operation transform data
 			Transform transform = op.getTransform();
+			
 			Matrix4f modelviewtemp = modelview_matrix.multiplyInto(transform.getTransformMatrix(), null);
 
 			int progID = op.getGraphicsObject().bind();
+			
 			
 			FloatBuffer MV_buffer2 = modelviewtemp.toBuffer();
 			int loc = glGetUniformLocation(progID, "mv");
@@ -153,26 +140,41 @@ public class Renderer
 			loc = glGetUniformLocation(progID, "light_position");
 			glUniform4f(loc, 10f, 10f, 5f, 1f);
 			
+			
+			
+			
 			op.getGraphicsObject().draw();
 		}
 
 	    glUseProgram(0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
+		
 	    // DRAW CONSOLE
 	    GL11.glDisable(GL11.GL_CULL_FACE);
+	    
+	    
 	    GL11.glMatrixMode(GL11.GL_PROJECTION);
 	    GL11.glLoadIdentity();
+	    
+	    
 		glOrtho(0, width, 0, height, 0f, 1f);
+		
 	    GL11.glMatrixMode(GL11.GL_MODELVIEW);   
 	    glLoadIdentity();
 	    GL11.glPushMatrix();
+	    
 	    Console.draw();
+	    
 	    GL11.glPopMatrix();
 	    
 	    GL11.glPushMatrix();
 	    // draw gui
-//	    Scene s = Game.getHandle().getActiveScene();
+	  //  Scene s = Game.getHandle().getActiveScene();
+	    WelcomeGUI welcome = new WelcomeGUI();
+	    welcome.draw();
+	    
+	  //  GLMenuWindow.draw();
 	    GL11.glPopMatrix();
 	    
 	    
@@ -190,35 +192,67 @@ public class Renderer
 		return true;
 	}
 
-	public static FloatBuffer mv_m = BufferUtils.createFloatBuffer(16);
 	public static Transform camerat = new Transform();
-	
 	public static Light light;
 	private Renderer()
 	{
-		
 		light = new Light();
 		light.setColor(Color4f.red);
 	}
-	
-	public static void printMatrixStates()
-	{
-		FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-		glGetFloat(GL_MODELVIEW_MATRIX, fb);
-		Matrix4f gl_MV = new Matrix4f().fromBuffer(fb).transpose();
-		fb.rewind();
-		GL11.glGetFloat(GL_PROJECTION_MATRIX, fb);
-		Matrix4f gl_P = new Matrix4f().fromBuffer(fb).transpose();
-		fb.rewind();
-		
-		System.out.println("gl MV matrix: " + gl_MV);
-		System.out.println("custom MV matrix: " + modelview_matrix);
-		System.out.println("gl P matrix: " + gl_P);
-		System.out.println("custom P matrix: " + projection_matrix);
-		System.out.println("gl MV*P matrix: " + gl_MV.multiplyInto(gl_P, null));
-		System.out.println("custom MV*P matrix: " + modelview_matrix.multiplyInto(projection_matrix, new Matrix4f()));
-	}
 }
+
+
+
+
+
+//Texture t = AssetManager.getTexture("ship_diff");
+//t.bind();
+//
+//glEnable(GL_TEXTURE_2D);
+//
+//
+//
+//glBegin(GL_QUADS);
+//glColor4f(1f, 2f, 3f, 1f);
+//glTexCoord2f(0f, 0f);
+//glVertex3f(100f, 100f, 0f);
+//glTexCoord2f(0f, 1f);
+//glVertex3f(100f, 200f, 0f);
+//glTexCoord2f(1f, 1f);
+//glVertex3f(200f, 200f, 0f);
+//glTexCoord2f(1f, 0f);
+//glVertex3f(200f, 100f, 0f);
+//glEnd();
+
+
+
+
+
+
+
+
+
+
+
+//public static void printMatrixStates()
+//{
+//	FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+//	glGetFloat(GL_MODELVIEW_MATRIX, fb);
+//	Matrix4f gl_MV = new Matrix4f().fromBuffer(fb).transpose();
+//	fb.rewind();
+//	GL11.glGetFloat(GL_PROJECTION_MATRIX, fb);
+//	Matrix4f gl_P = new Matrix4f().fromBuffer(fb).transpose();
+//	fb.rewind();
+//	
+//	System.out.println("gl MV matrix: " + gl_MV);
+//	System.out.println("custom MV matrix: " + modelview_matrix);
+//	System.out.println("gl P matrix: " + gl_P);
+//	System.out.println("custom P matrix: " + projection_matrix);
+//	System.out.println("gl MV*P matrix: " + gl_MV.multiplyInto(gl_P, null));
+//	System.out.println("custom MV*P matrix: " + modelview_matrix.multiplyInto(projection_matrix, new Matrix4f()));
+//}
+
+
 
 
 
