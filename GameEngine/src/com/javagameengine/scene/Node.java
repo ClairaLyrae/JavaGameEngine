@@ -3,25 +3,13 @@
 
 package com.javagameengine.scene;
 
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW_MATRIX;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import org.lwjgl.opengl.GL11;
-
-import com.javagameengine.math.Matrix;
-import com.javagameengine.math.Quaternion;
 import com.javagameengine.math.Transform;
-import com.javagameengine.math.Vector3f;
-import com.javagameengine.math.Vector4f;
-import com.javagameengine.renderer.RenderOperation;
 import com.javagameengine.renderer.Renderable;
 import com.javagameengine.renderer.Renderer;
 
@@ -82,13 +70,15 @@ public final class Node implements Bounded
 	 */
 	public void destroy()
 	{
-		for(Node n : children)
+		List<Node> child_list = new ArrayList<Node>(children);
+		List<Component> comp_list = new ArrayList<Component>(components);
+		for(Node n : child_list)
 			n.destroy();
-		for(Component c : components)
+		for(Component c : comp_list)
 			c.destroy(); 
 		if(parent != null)
 		{
-			parent.removeChild(this);
+			parent.children.remove(this);
 			parent = null;
 		}
 		if(scene != null && scene.getRoot() != this)
@@ -145,9 +135,8 @@ public final class Node implements Bounded
 	{
 		if(!children.contains(n))
 			return false;
-		n.parent = null;
-		n.scene = null;
-		return children.remove(n);
+		n.destroy();
+		return true;
 	}
 	
 	public void removeChildren()
@@ -307,7 +296,6 @@ public final class Node implements Bounded
 	 */
 	public Transform findWorldTransform()
 	{
-		// TODO Untested
 		// Go up the chain to the root, then back out, applying transforms. End result will be absolute transform referenced to the identity
 		if(parent == null)
 			return new Transform();
@@ -355,7 +343,7 @@ public final class Node implements Bounded
 	 * and stores it in the node. Then it computes the Bounds of the node based on the Components and the Bounds of  
 	 * the subtree. During this it will load the Renderer with RenderOperations based on the computed data.
 	 */
-	public void queueRenderOperations()
+	public void queueRenderables()
 	{
 		// Update the world space transforms
 		worldTransform.set(transform);
@@ -369,7 +357,7 @@ public final class Node implements Bounded
 			if(c instanceof Bounded)
 				boundingBoxNode.encompass(((Bounded)c).getBounds());
 			if(c instanceof Renderable)
-				Renderer.queue(new RenderOperation((Renderable)c, worldTransform));
+				Renderer.queue((Renderable)c);
 		}
 		
 		// Call graphics method on child nodes & update subtree bounds
@@ -377,7 +365,7 @@ public final class Node implements Bounded
 		for(Node n : children)
 		{
 			boundingBox.encompass(n.getBounds());	// Extend the bounding box to include the bounds of this child
-			n.queueRenderOperations();
+			n.queueRenderables();
 		}
 	}
 	

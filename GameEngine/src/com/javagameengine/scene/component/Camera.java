@@ -1,77 +1,174 @@
 package com.javagameengine.scene.component;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
-import com.javagameengine.console.Console;
-import com.javagameengine.events.EventManager;
-import com.javagameengine.events.EventMethod;
-import com.javagameengine.events.Listener;
-import com.javagameengine.events.MouseMoveEvent;
-import com.javagameengine.events.MouseScrollEvent;
-import com.javagameengine.renderer.RenderState;
+import com.javagameengine.math.FastMath;
+import com.javagameengine.math.Matrix4f;
+import com.javagameengine.math.Quaternion;
 import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.Component;
-import com.javagameengine.scene.Scene;
 
-// TODO Claira - working on this, will require a fair amount of fiddling with other things. Wes, if you want to help with this it will need some openGL work on view changes that im not clear on... let me know
-
-/**
- * @author ClairaLyrae
- * Provides a movable camera view in component form to render the scene from.
- */
-public class Camera extends Component implements Listener
+public class Camera extends Component
 {
-	@EventMethod
-	public void onMouseMove(MouseMoveEvent e)
-	{
-		if(!Mouse.isButtonDown(2) || e.isCancelled())
-			return;
-		if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
-		{
-			Renderer.camerat.translate(0.1f*e.getDeltaX(), 0f, 0f);
-			Renderer.camerat.translate(0f, 0.1f*e.getDeltaY(), 0f);
-		}
-		else
-		{
-			Renderer.camerat.rotate(0.01f*e.getDeltaX(), 0f, 1f, 0f);
-			Renderer.camerat.rotate(0.01f*e.getDeltaY(), 2f, 0f, 0f);
-		}
+	public enum Type{
+		PERSPECTIVE,
+		ORTHOGONAL;
 	}
 	
-	@EventMethod
-	public void onMouseScroll(MouseScrollEvent e)
+	private Type type;
+	
+	private float aspect;
+	private float fovy;
+
+	private float zNear;
+	private float zFar;
+
+	private float left;
+	private float right;
+	private float bottom;
+	private float top;
+
+	public void setAspectRatio(float f)
 	{
-		if(e.isCancelled())
-			return;
-		float s = e.getAmount();
-		if(s > 0f)
-			s *= 2;
-		else
-			s *= -0.5;
-		Renderer.camerat.scale(s, s, s);
+		aspect = f;
 	}
 	
-	public RenderState getRenderState()
+	public void setFOV(float fov)
 	{
-		return null;
+		this.fovy = fov;
+	}
+	
+	public void setOrthoBounds(float top, float bottom, float left, float right)
+	{
+		this.top = top;
+		this.bottom = bottom;
+		this.left = left;
+		this.right = right;
+	}
+	
+	public void setDepth(float zNear, float zFar)
+	{
+		this.zFar = zFar;
+		this.zNear = zNear;
+	}
+	
+	public void setType(Type type)
+	{
+		this.type = type;
+	}
+	
+	private int[] ignoreLayers = new int[Renderer.MAX_LAYERS];
+	
+	private boolean isEnabled = false;
+	
+	public void setEnabled(boolean state)
+	{
+		isEnabled = state;
+	}
+	
+	public boolean isEnabled()
+	{
+		return isEnabled;
+	}
+	
+	private boolean useDisplayBorders = true;
+	
+	public void useDisplayBorders(boolean b)
+	{
+		useDisplayBorders = b;
+	}
+	
+	public boolean isAlignedToDisplay()
+	{
+		return useDisplayBorders;
+	}
+	
+	public float getAspect()
+	{
+		if(useDisplayBorders)
+		{
+			float width = (float)Display.getWidth();
+			float height = (float)Display.getHeight();
+			return width/height;
+		}
+		return aspect;
+	}
+	
+	public float getOrthoLeft()
+	{
+		if(useDisplayBorders)
+			return 0;
+		return left;
 	}
 
-	public void onDestroy()
+	public float getOrthoRight()
 	{
-		Scene s = getScene();
-		if(s != null)
-			s.getEventManager().unregisterListener(this);
+		if(useDisplayBorders)
+			return (float)Display.getWidth();
+		return right;
+	}
+	
+	public float getOrthoBottom()
+	{
+		if(useDisplayBorders)
+			return 0;
+		return bottom;
+	}
+	
+	public float getOrthoTop()
+	{
+		if(useDisplayBorders)
+			return (float)Display.getHeight();
+		return top;
+	}
+	
+	public float getFOV()
+	{
+		return fovy;
+	}
+	
+	public float getDepthNear()
+	{
+		return zNear;
 	}
 
-	public void onCreate()
+	public float getDepthFar()
 	{
-		Scene s = getScene();
-		if(s != null)
-			s.getEventManager().registerListener(this);
+		return zFar;
 	}
-
+	
+	public Matrix4f getViewMatrix()
+	{
+		if(node == null)
+			return new Matrix4f();
+		Matrix4f cinv = node.getWorldTransform().getTransformMatrix().inverseInto(null);
+		Matrix4f.rotationMatrix(FastMath.PI, 0f, 1f, 0f).multiplyInto(cinv, cinv);
+		return cinv;
+	}
+	
+	public Matrix4f getProjectionMatrix()
+	{
+		if(type == Type.PERSPECTIVE)
+			return Matrix4f.perspectiveMatrix(getFOV(), getAspect(), getDepthNear(), getDepthFar());
+		if(type == Type.ORTHOGONAL)
+			return Matrix4f.orthoMatrix(getOrthoLeft(), getOrthoRight(), getOrthoTop(), getOrthoBottom(), getDepthNear(), getDepthFar());
+		return new Matrix4f();
+	}
+	
+	@Override
 	public void onUpdate(int delta)
 	{
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		getScene().resetCamera();
+	}
+
+	@Override
+	public void onCreate()
+	{
+		getScene().setCamera(this);
 	}
 }

@@ -1,0 +1,5 @@
+s dsn_vert
+s dsn_frag
+t diffuse asteroid_2_diff
+t normal asteroid_2_norm
+t specular asteroid_2_spec

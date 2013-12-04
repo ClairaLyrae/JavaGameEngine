@@ -1,22 +1,13 @@
 package com.javagameengine.scene;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
-import com.javagameengine.math.Transform;
-import com.javagameengine.renderer.Renderable;
 import com.javagameengine.renderer.Renderer;
+import com.javagameengine.scene.component.Camera;
+import com.javagameengine.scene.component.PhysicsComponent;
 
 /**
  * A Scene object describes a particular state of the game world, and manages a scene graph comprised of Node objects.
@@ -30,6 +21,24 @@ public class Scene
 	private String name;
 	private Node root;
 	private EventManager eventManager = new EventManager();
+	private Camera camera = null;
+	
+	public Camera getCamera()
+	{
+		return camera;
+	}
+	
+	public void resetCamera()
+	{
+		camera = null;
+	}
+	
+	public void setCamera(Camera c)
+	{
+		if(camera != null)
+			throw new IllegalStateException("Camera is already mounted.");
+		camera = c;
+	}	
 	
 	public Scene(String name)
 	{
@@ -69,31 +78,17 @@ public class Scene
 		return root;
 	}
 
+	public void queueRender()
+	{
+		Renderer.camera = camera;
+		root.queueRenderables();
+	}
+	
 	public void update(int delta)
 	{
 		if(root == null)
 			return;
 		root.logic(delta);
-	}
-	
-	// For debugging scenes
-	public void print()
-	{
-		Console.println("Scene: " + getName());
-		print(root, "");
-	}
-
-	// For debugging scenes
-	private void print(Node n, String sb)
-	{
-		sb += "  ";
-		
-		Console.println(sb + "N: " + n.toString());
-		
-		for(Component c : n.getComponents())
-			Console.println(sb + "C: " + c.toString());
-		
-		for(Node node : n.getChildren())
-			print(node, sb);
+		PhysicsComponent.calculateCollisions();
 	}
 }

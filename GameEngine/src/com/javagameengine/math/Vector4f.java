@@ -2,6 +2,8 @@ package com.javagameengine.math;
 
 import java.nio.FloatBuffer;
 
+import org.lwjgl.BufferUtils;
+
 /**
  * 4 dimensional vector class implemented using floats.
  * @author ClairaLyrae
@@ -288,5 +290,23 @@ public class Vector4f extends Vector<Vector4f>
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public static FloatBuffer getBufferFromArray(Vector4f[] array)
+	{
+		FloatBuffer fb = BufferUtils.createFloatBuffer(array.length * 4);
+		for(int i = 0; i < array.length; i++)
+			fb.put(array[i].x).put(array[i].y).put(array[i].z).put(array[i].w);
+		fb.flip();
+		return fb;
+	}
+	
+	public static Vector4f[] getArrayFromBuffer(FloatBuffer fb)
+	{
+		Vector4f[] array = new Vector4f[(int)(fb.limit()/4)];
+		for(int i = 0; i < array.length; i++)
+			array[i] = new Vector4f(fb.get(), fb.get(), fb.get(), fb.get());
+		fb.rewind();
+		return array;
 	}
 }

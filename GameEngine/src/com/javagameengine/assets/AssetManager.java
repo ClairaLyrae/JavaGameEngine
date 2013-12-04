@@ -13,7 +13,6 @@ import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Shader;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
-import com.javagameengine.console.Console;
 
 /**
  * Loads all the assets located in the main game directory. Provides access to the assets.

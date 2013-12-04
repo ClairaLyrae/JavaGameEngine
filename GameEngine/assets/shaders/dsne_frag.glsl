@@ -10,7 +10,6 @@ uniform sampler2D tex_specular;
 uniform sampler2D tex_emissive;
 
 in vec3 l_dir;
-in vec3 view_dir;
 
 in vec3 position;
 in vec3 normal;
@@ -25,7 +24,7 @@ void main(void)
 {
     vec3 N = normal;
     
-    vec3 nmap = (texture2D(tex_normal, texcoord).rgb)*2.0;
+    vec3 nmap = ((texture2D(tex_normal, texcoord).rgb)*2.0)-1;
     N = normalize((tangent * nmap.r) + (bitangent * nmap.g) + (normal * nmap.b));
     
     float brightness = max(0.0, dot(N, l_dir));

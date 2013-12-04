@@ -1,5 +1,5 @@
-s test_vert
-s test_frag
+s dsne_vert
+s dsne_frag
 t diffuse ship_diff
 t specular ship_spec
 t emissive ship_emissive

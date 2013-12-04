@@ -200,26 +200,6 @@ public class Quaternion extends Vector<Quaternion>
 		return r;
 	}
 
-	public Quaternion rotate(float x, float y, float z)
-	{
-		return new Quaternion();
-	}
-
-	public Quaternion rotate(Vector3f v)
-	{
-		return new Quaternion();
-	}
-
-	public Quaternion rotateTo(Quaternion q)
-	{
-		return new Quaternion();
-	}
-
-	public Quaternion rotateTo(Quaternion q, float step)
-	{
-		return new Quaternion();
-	}
-
 	public Quaternion scale(float s)
 	{
 		return scaleInto(s, this);
@@ -334,7 +314,38 @@ public class Quaternion extends Vector<Quaternion>
         return r;
     }	
 
-	public Matrix4f toRotationMatrix()
+	public Matrix3f toRotationMatrix3f()
+	{
+		Matrix3f m = new Matrix3f();
+		float Nq = magnitudeSquared();
+		float s = 0.0f;
+		if (Nq > 0.0f)
+			s = 2.0f / Nq;
+		float X = x * s;
+		float Y = y * s;
+		float Z = z * s;
+		float wX = w * X;
+		float wY = w * Y;
+		float wZ = w * Z;
+		float xX = x * X;
+		float xY = x * Y;
+		float xZ = x * Z;
+		float yY = y * Y;
+		float yZ = y * Z;
+		float zZ = z * Z;
+		m.f00 = 1.0f - (yY + zZ);
+		m.f01 = xY - wZ;
+		m.f02 = xZ + wY;
+		m.f10 = xY + wZ;
+		m.f11 = 1.0f - (xX + zZ);
+		m.f12 = yZ - wX;
+		m.f20 = xZ - wY;
+		m.f21 = yZ + wX;
+		m.f22 = 1.0f - (xX + yY);
+		return m;
+	}
+	
+	public Matrix4f toRotationMatrix4f()
 	{
 		Matrix4f m = new Matrix4f();
 		float Nq = magnitudeSquared();

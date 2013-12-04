@@ -2,6 +2,8 @@ package com.javagameengine.math;
 
 import java.nio.FloatBuffer;
 
+import org.lwjgl.BufferUtils;
+
 /**
  * 3 dimensional vector class implemented using floats.
  * @author ClairaLyrae
@@ -146,6 +148,11 @@ public class Vector3f extends Vector<Vector3f>
 		return r;
 	}
 
+	public float sum()
+	{
+		return x+y+z;
+	}
+	
 	public Vector3f normalize()
 	{
 		return normalizeInto(this);
@@ -155,10 +162,13 @@ public class Vector3f extends Vector<Vector3f>
 	{
 		if (r == null)
 			r = new Vector3f();
-		float mag = 1.0f / magnitude();
-		r.x = mag * x;
-		r.y = mag * y;
-		r.z = mag * z;
+		float mag = magnitude();
+		if(mag == 0f)
+			return r.set(0f, 0f, 1f);
+		float mult = 1f/mag;
+		r.x = mult * x;
+		r.y = mult * y;
+		r.z = mult * z;
 		return r;
 	}
 
@@ -241,6 +251,19 @@ public class Vector3f extends Vector<Vector3f>
 		return r;
 	}
 
+	public Vector3f orthogonalize(Vector3f v)
+	{
+		return orthogonalizeInto(v, this);
+	}
+	
+	public Vector3f orthogonalizeInto(Vector3f v, Vector3f r)
+	{
+		if(r == null)
+			r = new Vector3f();
+	    subtractInto(v.scaleInto(v.dot(this), r), r);
+	    return r;
+	}
+    
 	@Override
 	public float[] toArray(float[] a)
 	{
@@ -294,5 +317,23 @@ public class Vector3f extends Vector<Vector3f>
 		r.y = j;
 		r.z = k;
 		return r;
+	}
+
+	public static FloatBuffer getBufferFromArray(Vector3f[] array)
+	{
+		FloatBuffer fb = BufferUtils.createFloatBuffer(array.length * 3);
+		for(int i = 0; i < array.length; i++)
+			fb.put(array[i].x).put(array[i].y).put(array[i].z);
+		fb.flip();
+		return fb;
+	}
+	
+	public static Vector3f[] getArrayFromBuffer(FloatBuffer fb)
+	{
+		Vector3f[] array = new Vector3f[(int)(fb.limit()/3)];
+		for(int i = 0; i < array.length; i++)
+			array[i] = new Vector3f(fb.get(), fb.get(), fb.get());
+		fb.rewind();
+		return array;
 	}
 }

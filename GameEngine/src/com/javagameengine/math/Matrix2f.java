@@ -3,8 +3,6 @@ package com.javagameengine.math;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
-
 /**
  * 2x2 square matrix class implemented using floats.
  * @author ClairaLyrae

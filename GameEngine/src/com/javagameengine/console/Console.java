@@ -1,34 +1,36 @@
 package com.javagameengine.console;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LINES;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glColor4f;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glPolygonMode;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 
+import com.javagameengine.Game;
 import com.javagameengine.events.CommandEvent;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.EventMethod;
-import com.javagameengine.events.KeyEvent;
+import com.javagameengine.events.KeyPressEvent;
 import com.javagameengine.events.Listener;
 import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
@@ -129,7 +131,7 @@ public class Console implements Listener
 	}
 	
 	@EventMethod
-	public void onKey(KeyEvent e)
+	public void onKey(KeyPressEvent e)
 	{
 		if(!e.state())	// Ignore key releases
 			return;
@@ -139,7 +141,7 @@ public class Console implements Listener
 			return;
 		if(e.getKey() == Keyboard.KEY_GRAVE)	// Toggle console on tilde ~ key
 		{
-			isVisible = !isVisible;
+			setVisible(!isVisible());
 			strbuffer.setReadToHead();
 			return;
 		}
@@ -256,12 +258,13 @@ public class Console implements Listener
 	 */
 	public static boolean isVisible()
 	{
-		return isVisible();
+		return isVisible;
 	}
 	
 	public static void setVisible(boolean b)
 	{
 		isVisible = b;
+		Game.getHandle().pause(b);
 	}
 	
 	/**
@@ -279,6 +282,8 @@ public class Console implements Listener
 	 */
 	public static void draw()
 	{
+		if(!isVisible)
+			return;
 		// Get the display dimensions
 		int width = Display.getWidth();
 		int height = Display.getHeight();
@@ -311,8 +316,7 @@ public class Console implements Listener
 	    }
 		
 	    // Draw the buffer box and border
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		
 		glBegin(GL_QUADS);
@@ -348,10 +352,8 @@ public class Console implements Listener
 	    strbuffer.setReadPos(bpos);
 
 	    // If console is enabled, draw the input box too
-		if(isVisible)
-		{
-		    glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
-			glBegin(GL_QUADS);
+		glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
+		glBegin(GL_QUADS);
 		    glVertex3f(0, yBuffer, 0f);
 		    glVertex3f(width, yBuffer, 0f);
 		    glVertex3f(width, yInput, 0f);
@@ -364,7 +366,6 @@ public class Console implements Listener
 		    glEnd();
 		    glColor4f(1f, 1f, 1f, 1f);
 		    SimpleText.drawString("> " + input.toString() + "_" , 5, yInputText);
-		}
 	}
 	
 	public static void executeFromFile(File f)

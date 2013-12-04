@@ -1,8 +1,9 @@
-package com.javagameengine.assets.lights;
+package com.javagameengine.scene.component;
 
 import com.javagameengine.math.Color4f;
+import com.javagameengine.scene.Component;
 
-public class Light
+public class Light extends Component
 {
 	private float angle = 0.0f;
 	private float intensity = 0.0f;
@@ -38,5 +39,26 @@ public class Light
 	public void setLimit(float limit)
 	{
 		this.limit = limit;
+	}
+
+	@Override
+	public void onUpdate(int delta)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onCreate()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

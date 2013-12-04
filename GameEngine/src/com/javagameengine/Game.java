@@ -1,33 +1,23 @@
 package com.javagameengine;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
-import static org.lwjgl.opengl.GL11.glMatrixMode;
-
-import java.nio.ByteBuffer; 
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
-import org.lwjgl.util.glu.GLU;
 
+import com.javagameengine.assets.NativeObject;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
-import com.javagameengine.events.KeyEvent;
+import com.javagameengine.events.KeyHeldEvent;
+import com.javagameengine.events.KeyPressEvent;
 import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.events.MouseEvent;
 import com.javagameengine.events.MouseMoveEvent;
@@ -140,6 +130,11 @@ public abstract class Game
 		return activeScene;
 	}
 	
+	public Scene getScene(String s)
+	{
+		return scenes.get(s);
+	}
+	
 	/**
 	 * @param Scene to check
 	 * @return True if given scene is the active scene
@@ -218,7 +213,24 @@ public abstract class Game
 		return fps;
 	}
 	
-	private long keyPressTime = 0;
+	private boolean isPaused = false;
+	
+	private int[] validKeyHolds = {
+			Keyboard.KEY_UP,
+			Keyboard.KEY_DOWN,
+			Keyboard.KEY_LEFT,
+			Keyboard.KEY_RIGHT,
+			Keyboard.KEY_S,
+			Keyboard.KEY_D,
+			Keyboard.KEY_F,
+			Keyboard.KEY_E,
+			Keyboard.KEY_W,
+			Keyboard.KEY_R,
+			Keyboard.KEY_T,
+			Keyboard.KEY_G,
+			Keyboard.KEY_Q,
+			Keyboard.KEY_A
+			};
 	
 	/**
  	 * Links the LWJGL input device event system with the object-based event system of the engine. Analyzes the LWJGL
@@ -227,25 +239,18 @@ public abstract class Game
 	private void input()
 	{
 		// While keyboard has events in buffer
+		for(int key : validKeyHolds)
+		{
+			if(Keyboard.isKeyDown(key))
+				EventManager.global.callEvent(new KeyHeldEvent(key, ' ', getDelta()));
+		}
 		while(Keyboard.next())
 		{
-			KeyEvent e;
+			KeyPressEvent e;
 			int key = Keyboard.getEventKey();
-			boolean isRepeat = Keyboard.isRepeatEvent();
 			boolean isPress = Keyboard.isKeyDown(key);
 			char c = Keyboard.getEventCharacter();
-			if(Keyboard.areRepeatEventsEnabled() && isRepeat)
-			{
-			 	keyPressTime += Keyboard.getEventNanoseconds();
-				e = new KeyEvent(key, c, isPress, Keyboard.getEventNanoseconds());
-			}
-			else if(keyPressTime > 0)
-			{
-				e = new KeyEvent(key, c, isPress, keyPressTime);
-				keyPressTime = 0;
-			}
-			else
-				e = new KeyEvent(key, c, isPress);
+			e = new KeyPressEvent(key, c, isPress);
 			EventManager.global.callEvent(e);
 		}
 		// While mouse has events in buffer
@@ -285,6 +290,16 @@ public abstract class Game
 		}
 	}
 	
+	public void pause(boolean state)
+	{
+		isPaused = state;
+	}
+	
+	public boolean isPaused()
+	{
+		return isPaused;
+	}
+	
 	/**
 	 * Runs the game. Initializes the game engine and starts the main loop. 
 	 * @param	args	Arguments applied to game on startup
@@ -318,6 +333,7 @@ public abstract class Game
 			}
 		}
 
+		Renderer.initialize();
 		EventManager.global.registerListener(Console.handle);
 		onCreate();
 		
@@ -327,36 +343,31 @@ public abstract class Game
 			updateDelta();
 			updateFPS();
 			Display.setTitle("FPS: " + fps + " Delta: " + delta);
-			
-			
-			
-			// Call loop update methods that trickle down the hierarchy
 			input();
 			
-			
-			
-			
-			if (activeScene == null)
-				break;
-			
-			
-			activeScene.update(delta);
-			onUpdate();
-			Renderer.clearQueue();
-			// Load the renderer queue with the scene
-			if(activeScene.getRoot() != null)
-				activeScene.getRoot().queueRenderOperations();	
-			
-			Renderer.render();
-			onRender();
+			// Call loop update methods that trickle down the hierarchy
+			if (activeScene != null)
+			{
+				if(!isPaused)
+				{
+					activeScene.update(delta);
+					onUpdate();
+				}
+				
+				Renderer.clearQueue();
+				activeScene.queueRender();	
+				Renderer.render();
+				onRender();
+			}
 			
 			Display.sync(framerateCap);		// If we are running at an FPS above framerateCap, idle until we are synced
 		}
 		
 		// Cleanup
+		onDestroy();
+		NativeObject.destroyAll();
 		Display.destroy();
 		EventManager.global.unregisterListener(Console.handle);
-		onDestroy();
 		handle = null;
 	}
 

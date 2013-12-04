@@ -15,7 +15,7 @@ void main(void)
 {
 	normal = normalize(in_normal);
 	tangent = normalize(in_tangent.xyz);
-	bitangent = normalize(cross(in_normal, tangent));
+	bitangent = normalize(cross(in_normal, tangent) * in_tangent.w);
 	
 	gl_Position = vec4(in_position, 1);
 }

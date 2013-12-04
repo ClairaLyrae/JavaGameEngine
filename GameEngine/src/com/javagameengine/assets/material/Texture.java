@@ -1,8 +1,5 @@
 package com.javagameengine.assets.material;
 
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
-import static org.lwjgl.opengl.GL11.GL_RGBA8;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
@@ -15,9 +12,7 @@ import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,7 +26,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
-import org.lwjgl.opengl.GL15;
 
 import com.javagameengine.assets.NativeObject;
 
@@ -184,13 +178,15 @@ public class Texture extends NativeObject
     public static Texture loadFromFile(File f) throws FileNotFoundException, IOException
     {
     	 BufferedImage image = null;
+      	long beginTime = System.currentTimeMillis();
          image = ImageIO.read(f);
          image = verticalflip(image);
+         System.out.println("Time to load: " + (System.currentTimeMillis() - beginTime));
          if(image.getWidth() > GL11.GL_MAX_TEXTURE_SIZE || image.getHeight() > GL11.GL_MAX_TEXTURE_SIZE)
         	 throw new IllegalStateException("Texture " + f.getName() + " exceeds the maximum texture size");
          int[] pixels = new int[image.getWidth() * image.getHeight()];
          image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
-         
+
          ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * BYTES_PER_PIXEL); //4 for RGBA, 3 for RGB
 
          for(int y = 0; y < image.getHeight(); y++)

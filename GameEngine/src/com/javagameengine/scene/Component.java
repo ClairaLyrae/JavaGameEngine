@@ -13,18 +13,7 @@ public abstract class Component
 {
 	protected boolean isEnabled = true;
 	protected Node node;
-	private int layerID = 0;
-	
-	public void setLayer(int layer)
-	{
-		layerID = layer;
-	}
-	
-	public int getLayer()
-	{
-		return layerID;
-	}
-	
+		
 	public Component()
 	{
 		

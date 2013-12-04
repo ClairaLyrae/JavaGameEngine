@@ -1,9 +1,8 @@
 package com.javagameengine.console;
 
-import java.util.List;
-
 import com.javagameengine.Game;
-import com.javagameengine.assets.AssetManager;
+import com.javagameengine.scene.Component;
+import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
 
 public class SceneCommand extends Command
@@ -36,7 +35,39 @@ public class SceneCommand extends Command
 					Console.println("- " + s + " [ACTIVE]");
 			}
 		}
-		// TODO Auto-generated method stub
+		else if(args[0].equalsIgnoreCase("print"))
+		{
+			Scene s = Game.getHandle().getActiveScene();
+			if(args.length > 1)
+			{
+				s = Game.getHandle().getScene(args[1]);
+				if(s == null)
+					return "Scene '" + args[1] + "' cannot be found.";
+			}
+			if(s == null)
+				return "No active scene available.";
+			Console.println("Scene " + s.getName() + ":");
+			printScene(s);
+		}
 		return null;
+	}
+	
+	public static void printScene(Scene s)
+	{
+		Console.println("Scene: " + s.getName());
+		printSceneRecursive(s.getRoot(), "");
+	}
+
+	private static void printSceneRecursive(Node n, String sb)
+	{
+		sb += "  ";
+		
+		Console.println(sb + "N: " + n.toString());
+		
+		for(Component c : n.getComponents())
+			Console.println(sb + "C: " + c.toString());
+		
+		for(Node node : n.getChildren())
+			printSceneRecursive(node, sb);
 	}
 }
