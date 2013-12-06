@@ -38,6 +38,7 @@ import com.javagameengine.scene.Scene;
  */
 public abstract class Game
 {
+	//THIS IS A TEST
 	private static Game handle;
 	
 	/**
