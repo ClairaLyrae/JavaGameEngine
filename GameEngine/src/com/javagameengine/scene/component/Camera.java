@@ -163,7 +163,7 @@ public class Camera extends Component
 	@Override
 	public void onDestroy()
 	{
-		getScene().resetCamera();
+		getScene().setCamera(null);
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import java.util.List;
 import com.javagameengine.math.Transform;
 import com.javagameengine.renderer.Renderable;
 import com.javagameengine.renderer.Renderer;
+import com.javagameengine.scene.component.Light;
 
 /**
  * Node is the discrete element of the scene graph structure that comprises the heart of the game engine. It 
@@ -37,7 +38,7 @@ import com.javagameengine.renderer.Renderer;
  * main game loop down the scene graph to each node in the tree and to each component the nodes contain.
  * @author ClairaLyrae
  */
-public final class Node implements Bounded
+public class Node implements Bounded
 {
 	private String name;
 	
@@ -77,12 +78,10 @@ public final class Node implements Bounded
 		for(Component c : comp_list)
 			c.destroy(); 
 		if(parent != null)
-		{
 			parent.children.remove(this);
-			parent = null;
-		}
 		if(scene != null && scene.getRoot() != this)
 			scene = null;
+		parent = null;
 	}
 	
 	public Scene getScene()
@@ -115,8 +114,9 @@ public final class Node implements Bounded
 		return new ArrayList<Node>(children);
 	}
 	
-	protected void updateLinks(Node n)
+	private void updateLinks(Node n)
 	{
+		parent = n;
 		scene = n.scene;
 		for(Node child : children)
 			child.updateLinks(this);
@@ -126,7 +126,6 @@ public final class Node implements Bounded
 	{
 		if(n.isLinked())
 			return false;
-		n.parent = this;
 		n.updateLinks(this);
 		return children.add(n);
 	}
@@ -216,6 +215,7 @@ public final class Node implements Bounded
 			graphicsComponents.add((Renderable)c);
 		components.add(c);
 		c.node = this;
+		c.scene = scene;
 		c.onCreate();
 		return true;
 	}
@@ -343,7 +343,7 @@ public final class Node implements Bounded
 	 * and stores it in the node. Then it computes the Bounds of the node based on the Components and the Bounds of  
 	 * the subtree. During this it will load the Renderer with RenderOperations based on the computed data.
 	 */
-	public void queueRenderables()
+	public void queueRender()
 	{
 		// Update the world space transforms
 		worldTransform.set(transform);
@@ -354,6 +354,8 @@ public final class Node implements Bounded
 		boundingBoxNode = Bounds.getVoid();	// Start off with a void Bounds
 		for(Component c : components)
 		{
+			if(c instanceof Light)
+				Renderer.queue((Light) c);
 			if(c instanceof Bounded)
 				boundingBoxNode.encompass(((Bounded)c).getBounds());
 			if(c instanceof Renderable)
@@ -365,7 +367,7 @@ public final class Node implements Bounded
 		for(Node n : children)
 		{
 			boundingBox.encompass(n.getBounds());	// Extend the bounding box to include the bounds of this child
-			n.queueRenderables();
+			n.queueRender();
 		}
 	}
 	

@@ -5,7 +5,34 @@ import com.javagameengine.renderer.Renderable;
 
 public abstract class RenderableComponent extends Component implements Renderable, Bounded
 {
-	public int layer = 0;
+	protected int layer = 0;
+	protected boolean isVisible;
+	protected boolean castsShadows;
+	
+	public boolean castsShadow()
+	{
+		return castsShadows;
+	}
+	
+	public void setCastsShadows(boolean b)
+	{
+		castsShadows = true;
+	}
+	
+	public boolean isVisible()
+	{
+		return isVisible;
+	}
+	
+	public void setLayer(int layer)
+	{
+		this.layer = layer;
+	}
+	
+	public void setVisible(boolean state)
+	{
+		isVisible = state;
+	}
 	
 	@Override
 	public Bounds getBounds()

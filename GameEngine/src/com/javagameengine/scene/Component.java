@@ -13,6 +13,7 @@ public abstract class Component
 {
 	protected boolean isEnabled = true;
 	protected Node node;
+	protected Scene scene;
 		
 	public Component()
 	{
@@ -25,6 +26,7 @@ public abstract class Component
 		if(node != null)
 			node.removeComponent(this);
 		node = null;
+		scene = null;
 	}
 	
 	public abstract void onUpdate(int delta);
@@ -75,9 +77,7 @@ public abstract class Component
 	 */
 	public Scene getScene()
 	{
-		if(node == null)
-			return null;
-		return node.getScene();
+		return scene;
 	}	
 	
 	public String toString()

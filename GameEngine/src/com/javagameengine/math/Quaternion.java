@@ -182,6 +182,11 @@ public class Quaternion extends Vector<Quaternion>
 		r.z = xt * m.f03 + yt * m.f13 + zt * m.f23 + wt * m.f33;
 		return r;
 	}
+	
+	public Vector3f direction()
+	{
+		return new Vector3f(x, y, z).normalize();
+	}
 
 	public Quaternion normalize()
 	{

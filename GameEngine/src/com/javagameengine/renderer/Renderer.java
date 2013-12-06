@@ -59,9 +59,10 @@ public class Renderer
 	public static final int MAX_PASSES = 10;
 	public static final int MAX_LAYERS = 10;
 	public static final int MAX_LIGHTS = 10;
-	private static RenderPass[] passes = new RenderPass[MAX_PASSES];	// These are the different render views we can use. 
-	private static RenderQueue[] layers = new RenderQueue[MAX_LAYERS];	// These are the different layers we can draw in. Each layer handles drawing inside itself
-	private static Light[] lights = new Light[MAX_LIGHTS];
+	protected static RenderPass[] passes = new RenderPass[MAX_PASSES];	// These are the different render views we can use. 
+	protected static RenderQueue[] layers = new RenderQueue[MAX_LAYERS];	// These are the different layers we can draw in. Each layer handles drawing inside itself
+	protected static Light[] lights = new Light[MAX_LIGHTS];
+	protected static int light_index = 0;
 	
 	public static void render()
 	{		
@@ -133,18 +134,11 @@ public class Renderer
 	
 	public static Camera camera;
 	
-	public void queueView(RenderPass v)
+	public static void reset()
 	{
-		
-	}
-	
-	public void clearViewQueue()
-	{
-		
-	}
-	
-	public static void clearQueue()
-	{
+		for(int i = 0; i < light_index; i++)
+			lights[i] = null;
+		light_index = 0;
 		for(int i = 0; i < MAX_LAYERS; i++)
 		{
 			RenderQueue q = layers[i];
@@ -154,21 +148,38 @@ public class Renderer
 		}
 	}
 	
-	public static boolean queue(Renderable r)
+	
+	public static void queue(Light l)
+	{
+		if(light_index >= lights.length)
+			throw new IllegalStateException("Number of lights exceeds limit. Cannot queue light.");
+		lights[light_index++] = l;
+	}
+	
+	public void queue(RenderPass v)
+	{
+		
+	}
+	
+	public static void queue(Renderable r)
 	{
 		int l = r.getLayer();
 		if(l < 0 || l >= MAX_LAYERS)
 			throw new IllegalStateException("Renderable object is on invalid layer");
 		layers[l].queue(r);
-		return true;
 	}
 
+	public static int getNumLights()
+	{
+		return light_index;
+	}
+	
 	public static Transform camerat = new Transform();
 	public static Light light;
 	
 	private Renderer()
 	{
 		light = new Light();
-		light.setColor(Color4f.red);
+		light.setDiffuseColor(Color4f.red);
 	}
 }

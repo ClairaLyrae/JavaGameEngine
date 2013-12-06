@@ -61,6 +61,9 @@ public class RenderQueue
 					loc = glGetUniformLocation(progID, "p");
 					glUniformMatrix4(loc, false, P_buffer);
 					
+					for(int i = 0; i < Renderer.light_index; i++)
+						Renderer.lights[i].bind(progID,i);
+					
 					Color4f lightcol = Renderer.light.getColor();
 					loc = glGetUniformLocation(progID, "light_diffuse");
 					glUniform4f(loc, lightcol.r, lightcol.g, lightcol.b, lightcol.a);
