@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.javagameengine.assets.audio.Sound;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Shader;
 import com.javagameengine.assets.material.Texture;
@@ -28,6 +29,7 @@ public class AssetManager
 	public static final String[] shaderExtensions = {"vert", "frag", "geom", "geo", "vs", "fs", "gs", "glsl"};
 	public static final String[] textureExtensions = {"bmp", "jpg", "jpeg", "gif", "png"};
 	public static final String[] materialExtensions = {"mtl"};
+	public static final String[] audioExtensions = {"wav"};
 	
 	public static final String dir = "assets";
 	public static final String meshDir = "assets/meshes";
@@ -139,6 +141,13 @@ public class AssetManager
 			m.create();
 			materials.put(fname, m);
 			System.out.println("Material '" + fname + "' loaded: " + m.toString());
+		}
+		else if(isFileType(ext, audioExtensions))
+		{
+			Sound s = Sound.loadFromFile(f);
+			s.create();
+			//materials.put(fname, m);
+			//System.out.println("Material '" + fname + "' loaded: " + m.toString());
 		}
 		else
 			System.out.println("Unknown filetype");
