@@ -44,12 +44,8 @@ public class AssetManager
 	private static Map<String, Scene> scenes;
 	private static Map<String, GUI> guis;
 	
-	private static Set<NativeObject> nativeObjects;
-	
 	private AssetManager()
 	{
-		nativeObjects = new HashSet<NativeObject>();
-		
 		meshes = new HashMap<String, Mesh>();
 		textures = new HashMap<String, Texture>();
 		shaders = new HashMap<String, Shader>();
@@ -59,26 +55,41 @@ public class AssetManager
 		guis = new HashMap<String, GUI>();
 	}
 	
+	/**
+	 * @return List of the names of all loaded GUIs
+	 */
 	public static List<String> getGUIList()
 	{
 		return new ArrayList<String>(guis.keySet());
 	}
 	
+	/**
+	 * @return List of the names of all loaded Scenes
+	 */
 	public static List<String> getSceneList()
 	{
 		return new ArrayList<String>(scenes.keySet());
 	}
-	
+
+	/**
+	 * @return List of the names of all loaded Meshes
+	 */
 	public static List<String> getMeshList()
 	{
 		return new ArrayList<String>(meshes.keySet());
 	}
-	
+
+	/**
+	 * @return List of the names of all loaded Shaders
+	 */
 	public static List<String> getShaderList()
 	{
 		return new ArrayList<String>(shaders.keySet());
 	}
-	
+
+	/**
+	 * @return List of the names of all loaded Textures
+	 */
 	public static List<String> getTextureList()
 	{
 		return new ArrayList<String>(textures.keySet());
@@ -144,6 +155,10 @@ public class AssetManager
 		return false;
 	}
 	
+	/**
+	 * Loads all files in a given dire
+	 * @param dir Directory to load from
+	 */
 	public static void loadDir(String dir)
 	{
 		File fdir = new File(dir);
@@ -166,6 +181,30 @@ public class AssetManager
 		}
 	}
 
+	/**
+	 * Loads the given object into the asset manager if the obect is of a valid type.
+	 * @param name Name to give object
+	 * @param o Object to load into manager
+	 */
+	public static boolean addObject(String name, Object o)
+	{
+		if(o instanceof Mesh)
+			addMesh(name, (Mesh)o);
+		else if(o instanceof Material)
+			addMaterial(name, (Material)o);
+		else if(o instanceof GUI)
+			addGUI(name, (GUI)o);
+		else if(o instanceof Scene)
+			addScene((Scene)o);
+		else if(o instanceof Texture)
+			addTexture(name, (Texture)o);
+		else if(o instanceof Shader)
+			addShader(name, (Shader)o);
+		else
+			return false;
+		return true;
+	}
+	
 	public static void addMesh(String name, Mesh m)
 	{
 		if(meshes.containsKey(name))
