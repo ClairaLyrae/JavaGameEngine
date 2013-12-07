@@ -13,6 +13,26 @@ public class InputManager
 	private static float mouseSensitivity = 1f;
 	private static boolean invertAxis = false;
 	
+	public static boolean isMouseInverted()
+	{
+		return invertAxis;
+	}
+	
+	public static void setMouseInverted(boolean b)
+	{
+		invertAxis = b;
+	}
+	
+	public static float getMouseSensitivity()
+	{
+		return mouseSensitivity;
+	}
+	
+	public static void setMouseSensitivity(float f)
+	{
+		mouseSensitivity = f;
+	}
+	
 	private static List<KeyBinding> keyBindings = new ArrayList<KeyBinding>();
 	
 	private static boolean[] keyStates = new boolean[Keyboard.KEYBOARD_SIZE];
@@ -68,13 +88,13 @@ public class InputManager
 		return pressed;
 	}
 	
-	public static void updateAll()
+	public static void callEvents()
 	{
-		updateMouse();
-		updateKeyboard();
+		callMouseEvents();
+		callKeyboardEvents();
 	}
 	
-	public static void updateKeyboard()
+	public static void callKeyboardEvents()
 	{
 		for(int i = 0; i < keyStates.length; i++)
 		{
@@ -93,7 +113,7 @@ public class InputManager
 		}
 	}
 	
-	public static void updateMouse()
+	public static void callMouseEvents()
 	{
 		while(Mouse.next())
 		{
@@ -121,7 +141,7 @@ public class InputManager
 			}
 			if(button >= 0)
 			{
-				e = new MouseClickEvent(button, buttonState);
+				e = new MouseClickEvent(x, y, button, buttonState);
 				EventManager.global.callEvent(e);
 			}
 		}

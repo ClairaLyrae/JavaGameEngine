@@ -29,7 +29,7 @@ public abstract class Component
 		scene = null;
 	}
 	
-	public abstract void onUpdate(int delta);
+	public abstract void onUpdate(float deltaf);
 	public abstract void onDestroy();
 	public abstract void onCreate();
 	

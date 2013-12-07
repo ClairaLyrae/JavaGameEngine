@@ -137,7 +137,7 @@ public class Light extends Component
 	}
 
 	@Override
-	public void onUpdate(int delta)
+	public void onUpdate(float delta)
 	{
 	}
 

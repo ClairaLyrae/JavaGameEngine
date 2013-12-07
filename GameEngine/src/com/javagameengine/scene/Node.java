@@ -325,15 +325,15 @@ public class Node implements Bounded
 	/**
 	 * Iteration through the tree calling logic on child nodes and components. 
 	 */
-	public void logic(int delta)
+	public void logic(float deltaf)
 	{
 		// Call logic method on child nodes
 		for(Component c : components)
-			c.onUpdate(delta);	
+			c.onUpdate(deltaf);	
 
 		// Call logic method on child nodes
 		for(Node n : children)
-			n.logic(delta);	
+			n.logic(deltaf);	
 	}
 	
 	/**

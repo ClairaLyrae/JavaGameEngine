@@ -205,15 +205,15 @@ public class PhysicsComponent extends Component
 	}
 	
 	@Override
-	public void onUpdate(int delta)
+	public void onUpdate(float delta)
 	{
 		Transform t = getNode().getTransform();
 		if(velocity.magnitudeSquared() != 0f)
-			t.translate(velocity.x/delta, velocity.y/delta, velocity.z/delta);
+			t.translate(velocity.x*delta, velocity.y*delta, velocity.z*delta);
 		if(angular_velocity.magnitudeSquared() != 0f)
 		{
 			Vector3f av_norm = angular_velocity.normalizeInto(null);
-			t.rotate(angular_velocity.magnitude(), av_norm.x, av_norm.y, av_norm.z);
+			t.rotate(angular_velocity.magnitude()*delta, av_norm.x, av_norm.y, av_norm.z);
 		}
 		//Vector3f deltagrav = gravity.scaleInto(1f/delta, null);
 		//velocity.add(deltagrav);

@@ -115,8 +115,8 @@ public class TestGame extends Game
 		
 		// ADD ASTEROIDS!
 		{
-			float posSpread = 20f;
-			int numAsteroids = 200;
+			float posSpread = 400f;
+			int numAsteroids = 400;
 			for(int i = 0; i < numAsteroids; i++)
 			{
 				Random r =  new Random(System.currentTimeMillis());
@@ -131,8 +131,8 @@ public class TestGame extends Game
 				root.addChild(node);
 				node.addComponent(mr);
 				node.addComponent(ast_phys);
-				node.getTransform().translate((r.nextFloat()-0.5f)*posSpread, (r.nextFloat()-0.5f)*posSpread, (r.nextFloat()-0.5f)*posSpread + 30f);
-				node.getTransform().scale(r.nextFloat());
+				node.getTransform().translate((r.nextFloat()-0.5f)*posSpread, (r.nextFloat()-0.5f)*posSpread, (r.nextFloat()-0.5f)*posSpread);
+				node.getTransform().scale(r.nextFloat()*5f+1f);
 				node.getTransform().rotate(r.nextFloat()*180f, r.nextFloat(), r.nextFloat(), r.nextFloat());
 			}
 		}
@@ -156,7 +156,7 @@ public class TestGame extends Game
 		
 	}
 
-	protected void onUpdate()
+	protected void onUpdate(float delta)
 	{
 		
 	}

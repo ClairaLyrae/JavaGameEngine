@@ -88,11 +88,11 @@ public class Scene
 		root.queueRender();
 	}
 	
-	public void update(int delta)
+	public void update(float deltaf)
 	{
 		if(root == null)
 			return;
-		root.logic(delta);
+		root.logic(deltaf);
 		PhysicsComponent.calculateCollisions();
 	}
 }

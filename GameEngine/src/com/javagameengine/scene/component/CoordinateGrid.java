@@ -107,7 +107,7 @@ public class CoordinateGrid extends RenderableComponent implements Renderable, D
 	{
 	}
 
-	public void onUpdate(int delta)
+	public void onUpdate(float delta)
 	{
 	}
 

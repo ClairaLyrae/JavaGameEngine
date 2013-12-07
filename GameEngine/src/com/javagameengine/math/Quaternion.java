@@ -185,7 +185,20 @@ public class Quaternion extends Vector<Quaternion>
 	
 	public Vector3f direction()
 	{
-		return new Vector3f(x, y, z).normalize();
+		Vector3f r = new Vector3f();
+        float sqrLength = x * x + y * y + z * z;
+        if (sqrLength == 0f) 
+        {
+            r.x = 1f;
+            r.y = 0f;
+            r.z = 0f;
+        } else {
+            float invLength = FastMath.invSqrt(sqrLength);
+            r.x = x * invLength;
+            r.y = y * invLength;
+            r.z = z * invLength;
+        }
+        return r;
 	}
 
 	public Quaternion normalize()

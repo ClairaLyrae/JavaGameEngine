@@ -160,7 +160,7 @@ public abstract class Game
 			}
 			if(button >= 0)
 			{
-				e = new MouseClickEvent(button, buttonState);
+				e = new MouseClickEvent(x, y, button, buttonState);
 				EventManager.global.callEvent(e);
 			}
 		}
@@ -213,7 +213,7 @@ public abstract class Game
 	/**
 	 * Called after the game logic is updated.
 	 */
-	protected abstract void onUpdate();
+	protected abstract void onUpdate(float delta);
 	
 	/**
 	 * Pauses the game. Setting pause to true stops loop from calling update() on scene.
@@ -272,10 +272,11 @@ public abstract class Game
 			// Call loop update methods that trickle down the hierarchy
 			if (activeScene != null)
 			{
+				float deltaf = (float)delta/1000f;	// Find seconds since last frame
 				if(!isPaused)
 				{
-					activeScene.update(delta);
-					onUpdate();
+					activeScene.update(deltaf);
+					onUpdate(deltaf);
 				}
 				
 				Renderer.reset();
