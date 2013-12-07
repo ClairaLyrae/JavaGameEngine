@@ -1,6 +1,7 @@
 package com.javagameengine.scene.component;
 
 import com.javagameengine.assets.AssetManager;
+import com.javagameengine.assets.audio.Sound;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.events.EventMethod;
@@ -9,11 +10,20 @@ import com.javagameengine.math.Color4f;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.scene.Component;
 import com.javagameengine.scene.Node;
+import com.javagameengine.sound.SoundManager;
+import com.javagameengine.sound.SoundSource;
 
 public class LaserShot extends Component
 {
 	private final float timeLimit = 2f;
 	private float secCounter;
+	private static Sound sound;
+	
+	public LaserShot()
+	{
+		if(sound == null)
+			sound = AssetManager.getSound("laser");
+	}
 	
 	@Override
 	public void onUpdate(float deltaf) {}
@@ -22,7 +32,9 @@ public class LaserShot extends Component
 	private Mesh laserMesh;
 
 	@Override
-	public void onDestroy() {}
+	public void onDestroy() 
+	{
+	}
 
 	@Override
 	public void onCreate()
@@ -40,5 +52,6 @@ public class LaserShot extends Component
 		node.addComponent(light);
 		node.addComponent(phys);
 		node.markAsTransient(4f);
+		SoundManager.play(sound);
 	}
 }

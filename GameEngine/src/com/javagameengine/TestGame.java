@@ -10,6 +10,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import com.javagameengine.assets.AssetManager;
+import com.javagameengine.assets.audio.Sound;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.console.Console;
@@ -19,6 +20,7 @@ import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyPressEvent;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.FastMath;
+import com.javagameengine.math.Vector3f;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.Camera;
@@ -29,14 +31,14 @@ import com.javagameengine.scene.component.Light;
 import com.javagameengine.scene.component.MeshRenderer;
 import com.javagameengine.scene.component.PhysicsComponent;
 import com.javagameengine.scene.component.ShipControlComponent;
+import com.javagameengine.sound.SoundManager;
+import com.javagameengine.sound.SoundSource;
 
 public class TestGame extends Game
 {
 	// We want to manually put stuff in our game, so here we make a scene and load it in during startup
 	protected void onCreate()
 	{
-		AssetManager.loadAll();
-		
 		// Create a new scene
 		Scene s = new Scene("3d");
 		Scene s2 = new Scene("menu");
@@ -104,6 +106,9 @@ public class TestGame extends Game
 			ship.addComponent(ship_control);
 			ship.addComponent(ship_laser);
 			camera_node.addComponent(ship_camera);
+			
+			SoundManager.setListenerPosition(Vector3f.zero);
+			SoundManager.setListenerVelocity(Vector3f.zero);
 		}
 		
 		// SETUP SKYBOX

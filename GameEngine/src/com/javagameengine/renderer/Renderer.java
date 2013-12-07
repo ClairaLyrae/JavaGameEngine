@@ -14,8 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
 import com.javagameengine.console.Console;
@@ -50,6 +54,25 @@ public class Renderer
 	
 	public static void initialize()
 	{
+		PixelFormat pixelf;
+		try
+		{
+			pixelf = new PixelFormat().withSamples(4).withDepthBits(24).withSRGB(true);
+			Display.setDisplayMode(new DisplayMode(1280, 768));
+			Display.create(pixelf); // BLAH
+		} 
+		catch (LWJGLException e)
+		{
+			pixelf = new PixelFormat().withDepthBits(24).withSRGB(true);
+			try
+			{
+				Display.create(pixelf);
+			} catch (LWJGLException e1)
+			{
+				Sys.alert("Error", "Initialization failed!\n\n" + e1.getMessage());
+				System.exit(0);
+			}
+		}
 		for(int i = 0; i < MAX_LAYERS; i++)
 		{
 			layers[i] = new RenderQueue();
