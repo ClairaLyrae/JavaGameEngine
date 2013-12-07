@@ -53,13 +53,36 @@ public class TestGame extends Game
 		Node root = s.getRoot();
 		
 
+
 		// SETUP GUI
 		s2.addGUI(new WelcomeGUI());
 	
+
+		// Lights
+		{
+			Light light1 = new Light();
+			Light light2 = new Light();
+			Node light1_node = new Node("light_1");
+			light1.setIntensity(3f);
+			light2.setIntensity(3f);
+			light1_node.addComponent(light1);
+			Node light2_node = new Node("light_2");
+			light2_node.addComponent(light2);
+			root.addChild(light1_node);
+			root.addChild(light2_node);
+			
+			light1.setDiffuseAndSpecularColor(new Color4f("81a79f", 1f));
+			light1.setAmbientColor(new Color4f("122029", 1f));
+			
+			light2.setDiffuseAndSpecularColor(new Color4f("124651", 1f));
+			
+			light1_node.getTransform().translate(500f, 500f, 0f);
+			light2_node.getTransform().translate(-500f, -500f, -500f);
+		}
+
 		// SETUP SHIP
 
 		{
-			
 			Node ship = new Node("ship");
 			Mesh ship_mesh = AssetManager.getMesh("ship");
 			Material ship_mat = AssetManager.getMaterial("ship");
@@ -91,9 +114,6 @@ public class TestGame extends Game
 			ship.addComponent(ship_control);
 			ship.addComponent(ship_laser);
 			camera_node.addComponent(ship_camera);
-			
-			SoundManager.setListenerPosition(Vector3f.zero);
-			SoundManager.setListenerVelocity(Vector3f.zero);
 		}
 
 		// SETUP SKYBOX
@@ -109,7 +129,7 @@ public class TestGame extends Game
 		// ADD ASTEROIDS!
 		{
 			float posSpread = 400f;
-			int numAsteroids = 400;
+			int numAsteroids = 200;
 			for(int i = 0; i < numAsteroids; i++)
 			{
 				Random r =  new Random(System.currentTimeMillis());
@@ -138,9 +158,6 @@ public class TestGame extends Game
 		
 		// Auto load commands to console from file! Also we are manually firing some events
 		Console.executeFromFile(new File("commands.txt"));
-		EventManager.global.callEvent(new KeyPressEvent(Keyboard.KEY_1, '1', true));
-		EventManager.global.callEvent(new KeyPressEvent(Keyboard.KEY_M, 'm', true));
-		EventManager.global.callEvent(new KeyPressEvent(Keyboard.KEY_F, 'f', true));
 	}
 
 	// Dont care about destroying it
