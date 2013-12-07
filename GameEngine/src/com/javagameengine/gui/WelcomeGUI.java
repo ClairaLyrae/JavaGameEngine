@@ -14,9 +14,10 @@ public class WelcomeGUI extends GUI {
 	@Override
 	public void create() {
 		
-		testGUIcomponent mainBox = new testGUIcomponent(200, 200, centerX-100, centerY-100,
+		testGUIcomponent mainBox = new testGUIcomponent(this.scene, 200, 200, centerX-100, centerY-100,
 				Color4f.red.setTrans(), Color4f.red.setTrans(), null);
-		mainBox.addChild(new testGUIcomponent(100, 100, 50, 50, Color4f.black.setTrans(), Color4f.black.setTrans(), null));
+		mainBox.addChild(new testButton(this.scene, 100, 100, 50, 50, Color4f.black.setTrans(), 
+				Color4f.black.setTrans(), null, null));
 		
 		rootComponents.add(mainBox);
 	}

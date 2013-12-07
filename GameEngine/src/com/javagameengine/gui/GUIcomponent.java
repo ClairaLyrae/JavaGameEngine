@@ -37,9 +37,10 @@ public abstract class GUIcomponent {
 	public GUIcomponent()
 	{
 		children = new ArrayList<GUIcomponent>();
+		onCreate();
 	}
 	
-	public GUIcomponent(int w, int h, int x, int y, 
+	public GUIcomponent(Scene newScene, int w, int h, int x, int y, 
 			Color4f borC, Color4f bgC, GUIcomponent p)
 	{
 		width = w;
@@ -50,6 +51,9 @@ public abstract class GUIcomponent {
 		backgroundColor = bgC;
 		parent = p;
 		children = new ArrayList<GUIcomponent>();
+		scene = newScene;
+		onCreate();
+
 	}
 	
 	public void addChild(GUIcomponent newChild)

@@ -55,15 +55,19 @@ public class Renderer
 		for(int i = 0; i < MAX_LAYERS; i++)
 		{
 			layers[i] = new RenderQueue();
+			transparentLayers[i] = new RenderQueue();
 		}
 	}
 	
 	public static final int MAX_PASSES = 10;
 	public static final int MAX_LAYERS = 10;
 	public static final int MAX_LIGHTS = 10;
-	private static RenderPass[] passes = new RenderPass[MAX_PASSES];	// These are the different render views we can use. 
-	private static RenderQueue[] layers = new RenderQueue[MAX_LAYERS];	// These are the different layers we can draw in. Each layer handles drawing inside itself
-	private static Light[] lights = new Light[MAX_LIGHTS];
+	protected static RenderPass[] passes = new RenderPass[MAX_PASSES];	// These are the different render views we can use. 
+	protected static RenderQueue[] layers = new RenderQueue[MAX_LAYERS];	// These are the different layers we can draw in. Each layer handles drawing inside itself
+	protected static RenderQueue[] transparentLayers = new RenderQueue[MAX_LAYERS]; 
+	
+	protected static Light[] lights = new Light[MAX_LIGHTS];
+	protected static int light_index = 0;
 	
 	public static void render()
 	{		
@@ -71,22 +75,24 @@ public class Renderer
 		int width = Display.getWidth();
 		int height = Display.getHeight();
 		
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-		GL11.glClearColor(0.1f, 0.1f, 0.1f, 1f); // Black Background
-		GL11.glClearDepth(1.0f); // Depth Buffer Setup
-		
-		GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
-		GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
-	    GL11.glEnable(GL11.GL_CULL_FACE);
-	    GL11.glEnable(GL11.GL_NORMALIZE);
 
 		if(camera != null)
 		{
+
+			GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
+			GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
+		    GL11.glEnable(GL11.GL_CULL_FACE);
+		    GL11.glEnable(GL11.GL_NORMALIZE);
+		    
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glDepthMask(true);
+			GL11.glClearDepth(1.0f); // Depth Buffer Setup
+			
+			
+			
+			
 		    GL11.glMatrixMode(GL11.GL_PROJECTION);
 		    GL11.glLoadIdentity();
 		    //GLU.gluPerspective(45.0f, ((float) width / (float) height), 0.1f, 100.0f);
@@ -97,15 +103,18 @@ public class Renderer
 		    GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		    GL11.glLoadIdentity();
 		    GL11.glMultMatrix(view_matrix.transposeInto(null).toBuffer());
-			
-			for(RenderQueue q : layers)
-			{
-				if(q == null)
-					return;
-				q.render();
-			}
-		}
 
+			glDisable(GL_BLEND);
+			for(RenderQueue q : layers)
+				q.render();
+			glDepthMask(false);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+			for(RenderQueue q : transparentLayers)
+				q.render();
+			glDepthMask(true);
+		}
+		
 	    glUseProgram(0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
@@ -137,42 +146,67 @@ public class Renderer
 	
 	public static Camera camera;
 	
-	public void queueView(RenderPass v)
+	public static void reset()
 	{
-		
-	}
-	
-	public void clearViewQueue()
-	{
-		
-	}
-	
-	public static void clearQueue()
-	{
+		for(int i = 0; i < MAX_LIGHTS; i++)
+			lights[i] = null;
+		light_index = 0;
 		for(int i = 0; i < MAX_LAYERS; i++)
 		{
 			RenderQueue q = layers[i];
-			if(q == null)
-				continue;
-			q.clearQueue();
+			RenderQueue tq = transparentLayers[i];
+			if(q != null)
+				q.clearQueue();
+			if(tq != null)
+				tq.clearQueue();
 		}
 	}
 	
-	public static boolean queue(Renderable r)
+	
+	public static void queue(Light l)
+	{
+		if(light_index >= lights.length)
+		{
+			for(int i = 0; i < lights.length; i++)
+			{
+				if(lights[i].getUsage() == Light.Usage.TRANSIENT)
+				{
+					lights[i] = l;
+					return;
+				}
+			}
+		}
+		else
+			lights[light_index++] = l;
+	}
+	
+	public void queue(RenderPass v)
+	{
+		
+	}
+	
+	public static void queue(Renderable r)
 	{
 		int l = r.getLayer();
 		if(l < 0 || l >= MAX_LAYERS)
-			throw new IllegalStateException("Renderable object is on invalid layer");
-		layers[l].queue(r);
-		return true;
+			return;
+		if(r.isTransparent())
+			transparentLayers[l].queue(r);
+		else
+			layers[l].queue(r);
 	}
 
+	public static int getNumLights()
+	{
+		return light_index;
+	}
+	
 	public static Transform camerat = new Transform();
 	public static Light light;
 	
 	private Renderer()
 	{
 		light = new Light();
-		light.setColor(Color4f.red);
+		light.setDiffuseColor(Color4f.red);
 	}
 }

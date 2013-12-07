@@ -1,0 +1,1 @@
+/mesh laser 1 laser

@@ -12,6 +12,7 @@ import java.util.List;
 import com.javagameengine.math.Transform;
 import com.javagameengine.renderer.Renderable;
 import com.javagameengine.renderer.Renderer;
+import com.javagameengine.scene.component.Light;
 
 /**
  * Node is the discrete element of the scene graph structure that comprises the heart of the game engine. It 
@@ -37,7 +38,7 @@ import com.javagameengine.renderer.Renderer;
  * main game loop down the scene graph to each node in the tree and to each component the nodes contain.
  * @author ClairaLyrae
  */
-public final class Node implements Bounded
+public class Node implements Bounded
 {
 	private String name;
 	
@@ -77,12 +78,17 @@ public final class Node implements Bounded
 		for(Component c : comp_list)
 			c.destroy(); 
 		if(parent != null)
-		{
 			parent.children.remove(this);
-			parent = null;
-		}
 		if(scene != null && scene.getRoot() != this)
 			scene = null;
+		parent = null;
+		isDestroyed = true;
+	}
+	private boolean isDestroyed = false;
+	
+	public boolean isDestroyed()
+	{
+		return isDestroyed;
 	}
 	
 	public Scene getScene()
@@ -115,8 +121,9 @@ public final class Node implements Bounded
 		return new ArrayList<Node>(children);
 	}
 	
-	protected void updateLinks(Node n)
+	private void updateLinks(Node n)
 	{
+		parent = n;
 		scene = n.scene;
 		for(Node child : children)
 			child.updateLinks(this);
@@ -126,7 +133,6 @@ public final class Node implements Bounded
 	{
 		if(n.isLinked())
 			return false;
-		n.parent = this;
 		n.updateLinks(this);
 		return children.add(n);
 	}
@@ -216,6 +222,7 @@ public final class Node implements Bounded
 			graphicsComponents.add((Renderable)c);
 		components.add(c);
 		c.node = this;
+		c.scene = scene;
 		c.onCreate();
 		return true;
 	}
@@ -322,18 +329,58 @@ public final class Node implements Bounded
 		return boundingBoxNode;
 	}
 
+	private boolean isTransient = false;
+	private float timeRemaining;
+	
 	/**
-	 * Iteration through the tree calling logic on child nodes and components. 
+	 * Checks to see if this node is marked as transient by <code>markAsTransient</code>;
+	 * @return True if this node is transient
 	 */
-	public void logic(int delta)
+	public boolean isTransient()
 	{
+		return isTransient;
+	}
+	
+	/**
+	 * Marks the current node as a transient node. When the node is marked as transient, it will only exist
+	 * for the number of seconds given. 
+	 * @param time Time until node is destroyed
+	 */
+	public void markAsTransient(float time)
+	{
+		isTransient = true;
+		timeRemaining = time;
+	}
+	
+	/**
+	 * Iteration through the tree calling <code>update</code> on child nodes and components. 
+	 */
+	public void update(float deltaf)
+	{
+		if(isTransient)
+		{
+			timeRemaining -= deltaf;
+			if(timeRemaining <= 0)
+			{
+				destroy();
+				return;
+			}
+		}
+		Component[] componentArr = components.toArray(new Component[0]);
+		Node[] nodeArr = children.toArray(new Node[0]);
+		
 		// Call logic method on child nodes
-		for(Component c : components)
-			c.onUpdate(delta);	
-
+		for(Component c : componentArr)
+		{
+			if(!c.isDestroyed())
+				c.onUpdate(deltaf);	
+		}
 		// Call logic method on child nodes
-		for(Node n : children)
-			n.logic(delta);	
+		for(Node n : nodeArr)
+		{
+			if(!n.isDestroyed())
+				n.update(deltaf);	
+		}
 	}
 	
 	/**
@@ -343,7 +390,7 @@ public final class Node implements Bounded
 	 * and stores it in the node. Then it computes the Bounds of the node based on the Components and the Bounds of  
 	 * the subtree. During this it will load the Renderer with RenderOperations based on the computed data.
 	 */
-	public void queueRenderables()
+	public void queueRender()
 	{
 		// Update the world space transforms
 		worldTransform.set(transform);
@@ -354,6 +401,8 @@ public final class Node implements Bounded
 		boundingBoxNode = Bounds.getVoid();	// Start off with a void Bounds
 		for(Component c : components)
 		{
+			if(c instanceof Light)
+				Renderer.queue((Light) c);
 			if(c instanceof Bounded)
 				boundingBoxNode.encompass(((Bounded)c).getBounds());
 			if(c instanceof Renderable)
@@ -365,7 +414,7 @@ public final class Node implements Bounded
 		for(Node n : children)
 		{
 			boundingBox.encompass(n.getBounds());	// Extend the bounding box to include the bounds of this child
-			n.queueRenderables();
+			n.queueRender();
 		}
 	}
 	

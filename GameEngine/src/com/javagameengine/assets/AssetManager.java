@@ -13,6 +13,8 @@ import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Shader;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
+import com.javagameengine.gui.GUI;
+import com.javagameengine.scene.Scene;
 
 /**
  * Loads all the assets located in the main game directory. Provides access to the assets.
@@ -24,7 +26,7 @@ public class AssetManager
 	
 	public static final String[] meshExtensions = {"obj"};
 	public static final String[] shaderExtensions = {"vert", "frag", "geom", "geo", "vs", "fs", "gs", "glsl"};
-	public static final String[] textureExtensions = {"bmp", "jpg", "jpeg", "gif"};
+	public static final String[] textureExtensions = {"bmp", "jpg", "jpeg", "gif", "png"};
 	public static final String[] materialExtensions = {"mtl"};
 	
 	public static final String dir = "assets";
@@ -39,6 +41,8 @@ public class AssetManager
 	private static Map<String, Shader> shaders;
 	private static Map<String, Material> materials;
 	private static Map<String, Texture> audio;
+	private static Map<String, Scene> scenes;
+	private static Map<String, GUI> guis;
 	
 	private static Set<NativeObject> nativeObjects;
 	
@@ -51,6 +55,18 @@ public class AssetManager
 		shaders = new HashMap<String, Shader>();
 		materials = new HashMap<String, Material>();
 		audio = new HashMap<String, Texture>();
+		scenes = new HashMap<String, Scene>();
+		guis = new HashMap<String, GUI>();
+	}
+	
+	public static List<String> getGUIList()
+	{
+		return new ArrayList<String>(guis.keySet());
+	}
+	
+	public static List<String> getSceneList()
+	{
+		return new ArrayList<String>(scenes.keySet());
 	}
 	
 	public static List<String> getMeshList()
@@ -149,7 +165,79 @@ public class AssetManager
 			} 
 		}
 	}
+
+	public static void addMesh(String name, Mesh m)
+	{
+		if(meshes.containsKey(name))
+			throw new IllegalStateException("Cannot add to asset pool. Mesh '" + name + "' already exists.");
+		meshes.put(name, m);
+	}
+
+	public static void addTexture(String name, Texture t)
+	{
+		if(textures.containsKey(name))
+			throw new IllegalStateException("Cannot add to asset pool. Texture '" + name + "' already exists.");
+		textures.put(name, t);
+	}
 	
+	public static void addShader(String name, Shader s)
+	{
+		if(shaders.containsKey(name))
+			throw new IllegalStateException("Cannot add to asset pool. Shader '" + name + "' already exists.");
+		shaders.put(name, s);
+	}
+
+	public static void addMaterial(String name, Material m)
+	{
+		if(materials.containsKey(name))
+			throw new IllegalStateException("Cannot add to asset pool. Material '" + name + "' already exists.");
+		materials.put(name, m);
+	}
+	
+	public static void addGUI(String name, GUI gui)
+	{
+		if(guis.containsKey(name))
+			throw new IllegalStateException("Cannot add to asset pool. GUI '" + name + "' already exists.");
+		guis.put(name, gui);
+	}
+	
+	public static void addScene(Scene s)
+	{
+		if(scenes.containsKey(s.getName()))
+			throw new IllegalStateException("Cannot add to asset pool. Scene '" + s.getName() + "' already exists.");
+		scenes.put(s.getName(), s);
+	}
+
+	public static Mesh removeMesh(String s)
+	{
+		return meshes.remove(s);
+	}
+
+	public static Texture removeTexture(String s)
+	{
+		return textures.remove(s);
+	}
+	
+	public static Shader removeShader(String s)
+	{
+		return shaders.remove(s);
+	}
+
+	public static Material removeMaterial(String string)
+	{
+		return materials.remove(string);
+	}
+	
+	public static GUI removeGUI(String string)
+	{
+		return guis.remove(string);
+	}
+	
+	public static Scene removeScene(String string)
+	{
+		return scenes.remove(string);
+	}
+
 	public static Mesh getMesh(String s)
 	{
 		return meshes.get(s);
@@ -159,6 +247,7 @@ public class AssetManager
 	{
 		return textures.get(s);
 	}
+	
 	public static Shader getShader(String s)
 	{
 		return shaders.get(s);
@@ -169,8 +258,13 @@ public class AssetManager
 		return materials.get(string);
 	}
 	
-	public static void addNativeObject(NativeObject no)
+	public static GUI getGUI(String string)
 	{
-		nativeObjects.add(no);
+		return guis.get(string);
+	}
+	
+	public static Scene getScene(String string)
+	{
+		return scenes.get(string);
 	}
 }

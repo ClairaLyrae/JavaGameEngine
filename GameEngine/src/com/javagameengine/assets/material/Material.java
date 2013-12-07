@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 import com.javagameengine.assets.AssetManager;
@@ -107,6 +108,18 @@ public class Material extends NativeObject implements Bindable
 		return textures;
 	}
 	
+	private boolean transparent = false;
+	
+	public boolean isTransparent()
+	{
+		return transparent;
+	}
+	
+	public void setTransparency(boolean state)
+	{
+		transparent = state;
+	}
+	
 	public static Material loadFromFile(File f) throws IOException
 	{
         BufferedReader reader = null;
@@ -118,6 +131,10 @@ public class Material extends NativeObject implements Bindable
             while ((line = reader.readLine()) != null)
             {
             	String[] split = line.split(" ");
+            	if(split.length == 1 && split[0].equalsIgnoreCase("transparent"))
+            	{
+            		m.setTransparency(true);
+            	}
             	if(split.length == 2 && split[0].equalsIgnoreCase("s"))
             	{
             		Shader s = AssetManager.getShader(split[1]);
@@ -218,7 +235,7 @@ public class Material extends NativeObject implements Bindable
 			if(getShader(type) != null)
 			sb.append(type.toString() + ", ");
 		}
-		sb.append("]");
+		sb.append("], transparent=[" + transparent + "]");
 		return sb.toString();
 	}
 

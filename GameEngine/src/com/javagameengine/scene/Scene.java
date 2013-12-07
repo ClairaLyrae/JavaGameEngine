@@ -3,6 +3,7 @@ package com.javagameengine.scene;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.javagameengine.assets.AssetManager;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.gui.GUI;
@@ -26,23 +27,6 @@ public class Scene
 	private Camera camera = null;
 	private GUI gui;
 	
-	public Camera getCamera()
-	{
-		return camera;
-	}
-	
-	public void resetCamera()
-	{
-		camera = null;
-	}
-	
-	public void setCamera(Camera c)
-	{
-		if(camera != null)
-			throw new IllegalStateException("Camera is already mounted.");
-		camera = c;
-	}	
-	
 	public Scene(String name)
 	{
 		this.name = name;
@@ -50,14 +34,34 @@ public class Scene
 		root.scene = this;
 	}
 	
+	public Camera getCamera()
+	{
+		return camera;
+	}
+	
+	public void setCamera(Camera c)
+	{
+		camera = c;
+	}	
+	
 	public String getName()
 	{
 		return name;
 	}
 	
-	public void setName(String name)
+	public void setName(String newname)
 	{
-		this.name = name;
+		boolean isAsset = AssetManager.getScene(name) != null;
+		if(isAsset)
+		{
+			if(AssetManager.getScene(newname) != null)
+				throw new IllegalStateException("Cannot rename scene when asset pool already contains the given name.");
+			AssetManager.removeScene(name);
+			name = newname;
+			AssetManager.addScene(this);
+		}
+		else
+			name = newname;
 	}
 	
 	/**
@@ -84,20 +88,20 @@ public class Scene
 	public void queueRender()
 	{
 		Renderer.camera = camera;
-		root.queueRenderables();
+		root.queueRender();
 	}
 	
-	public void update(int delta)
+	public void update(float deltaf)
 	{
 		if(root == null)
 			return;
-		root.logic(delta);
+		root.update(deltaf);
 		PhysicsComponent.calculateCollisions();
 	}
 	
 	public void addGUI(GUI newGUI) {
 		gui = newGUI;
-//		gui.addScene(this);
+		gui.setScene(this);
 	}
 
 	public GUI getGui() {

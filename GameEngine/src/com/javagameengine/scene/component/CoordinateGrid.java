@@ -107,7 +107,7 @@ public class CoordinateGrid extends RenderableComponent implements Renderable, D
 	{
 	}
 
-	public void onUpdate(int delta)
+	public void onUpdate(float delta)
 	{
 	}
 
@@ -121,6 +121,12 @@ public class CoordinateGrid extends RenderableComponent implements Renderable, D
 	public Bindable getBindable()
 	{
 		return null;
+	}
+	
+	@Override
+	public boolean isTransparent()
+	{
+		return false;
 	}
 
 	@Override

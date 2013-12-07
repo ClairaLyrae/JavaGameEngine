@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL20;
 
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.Matrix4f;
+import com.javagameengine.scene.component.Light;
 
 // Basically stores render layer queue
 public class RenderQueue
@@ -61,11 +62,13 @@ public class RenderQueue
 					loc = glGetUniformLocation(progID, "p");
 					glUniformMatrix4(loc, false, P_buffer);
 					
-					Color4f lightcol = Renderer.light.getColor();
-					loc = glGetUniformLocation(progID, "light_diffuse");
-					glUniform4f(loc, lightcol.r, lightcol.g, lightcol.b, lightcol.a);
-					loc = glGetUniformLocation(progID, "light_position");
-					glUniform4f(loc, 000f, 000f, 00f, 1f);
+					for(int i = 0; i < Renderer.MAX_LIGHTS; i++)
+					{
+						if(Renderer.lights[i] == null)
+							Light.bindInvalid(progID, i);
+						else
+							Renderer.lights[i].bind(progID,i);
+					}
 					
 					r.getDrawable().draw();
 				}

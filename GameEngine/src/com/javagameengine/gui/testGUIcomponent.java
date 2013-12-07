@@ -3,11 +3,13 @@ package com.javagameengine.gui;
 import java.util.ArrayList;
 
 
+
 import com.javagameengine.math.Color4f;
+import com.javagameengine.scene.Scene;
 
 public class testGUIcomponent extends GUIcomponent {
 
-	public testGUIcomponent(int w, int h, int x, int y, 
+	public testGUIcomponent(Scene newScene, int w, int h, int x, int y, 
 			Color4f borC, Color4f bgC, GUIcomponent p)
 	{
 		width = w;
@@ -17,6 +19,7 @@ public class testGUIcomponent extends GUIcomponent {
 		borderColor = borC;
 		backgroundColor = bgC;
 		parent = p;
+		scene = newScene;
 		children = new ArrayList<GUIcomponent>();
 	}
 	

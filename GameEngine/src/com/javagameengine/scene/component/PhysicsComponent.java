@@ -3,6 +3,7 @@ package com.javagameengine.scene.component;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.javagameengine.events.CollisionEvent;
 import com.javagameengine.math.Quaternion;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
@@ -75,21 +76,21 @@ public class PhysicsComponent extends Component
 	 * @param Object to check and do collision with
 	 * @return True if collision occured
 	 */
-	public boolean collideWith(PhysicsComponent m)
+	public boolean collideWith(PhysicsComponent collider)
 	{
-		if(m == this)
+		if(collider == this)
 			return false;
-		if(this.getScene() != m.getScene())
+		if(this.getScene() != collider.getScene())
 			return false;
-		if(!isCollidable() || !m.isCollidable())
+		if(!isCollidable() || !collider.isCollidable())
 			return false;
 		// Get positions (referenced to world)
 		Vector3f p1 = getNode().getWorldTransform().getPosition();
-		Vector3f p2 = m.getNode().getWorldTransform().getPosition();
+		Vector3f p2 = collider.getNode().getWorldTransform().getPosition();
 		
 		// Get radiuses
 		float r1 = radius;
-		float r2 = m.getRadius();
+		float r2 = collider.getRadius();
 
 		// Find normal (Vector between objects)
 		Vector3f normal = p2.subtractInto(p1, null);
@@ -101,18 +102,24 @@ public class PhysicsComponent extends Component
 
 		// Get velocities
 		Vector3f v1 = velocity;
-		Vector3f v2 = m.getLinearVelocity();
+		Vector3f v2 = collider.getLinearVelocity();
 		
 		// Ignore collision on objects moving away from each other
 		if(v1.subtractInto(v2, null).dot(p2.subtractInto(p1, null)) < 0f)
 			return false;
 		
+		// We have a collision, call event and ignore collision if it gets cancelled
+		CollisionEvent event = new CollisionEvent(this, collider, 0f);
+	    scene.getEventManager().callEvent(event);
+	    if(event.isCancelled())
+	    	return false;
+		
 		// Get masses
 		float m1 = mass;
-		float m2 = m.getMass();
+		float m2 = collider.getMass();
 		float msum = m1 + m2;
 		float e1 = elasticity;
-		float e2 = m.getElasticity();
+		float e2 = collider.getElasticity();
 		
 		// Find components of velocities parallel and perpendicular to the normal
 		Vector3f v1para = normal.scaleInto(normal.dot(v1), null);
@@ -205,15 +212,15 @@ public class PhysicsComponent extends Component
 	}
 	
 	@Override
-	public void onUpdate(int delta)
+	public void onUpdate(float delta)
 	{
 		Transform t = getNode().getTransform();
 		if(velocity.magnitudeSquared() != 0f)
-			t.translate(velocity.x/delta, velocity.y/delta, velocity.z/delta);
+			t.translate(velocity.x*delta, velocity.y*delta, velocity.z*delta);
 		if(angular_velocity.magnitudeSquared() != 0f)
 		{
 			Vector3f av_norm = angular_velocity.normalizeInto(null);
-			t.rotate(angular_velocity.magnitude(), av_norm.x, av_norm.y, av_norm.z);
+			t.rotate(angular_velocity.magnitude()*delta, av_norm.x, av_norm.y, av_norm.z);
 		}
 		//Vector3f deltagrav = gravity.scaleInto(1f/delta, null);
 		//velocity.add(deltagrav);

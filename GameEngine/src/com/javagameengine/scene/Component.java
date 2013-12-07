@@ -13,10 +13,18 @@ public abstract class Component
 {
 	protected boolean isEnabled = true;
 	protected Node node;
+	protected Scene scene;
 		
 	public Component()
 	{
 		
+	}
+	
+	private boolean isDestroyed = false;
+	
+	public boolean isDestroyed()
+	{
+		return isDestroyed;
 	}
 	
 	public void destroy()
@@ -25,9 +33,11 @@ public abstract class Component
 		if(node != null)
 			node.removeComponent(this);
 		node = null;
+		scene = null;
+		isDestroyed = true;
 	}
 	
-	public abstract void onUpdate(int delta);
+	public abstract void onUpdate(float deltaf);
 	public abstract void onDestroy();
 	public abstract void onCreate();
 	
@@ -75,9 +85,7 @@ public abstract class Component
 	 */
 	public Scene getScene()
 	{
-		if(node == null)
-			return null;
-		return node.getScene();
+		return scene;
 	}	
 	
 	public String toString()

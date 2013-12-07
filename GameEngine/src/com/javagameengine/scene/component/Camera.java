@@ -156,14 +156,14 @@ public class Camera extends Component
 	}
 	
 	@Override
-	public void onUpdate(int delta)
+	public void onUpdate(float delta)
 	{
 	}
 
 	@Override
 	public void onDestroy()
 	{
-		getScene().resetCamera();
+		getScene().setCamera(null);
 	}
 
 	@Override

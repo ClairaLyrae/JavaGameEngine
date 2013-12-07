@@ -1,6 +1,7 @@
 package com.javagameengine.console;
 
 import com.javagameengine.Game;
+import com.javagameengine.assets.AssetManager;
 import com.javagameengine.scene.Component;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
@@ -27,7 +28,7 @@ public class SceneCommand extends Command
 		{
 			Console.println("Scene List");
 			Scene active = Game.getHandle().getActiveScene();
-			for(String s : Game.getHandle().getSceneList())
+			for(String s : AssetManager.getSceneList())
 			{
 				if(!active.getName().equals(s))
 					Console.println("- " + s);
@@ -40,7 +41,7 @@ public class SceneCommand extends Command
 			Scene s = Game.getHandle().getActiveScene();
 			if(args.length > 1)
 			{
-				s = Game.getHandle().getScene(args[1]);
+				s = AssetManager.getScene(args[1]);
 				if(s == null)
 					return "Scene '" + args[1] + "' cannot be found.";
 			}

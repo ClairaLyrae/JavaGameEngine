@@ -63,9 +63,12 @@ public abstract class GUI {
 	
 	public abstract void create();
 
-	public void setScene(Scene newScene) {
+	
+	public void setScene(Scene newScene)
+	{
 		scene = newScene;
 	}
+	
 	
 	public Scene getScene()
 	{

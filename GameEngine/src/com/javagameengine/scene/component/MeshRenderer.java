@@ -73,9 +73,17 @@ public class MeshRenderer extends RenderableComponent
 			material.create();
 	}
 
-	public void onUpdate(int delta)
+	public void onUpdate(float delta)
 	{
 		// Update mesh bounds and vertex buffers... if needed!
+	}
+	
+	@Override
+	public boolean isTransparent()
+	{
+		if(material == null)
+			return false;
+		return material.isTransparent();
 	}
 
 	@Override

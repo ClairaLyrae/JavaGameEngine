@@ -63,7 +63,7 @@ public class CameraStatic extends Component implements Listener
 			s.getEventManager().registerListener(this);
 	}
 
-	public void onUpdate(int delta)
+	public void onUpdate(float delta)
 	{
 	}
 }
