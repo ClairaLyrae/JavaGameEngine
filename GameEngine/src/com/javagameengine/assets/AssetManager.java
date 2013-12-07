@@ -42,7 +42,7 @@ public class AssetManager
 	private static Map<String, Texture> textures;
 	private static Map<String, Shader> shaders;
 	private static Map<String, Material> materials;
-	private static Map<String, Texture> audio;
+	private static Map<String, Sound> sounds;
 	private static Map<String, Scene> scenes;
 	private static Map<String, GUI> guis;
 	
@@ -52,7 +52,7 @@ public class AssetManager
 		textures = new HashMap<String, Texture>();
 		shaders = new HashMap<String, Shader>();
 		materials = new HashMap<String, Material>();
-		audio = new HashMap<String, Texture>();
+		sounds = new HashMap<String, Sound>();
 		scenes = new HashMap<String, Scene>();
 		guis = new HashMap<String, GUI>();
 	}
@@ -95,6 +95,14 @@ public class AssetManager
 	public static List<String> getTextureList()
 	{
 		return new ArrayList<String>(textures.keySet());
+	}
+
+	/**
+	 * @return List of the names of all loaded Textures
+	 */
+	public static List<String> getAudioList()
+	{
+		return new ArrayList<String>(sounds.keySet());
 	}
 	
 	public static void loadAll()
@@ -145,7 +153,9 @@ public class AssetManager
 		else if(isFileType(ext, audioExtensions))
 		{
 			Sound s = Sound.loadFromFile(f);
+			sounds.put(fname, s);
 			s.create();
+			System.out.println("Sound '" + fname + "' loaded: " + s.toString());
 			//materials.put(fname, m);
 			//System.out.println("Material '" + fname + "' loaded: " + m.toString());
 		}
@@ -209,9 +219,18 @@ public class AssetManager
 			addTexture(name, (Texture)o);
 		else if(o instanceof Shader)
 			addShader(name, (Shader)o);
+		else if(o instanceof Sound)
+			addSound(name, (Sound)o);
 		else
 			return false;
 		return true;
+	}
+	
+	public static void addSound(String name, Sound s)
+	{
+		if(sounds.containsKey(name))
+			throw new IllegalStateException("Cannot add to asset pool. Mesh '" + name + "' already exists.");
+		sounds.put(name, s);
 	}
 	
 	public static void addMesh(String name, Mesh m)
@@ -256,6 +275,11 @@ public class AssetManager
 		scenes.put(s.getName(), s);
 	}
 
+	public static Sound removeSound(String s)
+	{
+		return sounds.remove(s);
+	}
+	
 	public static Mesh removeMesh(String s)
 	{
 		return meshes.remove(s);
@@ -314,5 +338,10 @@ public class AssetManager
 	public static Scene getScene(String string)
 	{
 		return scenes.get(string);
+	}
+	
+	public static Sound getSound(String string)
+	{
+		return sounds.get(string);
 	}
 }

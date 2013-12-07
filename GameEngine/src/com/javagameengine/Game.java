@@ -9,6 +9,8 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
@@ -26,6 +28,7 @@ import com.javagameengine.events.MouseScrollEvent;
 import com.javagameengine.events.SceneChangeEvent;
 import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.Scene;
+import com.javagameengine.sound.SoundManager;
 
 /**
  * This is the basic implementation of a game in the engine. It provides the basic functionality of the game and
@@ -235,32 +238,11 @@ public abstract class Game
 		if(handle != null)	
 			throw new LWJGLException("Another instance of a game is already running.");
 		handle = this;
-		
-		// Initialize Display
-		PixelFormat pixelf;
-		try
-		{
-			pixelf = new PixelFormat().withSamples(4).withDepthBits(24).withSRGB(true);
-			Display.setDisplayMode(new DisplayMode(1280, 768));
-			Display.create(pixelf); // BLAH
-		} 
-		catch (LWJGLException e)
-		{
-			pixelf = new PixelFormat().withDepthBits(24).withSRGB(true);
-			try
-			{
-				Display.create(pixelf);
-			} catch (LWJGLException e1)
-			{
-				Sys.alert("Error", "Initialization failed!\n\n" + e1.getMessage());
-				System.exit(0);
-			}
-		}
-
 		Renderer.initialize();
-		EventManager.global.registerListener(Console.handle);
+		Console.initialize();
+		SoundManager.initialize();
+		AssetManager.loadAll();
 		onCreate();
-		
 		while (!closeRequested)	// Main game loop
 		{
 			// Update timing information
@@ -268,7 +250,6 @@ public abstract class Game
 			updateFPS();
 			Display.setTitle("JavaGameEngine Test Game [FPS: " + fps + " Delta: " + delta + "]");
 			input();
-			
 			// Call loop update methods that trickle down the hierarchy
 			if (activeScene != null)
 			{
@@ -284,14 +265,13 @@ public abstract class Game
 				Renderer.render();
 				onRender();
 			}
-			
-			//Display.sync(framerateCap);		// If we are running at an FPS above framerateCap, idle until we are synced
+			Display.sync(framerateCap);	
 		}
-		
 		// Cleanup
 		onDestroy();
 		NativeObject.destroyAll();
 		Display.destroy();
+		AL.destroy();
 		EventManager.global.unregisterListener(Console.handle);
 		handle = null;
 	}

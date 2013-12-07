@@ -65,14 +65,8 @@ public class Console implements Listener
 	private static boolean dockPosition = true;	// true is up, false is down
 	private static int percentSize = 25;
 	
-	private Console()
+	public static void initialize()
 	{
-		// Init vars
-		strbuffer = new CyclicArrayBuffer<String>(128);
-		cmdbuffer = new CyclicArrayBuffer<String>(10);
-		commands = new HashMap<String, Command>();
-		// Here we register the default commands for the console. Default commands are given as
-		// anonymous classes of type Command.
 		registerCommand(new Command("clear", 0) {
 			public String execute(String[] args)
 			{
@@ -108,6 +102,14 @@ public class Console implements Listener
 		});
 		registerCommand(new DisplayCommand());
 		registerCommand(new AssetCommand());
+		EventManager.global.registerListener(Console.handle);
+	}
+	
+	private Console()
+	{
+		strbuffer = new CyclicArrayBuffer<String>(128);
+		cmdbuffer = new CyclicArrayBuffer<String>(10);
+		commands = new HashMap<String, Command>();
 	}
 
 	@EventMethod
