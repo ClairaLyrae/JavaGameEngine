@@ -3,6 +3,7 @@ package com.javagameengine.gui;
 import java.util.ArrayList;
 
 import com.javagameengine.math.Color4f;
+import com.javagameengine.scene.Scene;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import static org.lwjgl.opengl.GL11.GL_LINE;
@@ -30,6 +31,8 @@ public abstract class GUIcomponent {
 	protected GUIcomponent parent;
 	protected ArrayList<GUIcomponent> children;
 	protected boolean visible = true;
+	protected Scene scene;
+	
 
 	public GUIcomponent()
 	{
@@ -52,6 +55,7 @@ public abstract class GUIcomponent {
 	public void addChild(GUIcomponent newChild)
 	{
 		newChild.parent = this;
+		// add scene to child
 		this.children.add(newChild);
 	}
 
@@ -97,6 +101,12 @@ public abstract class GUIcomponent {
 		{
 			this.children.get(i).draw();
 		}
+	}
+	
+	
+	public Scene getScene()
+	{
+		return scene;
 	}
 	
 	public abstract void onUpdate(int delta);

@@ -14,10 +14,6 @@ public class AssetCommand extends Command
 	@Override
 	public String execute(String[] args)
 	{
-		if(args.length == 1 && args[0].equalsIgnoreCase("reload"))
-		{
-			//reload assets
-		}
 		if(args.length >= 1 && args[0].equalsIgnoreCase("list"))
 		{
 			List<String> meshlist = null;

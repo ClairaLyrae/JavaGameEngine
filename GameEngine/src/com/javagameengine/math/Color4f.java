@@ -38,5 +38,19 @@ public class Color4f
 		return new Color4f(v.w, v.x, v.y, v.z);
 	}
 	
-
+	// return color at half transparency
+	public Color4f setTrans()
+	{
+		Color4f transColor = new Color4f(this.r, this.g, this.b, 0.5f);;
+		
+		return transColor;
+	}
+	
+	// return color at specified transparency
+	public Color4f setTrans(float trans)
+	{
+		Color4f transColor = new Color4f(this.r, this.g, this.b, trans);;
+		
+		return transColor;
+	}
 }

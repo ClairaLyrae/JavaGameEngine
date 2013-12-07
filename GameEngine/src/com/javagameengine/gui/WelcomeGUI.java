@@ -15,8 +15,8 @@ public class WelcomeGUI extends GUI {
 	public void create() {
 		
 		testGUIcomponent mainBox = new testGUIcomponent(200, 200, centerX-100, centerY-100,
-				Color4f.red, Color4f.red, null);
-		mainBox.addChild(new testGUIcomponent(100, 100, 50, 50, Color4f.black, Color4f.black, null));
+				Color4f.red.setTrans(), Color4f.red.setTrans(), null);
+		mainBox.addChild(new testGUIcomponent(100, 100, 50, 50, Color4f.black.setTrans(), Color4f.black.setTrans(), null));
 		
 		rootComponents.add(mainBox);
 	}

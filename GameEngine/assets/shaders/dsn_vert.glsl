@@ -1,5 +1,7 @@
-#version 330
+#version 150
 
+uniform mat4 m;
+uniform mat4 v;
 uniform mat4 mv;
 uniform mat4 p;
 
@@ -35,5 +37,5 @@ void main(void)
 	
 	gl_Position = vec4(in_position, 1) * mv * p;
 	
-    l_dir = normalize((light_position).xyz - position);
+    l_dir = normalize((light_position*v).xyz - position);
 }

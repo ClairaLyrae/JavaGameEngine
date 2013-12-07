@@ -43,10 +43,6 @@ void main()
 		gl_Position = (P + B) * p;
 		EmitVertex();
 		EndPrimitive();
-		
-		
-		
-    
 	}
 	for(i=0; i<3; i++)
 	{

@@ -1,14 +1,8 @@
 package com.javagameengine.math;
 
-import static org.lwjgl.opengl.GL11.glMultMatrix;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.util.glu.GLU;
-import org.lwjgl.util.glu.Project;
 
 /**
  * 4x4 square matrix class implemented using floats.
@@ -99,8 +93,23 @@ public class Matrix4f extends Matrix<Matrix4f>
 
 	public float det()
 	{
-		// TODO Need to do 4x4 determinant
-		return 0.0f;
+		float f = f00 * ((f11 * f22 * f33 + f12 * f23 * f31 + f13 * f21 * f32)
+					- f13 * f22 * f31
+					- f11 * f23 * f32
+					- f12 * f21 * f33);
+		f -= f01 * ((f10 * f22 * f33 + f12 * f23 * f30 + f13 * f20 * f32)
+				- f13 * f22 * f30
+				- f10 * f23 * f32
+				- f12 * f20 * f33);
+		f += f02 * ((f10 * f21 * f33 + f11 * f23 * f30 + f13 * f20 * f31)
+				- f13 * f21 * f30
+				- f10 * f23 * f31
+				- f11 * f20 * f33);
+		f -= f03 * ((f10 * f21 * f32 + f11 * f22 * f30 + f12 * f20 * f31)
+				- f12 * f21 * f30
+				- f10 * f22 * f31
+				- f11 * f20 * f32);
+		return f;
 	}
 
 	public Matrix4f inverse()
@@ -108,10 +117,60 @@ public class Matrix4f extends Matrix<Matrix4f>
 		return inverseInto(this);
 	}
 
-	public Matrix4f inverseInto(Matrix4f r)
+	private static float determinant3x3(float t00, float t01, float t02, float t10, float t11, float t12, float t20, float t21, float t22)
 	{
-		// TODO Need to do a 4x4 inverse and store it in r
-		return null;
+		return   t00 * (t11 * t22 - t12 * t21)
+		       + t01 * (t12 * t20 - t10 * t22)
+		       + t02 * (t10 * t21 - t11 * t20);
+	}
+
+	public Matrix4f inverseInto(Matrix4f dest)
+	{
+		float det = this.det();
+		if (det == 0) 
+			return null;
+		
+		if (dest == null)
+			dest = new Matrix4f();
+		float determinant_inv = 1f/det;
+
+		float t00 =  determinant3x3(f11, f12, f13, f21, f22, f23, f31, f32, f33);
+		float t01 = -determinant3x3(f10, f12, f13, f20, f22, f23, f30, f32, f33);
+		float t02 =  determinant3x3(f10, f11, f13, f20, f21, f23, f30, f31, f33);
+		float t03 = -determinant3x3(f10, f11, f12, f20, f21, f22, f30, f31, f32);
+		
+		float t10 = -determinant3x3(f01, f02, f03, f21, f22, f23, f31, f32, f33);
+		float t11 =  determinant3x3(f00, f02, f03, f20, f22, f23, f30, f32, f33);
+		float t12 = -determinant3x3(f00, f01, f03, f20, f21, f23, f30, f31, f33);
+		float t13 =  determinant3x3(f00, f01, f02, f20, f21, f22, f30, f31, f32);
+		
+		float t20 =  determinant3x3(f01, f02, f03, f11, f12, f13, f31, f32, f33);
+		float t21 = -determinant3x3(f00, f02, f03, f10, f12, f13, f30, f32, f33);
+		float t22 =  determinant3x3(f00, f01, f03, f10, f11, f13, f30, f31, f33);
+		float t23 = -determinant3x3(f00, f01, f02, f10, f11, f12, f30, f31, f32);
+		
+		float t30 = -determinant3x3(f01, f02, f03, f11, f12, f13, f21, f22, f23);
+		float t31 =  determinant3x3(f00, f02, f03, f10, f12, f13, f20, f22, f23);
+		float t32 = -determinant3x3(f00, f01, f03, f10, f11, f13, f20, f21, f23);
+		float t33 =  determinant3x3(f00, f01, f02, f10, f11, f12, f20, f21, f22);
+
+		dest.f00 = t00*determinant_inv;
+		dest.f11 = t11*determinant_inv;
+		dest.f22 = t22*determinant_inv;
+		dest.f33 = t33*determinant_inv;
+		dest.f01 = t10*determinant_inv;
+		dest.f10 = t01*determinant_inv;
+		dest.f20 = t02*determinant_inv;
+		dest.f02 = t20*determinant_inv;
+		dest.f12 = t21*determinant_inv;
+		dest.f21 = t12*determinant_inv;
+		dest.f03 = t30*determinant_inv;
+		dest.f30 = t03*determinant_inv;
+		dest.f13 = t31*determinant_inv;
+		dest.f31 = t13*determinant_inv;
+		dest.f32 = t23*determinant_inv;
+		dest.f23 = t32*determinant_inv;
+		return dest;
 	}
 
 	public Matrix4f loadIdentity()
@@ -458,11 +517,6 @@ public class Matrix4f extends Matrix<Matrix4f>
 		f32 += f02 * x + f12 * y + f22 * z;
 		f33 += f03 * x + f13 * y + f23 * z;
 		return this;
-	}
-	
-	public static Matrix4f lookAtMatrix()
-	{
-		return null;
 	}
 
 	public static Matrix4f orthoMatrix(float left, float right, float top, float bottom, float znear, float zfar)

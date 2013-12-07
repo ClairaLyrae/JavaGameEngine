@@ -1,7 +1,6 @@
 package com.javagameengine.renderer;
 
-import com.javagameengine.math.Transform;
-import com.javagameengine.scene.Bounds;
+import com.javagameengine.math.Matrix4f;
 
 /**
  * Describes an object that can be rendered into openGL or affects the rendering process.
@@ -9,6 +8,8 @@ import com.javagameengine.scene.Bounds;
  */
 public interface Renderable
 {
-	public void draw();
-	public int bind();
+	public Bindable getBindable();
+	public Drawable getDrawable();
+	public Matrix4f getMatrix();
+	public int getLayer();
 }

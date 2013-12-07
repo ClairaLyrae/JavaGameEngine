@@ -109,7 +109,7 @@ public class Transform
 
 	public Matrix4f getRotationMatrix()
 	{
-		return rotation.toRotationMatrix();
+		return rotation.toRotationMatrix4f();
 	}
 
 	public Matrix4f getTransformMatrix()
@@ -117,7 +117,7 @@ public class Transform
 		Matrix4f rm = getRotationMatrix();
 		Matrix4f sm = getScaleMatrix();
 		Matrix4f tm = getTranslationMatrix();
-		return (sm.multiply(rm)).multiply(tm).set(3, 3, 1f);
+		return (sm.multiply(rm)).set(3, 3, 1f).set(0, 3, position.x).set(1, 3, position.y).set(2, 3, position.z);
 	}
 
 	public void lerp(Transform t, float f)
@@ -149,9 +149,9 @@ public class Transform
 		position.add(x, y, z);
 	}
 	
-	public void rotate(float angle, float x, float y, float z)
+	public void rotate(float rads, float x, float y, float z)
 	{
-		Quaternion rot = new Quaternion().fromAxisAngle(angle, x, y, z);
+		Quaternion rot = new Quaternion().fromAxisAngle(rads, x, y, z);
 		rot.multiplyInto(rotation, rotation);
 	}
 

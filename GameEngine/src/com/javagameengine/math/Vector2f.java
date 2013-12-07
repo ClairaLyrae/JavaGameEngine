@@ -2,6 +2,8 @@ package com.javagameengine.math;
 
 import java.nio.FloatBuffer;
 
+import org.lwjgl.BufferUtils;
+
 /**
  * 2 dimensional vector class implemented using floats.
  * @author ClairaLyrae
@@ -239,5 +241,23 @@ public class Vector2f extends Vector<Vector2f>
 	public String toString()
 	{
 		return String.format("[%f,%f]", x, y);
+	}
+
+	public static FloatBuffer getBufferFromArray(Vector2f[] array)
+	{
+		FloatBuffer fb = BufferUtils.createFloatBuffer(array.length * 2);
+		for(int i = 0; i < array.length; i++)
+			fb.put(array[i].x).put(array[i].y);
+		fb.flip();
+		return fb;
+	}
+	
+	public static Vector2f[] getArrayFromBuffer(FloatBuffer fb)
+	{
+		Vector2f[] array = new Vector2f[(int)(fb.limit()/2)];
+		for(int i = 0; i < array.length; i++)
+			array[i] = new Vector2f(fb.get(), fb.get());
+		fb.rewind();
+		return array;
 	}
 }

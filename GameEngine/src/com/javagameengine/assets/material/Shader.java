@@ -1,35 +1,26 @@
 package com.javagameengine.assets.material;
 
+import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL20.glCompileShader;
+import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteShader;
+import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
+import static org.lwjgl.opengl.GL20.glShaderSource;
+import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL21;
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import org.lwjgl.opengl.*;
 
 import com.javagameengine.assets.NativeObject;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL32.*;
-import static org.lwjgl.opengl.GL33.*;
 
 /**
  * Compiles GLSL shader files into a representative object.
@@ -37,6 +28,16 @@ import static org.lwjgl.opengl.GL33.*;
  */
 public class Shader extends NativeObject
 {
+	public class Variable{
+		String type, name;
+		
+		public Variable(String type, String name)
+		{
+			this.type = type;
+			this.name = name;
+		}
+	}
+	
 	public enum Type 
 	{
 		VERTEX(GL_VERTEX_SHADER),
@@ -61,6 +62,33 @@ public class Shader extends NativeObject
     	super(Shader.class);
     	this.type = type;
     	this.source = data;
+    	parseUniforms();
+    }
+    
+    public void parseUniforms()
+    {
+    	String version = "";
+
+    	List<ShaderVariable> vars = new ArrayList<ShaderVariable>();
+    	
+    	String[] program = source.split("\n");
+    	for(String s : program)
+    	{
+    		String[] split = s.replaceAll(";", "").split(" ");
+    		if(split.length < 1)
+    			continue;
+    		if(split[0].equalsIgnoreCase("#version"))
+    			version = split[1];
+    		else
+    		{
+    			ShaderVariable var = ShaderVariable.parseShaderVariable(s);
+    			if(var != null)
+    				vars.add(var);
+    		}
+    	}
+    	System.out.println("Version #: " + version);
+    	for(ShaderVariable v : vars)
+    		System.out.println(v);
     }
     
     public static Shader loadFromFile(File f) throws IOException

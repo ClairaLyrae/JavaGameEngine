@@ -1,18 +1,12 @@
 package com.javagameengine.console;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import com.javagameengine.Game;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.material.Material;
-import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
-import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
-import com.javagameengine.scene.component.TestComponent;
+import com.javagameengine.scene.component.MeshRenderer;
 
 public class MeshCommand extends Command
 {
@@ -59,10 +53,8 @@ public class MeshCommand extends Command
 				Node n = new Node("Mesh " + index);
 				s.getRoot().addChild(n);
 				
-				TestComponent b = new TestComponent(m, index);
-				b.setMaterial(mat);
-				
-				n.addComponent(b);
+				MeshRenderer ren = new MeshRenderer(mat, m);
+				n.addComponent(ren);
 				return "Mesh created";
 			}
 		}

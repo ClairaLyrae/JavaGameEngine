@@ -1,28 +1,24 @@
 package com.javagameengine.assets.mesh;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.opengl.GL14.*;
-import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LINES;
+import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
+import static org.lwjgl.opengl.GL11.GL_LINE_STRIP;
 import static org.lwjgl.opengl.GL11.GL_POINTS;
-import static org.lwjgl.opengl.GL11.glEndList;
-import static org.lwjgl.opengl.GL11.glGenLists;
-import static org.lwjgl.opengl.GL11.glNewList;
-import static org.lwjgl.opengl.GL11.glNormal3f;
-import static org.lwjgl.opengl.GL11.glNormalPointer;
-import static org.lwjgl.opengl.GL11.glTexCoord2f;
-import static org.lwjgl.opengl.GL11.glVertex3f;
-import static org.lwjgl.opengl.GL11.glVertexPointer;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_SMOOTH;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLE_FAN;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLE_STRIP;
+import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static org.lwjgl.opengl.GL11.glShadeModel;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferData;
-import static org.lwjgl.opengl.GL15.glGenBuffers;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,22 +26,28 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL15;
 
 import com.javagameengine.assets.NativeObject;
-import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Vector2f;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.math.Vector4f;
+import com.javagameengine.renderer.Drawable;
 import com.javagameengine.scene.Bounds;
 
 // TODO What is already here is not really anything. Before making this class, we have to figure out
@@ -56,11 +58,366 @@ import com.javagameengine.scene.Bounds;
  * rendering parameters.
  * @author ClairaLyrae
  */
-public class Mesh extends NativeObject
+public class Mesh extends NativeObject implements Drawable
 {
-    private int meshID = -1;
+	private Bounds bounds = Bounds.getVoid();
+    private AttributeBuffer<?>[] buffers = new AttributeBuffer<?>[Attribute.values().length];
+    private AttributeBuffer<?> indexes = null;
+    private Mode mode;
+
+	public Mesh()
+	{
+		this(Mode.TRIANGLE);
+	}
+	
+	public Mesh(Mode mode)
+	{
+		super(Mesh.class);
+		this.mode = mode;
+	}    
+
+	public void setIndexBuffer(AttributeBuffer<?> sb)
+	{
+		if(!sb.isIndex())
+			throw new IllegalStateException("Given attribute buffer is not a valid index buffer");
+		indexes = sb;
+	}
+	
+	public AttributeBuffer<?> getIndexBuffer()
+	{
+		return indexes;
+	}
+	
+    public void updateBounds()
+    {
+    	// TODO recalculate mesh bounding box
+    }
     
-	public enum Mode {
+    public Bounds getBounds()
+    {
+    	return bounds;
+    }
+    
+    public Mode getMode()
+    {
+    	return mode;
+    }
+    
+    public void setMode(Mode mode) 
+    {
+        this.mode = mode;
+    }
+
+    public void setBuffer(Attribute type, AttributeBuffer<?> vb)
+    {
+        buffers[type.ordinal()] = vb;
+    }
+    
+    public AttributeBuffer<?> clearBuffer(Attribute type)
+    {
+        AttributeBuffer<?> vb = buffers[type.ordinal()];
+        buffers[type.ordinal()] = null;
+        return vb;
+    }
+    
+    public void setIndexBuffer(AttributeUsage u, Buffer data)
+    {
+    	if(data instanceof ShortBuffer)
+    		indexes = new AttributeBuffer<ShortBuffer>(u, (ShortBuffer)data);
+    	else if(data instanceof IntBuffer)
+    		indexes = new AttributeBuffer<IntBuffer>(u, (IntBuffer)data);
+    	else
+    		throw new IllegalStateException("Index buffer must be short or int.");
+    	indexes.setIndexStatus(true);
+    }
+    
+    public void setBuffer(Attribute type, AttributeUsage u, Buffer data)
+    {
+    	if(data instanceof ShortBuffer)
+    		buffers[type.ordinal()] = new AttributeBuffer<ShortBuffer>(u, (ShortBuffer)data);
+    	else if(data instanceof IntBuffer)
+    		buffers[type.ordinal()] = new AttributeBuffer<IntBuffer>(u, (IntBuffer)data);
+    	else if(data instanceof FloatBuffer)
+    		buffers[type.ordinal()] = new AttributeBuffer<FloatBuffer>(u, (FloatBuffer)data);
+    	else if(data instanceof DoubleBuffer)
+    		buffers[type.ordinal()] = new AttributeBuffer<DoubleBuffer>(u, (DoubleBuffer)data);
+    	else if(data instanceof LongBuffer)
+    		buffers[type.ordinal()] = new AttributeBuffer<LongBuffer>(u, (LongBuffer)data);
+    	else if(data instanceof ByteBuffer)
+    		buffers[type.ordinal()] = new AttributeBuffer<ByteBuffer>(u, (ByteBuffer)data);
+    	else if(data instanceof CharBuffer)
+    		buffers[type.ordinal()] = new AttributeBuffer<CharBuffer>(u, (CharBuffer)data);
+    }
+
+    public AttributeBuffer<?> getBuffer(Attribute type)
+    {
+        return buffers[type.ordinal()];
+    }
+    
+    public boolean hasBuffer(Attribute type)
+    {
+    	return buffers[type.ordinal()] != null;
+    }
+    
+    public static Mesh loadFromFile(File f) throws NumberFormatException, IOException
+    {
+        BufferedReader reader = new BufferedReader(new FileReader(f));
+        
+        List<Vector3f> vertexList = new ArrayList<Vector3f>();
+        List<Vector3f> normalList = new ArrayList<Vector3f>();
+        List<Vector2f> texcoordList = new ArrayList<Vector2f>();
+
+        List<String> vertexGroup = new ArrayList<String>();
+        
+        String line;
+        while ((line = reader.readLine()) != null) 
+        {
+            String prefix = line.split(" ")[0];
+            if (prefix.equals("v")) 
+            {
+                String[] xyz = line.split(" ");
+            	Vector3f r = new Vector3f(Float.valueOf(xyz[1]), Float.valueOf(xyz[2]), Float.valueOf(xyz[3]));
+                vertexList.add(r);
+            } 
+            else if (prefix.equals("vn")) 
+            {
+                String[] xyz = line.split(" ");
+            	Vector3f r = new Vector3f(Float.valueOf(xyz[1]), Float.valueOf(xyz[2]), Float.valueOf(xyz[3]));
+                normalList.add(r);
+            } 
+            else if (prefix.equals("vt")) 
+            {
+                String[] xy = line.split(" ");
+            	Vector2f r = new Vector2f(Float.valueOf(xy[1]), Float.valueOf(xy[2]));
+                texcoordList.add(r);
+            } 
+            else if (prefix.equals("f")) 
+            {
+            	String[] faceverts = line.split(" ");
+                for(int i = 1; i < faceverts.length; i++)
+                	vertexGroup.add(faceverts[i]);
+            }
+        }
+
+        short indexCount = 0;
+        LinkedHashMap<String, Short> vertexGroupMap = new LinkedHashMap<String, Short>();
+        
+        for(String s : vertexGroup)
+        {
+        	Short ind = vertexGroupMap.get(s);
+        	if(ind == null)
+        		vertexGroupMap.put(s, indexCount++);
+        }
+
+        int componentSize = vertexGroupMap.size();
+        int indexSize = vertexGroup.size();
+        Vector3f[] vertexArray = new Vector3f[componentSize];
+        Vector3f[] normalArray = new Vector3f[componentSize];
+        Vector2f[] texcoordArray = new Vector2f[componentSize];
+        short[] indexArray = new short[indexSize];
+        
+        int i = 0;
+        for(String s : vertexGroup)
+        {
+        	Short sh = vertexGroupMap.get(s);
+        	String[] split = s.split("/");
+        	Vector3f vert = vertexList.get(Integer.parseInt(split[0])-1);
+        	Vector2f texcoord = texcoordList.get(Integer.parseInt(split[1])-1);
+        	Vector3f norm = normalList.get(Integer.parseInt(split[2])-1);
+        	vertexArray[sh] = vert;
+        	normalArray[sh] = norm;
+        	texcoordArray[sh] = texcoord;
+        	indexArray[i] = sh;
+        	i++;
+        }
+        
+     
+        // Now we need to fill the tangent list
+        
+        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexArray.length * 3);
+        FloatBuffer normalBuffer = BufferUtils.createFloatBuffer(normalArray.length * 3);
+        FloatBuffer texcoordBuffer = BufferUtils.createFloatBuffer(texcoordArray.length * 2);
+        ShortBuffer indexBuffer = BufferUtils.createShortBuffer(indexArray.length);
+        
+        for(Vector3f v : vertexArray)
+        	vertexBuffer.put(v.x).put(v.y).put(v.z);
+        for(Vector3f v : normalArray)
+        	normalBuffer.put(v.x).put(v.y).put(v.z);
+        for(Vector2f v : texcoordArray)
+        	texcoordBuffer.put(v.x).put(v.y);
+        for(Short s : indexArray)
+        	indexBuffer.put(s);
+        
+        vertexBuffer.flip();
+        normalBuffer.flip();
+        texcoordBuffer.flip();
+        indexBuffer.flip();
+
+        Mesh m = new Mesh();
+        m.setBuffer(Attribute.POSITION, AttributeUsage.DYNAMIC, vertexBuffer);
+        m.setBuffer(Attribute.NORMAL, AttributeUsage.DYNAMIC, normalBuffer);
+        m.setBuffer(Attribute.TEXCOORDS, AttributeUsage.DYNAMIC, texcoordBuffer);
+        m.setIndexBuffer(AttributeUsage.DYNAMIC, indexBuffer);
+        m.calculateTangents();
+        
+        System.out.println("Vertices=" + vertexList.size() + 
+        		" Tex Coords=" + texcoordList.size() + 
+        		" Normals=" + normalList.size() + 
+        		" Vert Groups=" + vertexGroup.size());
+        System.out.println(m.toString());
+        reader.close();
+        return m;
+    }
+    
+    public void calculateTangents()
+    {
+    	int uniqueVertCount = size();
+    	int dupeVertCount;
+    	
+    	if(!hasBuffer(Attribute.POSITION) || !hasBuffer(Attribute.TEXCOORDS) || !hasBuffer(Attribute.NORMAL) || uniqueVertCount <= 0)
+    		throw new IllegalStateException("Mesh must have vertex position, normal, index and texture coordinate attributes to calculate tangents.");
+    	
+    	Vector3f[] vertices = Vector3f.getArrayFromBuffer((FloatBuffer) getBuffer(Attribute.POSITION).getData());
+    	Vector3f[] normals = Vector3f.getArrayFromBuffer((FloatBuffer) getBuffer(Attribute.NORMAL).getData());
+    	Vector2f[] texcoords = Vector2f.getArrayFromBuffer((FloatBuffer)getBuffer(Attribute.TEXCOORDS).getData());    	
+    	ShortBuffer indexes = (ShortBuffer)getIndexBuffer().getData();
+    	dupeVertCount = vertices.length;
+    	
+	    Vector3f[] tan1 = new Vector3f[dupeVertCount];
+	    Vector3f[] tan2 = new Vector3f[dupeVertCount];
+	    Vector4f[] tangent = new Vector4f[dupeVertCount];
+	    
+	    for(int i = 0; i < dupeVertCount; i++)
+	    {
+	    	tan1[i] = new Vector3f(0);
+	    	tan2[i] = new Vector3f(0);
+	    }
+	    for (short i = 0; i < uniqueVertCount; i += 3)
+	    {
+	        short i1 = indexes.get();
+	        short i2 = indexes.get();
+	        short i3 = indexes.get();
+	        
+	        Vector3f v1 = vertices[i1];
+	        Vector3f v2 = vertices[i2];
+	        Vector3f v3 = vertices[i3];
+	        
+	        Vector2f w1 = texcoords[i1];
+	        Vector2f w2 = texcoords[i2];
+	        Vector2f w3 = texcoords[i3];
+	        
+	        float x1 = v2.x - v1.x;
+	        float x2 = v3.x - v1.x;
+	        float y1 = v2.y - v1.y;
+	        float y2 = v3.y - v1.y;
+	        float z1 = v2.z - v1.z;
+	        float z2 = v3.z - v1.z;
+	        
+	        float s1 = w2.x - w1.x;
+	        float s2 = w3.x - w1.x;
+	        float t1 = w2.y - w1.y;
+	        float t2 = w3.y - w1.y;
+	        
+	        float r = 1.0f / (s1 * t2 - s2 * t1);
+	        Vector3f sdir = new Vector3f((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
+	                (t2 * z1 - t1 * z2) * r).normalize();
+	        Vector3f tdir = new Vector3f((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
+	                (s1 * z2 - s2 * z1) * r).normalize();
+	        
+	        tan1[i1].add(sdir);
+	        tan1[i2].add(sdir);
+	        tan1[i3].add(sdir);
+	        
+	        tan2[i1].add(tdir);
+	        tan2[i2].add(tdir);
+	        tan2[i3].add(tdir);
+	    }
+	    indexes.rewind();
+	    System.out.println(dupeVertCount);
+	    for(int i = 0; i < dupeVertCount; i++)
+	    {
+	        Vector3f n = normals[i];
+	        Vector3f t = tan1[i];
+	        
+	        // Gram-Schmidt orthogonalize
+	        Vector3f tan = t.subtractInto(n.scaleInto(n.dot(t), null), null).normalize();
+	        
+	        tangent[i] = new Vector4f((n.crossInto(t, null).dot(tan2[i]) < 0.0F) ? 1.0F : 1.0F,
+	        		tan.x, 
+	        		tan.y, 
+	        		tan.z);
+	    }
+	    FloatBuffer fb = Vector4f.getBufferFromArray(tangent);
+	    setBuffer(Attribute.TANGENT, AttributeUsage.DYNAMIC, fb);
+    }
+    
+    public int size()
+    {
+    	if(indexes == null)
+    		return 0;
+    	return indexes.size();
+    }
+    
+    public void draw()
+    {
+		glShadeModel(GL_SMOOTH);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glBindVertexArray(id);
+		GL11.glDrawElements(mode.getGLParam(), size(), indexes.getFormat().getGLEnum(), indexes.getOffset());	
+		glBindVertexArray(0);
+    }
+    
+	@Override
+	public boolean create()
+	{
+		if(size() <= 0)
+			throw new IllegalStateException("Mesh has no valid indexes.");
+		id = glGenVertexArrays();
+		glBindVertexArray(id);
+		
+		for(int i = 0; i < Attribute.values().length; i++)
+		{
+			AttributeBuffer<?> vb = buffers[i];
+			if(vb == null)
+				continue;
+			if(!vb.isLive())
+				vb.create();
+			Attribute type = Attribute.values()[i];
+		    glBindBuffer(GL15.GL_ARRAY_BUFFER, vb.getID());
+		    glEnableVertexAttribArray(type.ordinal());
+		    glVertexAttribPointer(type.ordinal(), 
+		    		type.getComponentSize(), 
+		    		type.getDataFormat().getGLEnum(), 
+		    		vb.isNormalized(), 
+		    		vb.getStride(), 
+		    		vb.getOffset()); 
+		}
+		
+		if(!indexes.isLive())
+			indexes.create();
+		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, indexes.getID());
+		
+		glBindVertexArray(0);
+		return true;
+	}
+
+	@Override
+	public void destroy()
+	{
+		glDeleteVertexArrays(id);
+		for(AttributeBuffer<?> vb : buffers)
+		{
+			if(vb == null || vb.getID() != -1)
+				continue;
+			vb.destroy();
+		}
+		if(indexes != null)
+			indexes.destroy();
+	}
+	
+
+	public enum Mode 
+	{
 		QUAD(GL_QUADS, 4),
 		TRIANGLE(GL_TRIANGLES, 3),
 		TRIANGLE_STRIP(GL_TRIANGLE_STRIP, 3),
@@ -90,459 +447,15 @@ public class Mesh extends NativeObject
 		}
 	}
 	
-	private Bounds bounds =  Bounds.getVoid();
-
-    private GLBuffer[] buffers = new GLBuffer[GLBuffer.Type.values().length];
-    
-    private FloatBuffer interleaved_data = null;
-    private float pointSize = 1f;
-    private float lineWidth = 1f;
-
-    private int vertexCount = -1;
-    private int elementCount = -1;
-
-    private Mode mode;
-    
-    public void updateBounds()
-    {
-    	// TODO recalculate mesh bounding box
-    }
-    
-    public Bounds getBounds()
-    {
-    	return bounds;
-    }
-    
-    public Mode getMode()
-    {
-    	return mode;
-    }
-    
-    public void setMode(Mode mode) 
-    {
-        this.mode = mode;
-    }
-	
-	public Mesh()
+	public String toString()
 	{
-		this(Mode.TRIANGLE);
-	}
-	
-	public Mesh(Mode mode)
-	{
-		super(Mesh.class);
-		this.mode = mode;
-	}
-
-    /**
-     * @return The size of points
-     */
-    public float getPointSize() {
-        return pointSize;
-    }
-
-    /**
-     * Set the size of points for point meshes. Point size is specified in pixels.
-     * @param pointSize The size of points
-     */
-    public void setPointSize(float pointSize) 
-    {
-        this.pointSize = pointSize;
-    }
-
-    /**
-     * @return The width of lines
-     */
-    public float getLineWidth() 
-    {
-        return lineWidth;
-    }
-
-    /**
-     * Set the width of lines for line meshes. Line width is specified in pixels.
-     * @param lineWidth The width of lines
-     */
-    public void setLineWidth(float lineWidth) 
-    {
-        this.lineWidth = lineWidth;
-    }
-
-    /**
-     * @param bufferSize Size of vertex buffer
-     * @return The number of elements of type mode in this mesh
-     */
-    private int calculateNumElements(int bufferSize)
-    {
-        switch (mode)
-        {
-            case TRIANGLE:
-                return bufferSize / 3;
-            case TRIANGLE_STRIP: case TRIANGLE_FAN:
-                return bufferSize - 2;
-            case LINE:
-                return bufferSize / 2;
-            case LINE_STRIP:
-                return bufferSize - 1;
-            case POINT: case LINE_LOOP: default:
-                return bufferSize;
-        }
-    }
-
-    /**
-     * @return Number of elements on the mesh of type mode
-     */
-    public int getElementCount()
-    {
-        return elementCount;
-    }
-    
-
-    /**
-     * Sets the buffer on this mesh to the buffer given. 
-     * @param vb The buffer to set
-     * @throws IllegalArgumentException If the buffer type is already set
-     */
-    public void setBuffer(GLBuffer vb)
-    {
-        if (buffers[vb.getBufferType().ordinal()] != null)
-            throw new IllegalArgumentException("Buffer type already set: "+vb.getBufferType());
-        buffers[vb.getBufferType().ordinal()] = vb;
-    }
-    
-    /**
-     * Clears the buffer of the given type on this mesh
-     * @param type The buffer type to clear
-     */
-    public void clearBuffer(GLBuffer.Type type)
-    {
-        GLBuffer vb = buffers[type.ordinal()];
-        buffers[type.ordinal()] = null;
-    }
-    
-    /**
-     * Sets the buffer of the given type to the given data, or creates a new buffer with the given
-     * parameters and data.
-     * @param type The type of the buffer to set
-     * @param format The format of the given buffer data
-     * @param data The data to set the buffer to
-     */
-    public void setBuffer(GLBuffer.Type type, GLBuffer.Format format, Buffer data)
-    {
-        GLBuffer vb = buffers[type.ordinal()];
-        if (vb == null)
-        {
-            vb = new GLBuffer(type);
-            vb.setupData(GLBuffer.Usage.DYNAMIC, type.getComponentSize(), format, data);
-            setBuffer(vb);
-        }
-        else
-        {
-            vb.updateData(data);
-        }
-    }
-    
-    public void setBuffer(GLBuffer.Type type, FloatBuffer buf) 
-    {
-        setBuffer(type, GLBuffer.Format.FLOAT, buf);
-    }
-
-    public void setBuffer(GLBuffer.Type type, float[] buf)
-    {
-        setBuffer(type, MeshUtil.createFloatBuffer(buf));
-    }
-
-    public void setBuffer(GLBuffer.Type type, IntBuffer buf) 
-    {
-        setBuffer(type, GLBuffer.Format.INT_UNSIGNED, buf);
-    }
-
-    public void setBuffer(GLBuffer.Type type, int[] buf)
-    {
-        setBuffer(type, MeshUtil.createIntBuffer(buf));
-    }
-
-    public void setBuffer(GLBuffer.Type type, ShortBuffer buf) 
-    {
-        setBuffer(type, GLBuffer.Format.SHORT_INT_UNSIGNED, buf);
-    }
-
-    public void setBuffer(GLBuffer.Type type, int components, byte[] buf)
-    {
-        setBuffer(type, MeshUtil.createByteBuffer(buf));
-    }
-
-    public void setBuffer(GLBuffer.Type type, ByteBuffer buf) 
-    {
-        setBuffer(type, GLBuffer.Format.UNSIGNED_BYTE, buf);
-    }
-
-    public void setBuffer(GLBuffer.Type type, short[] buf)
-    {
-        setBuffer(type, MeshUtil.createShortBuffer(buf));
-    }
-
-    /**
-     * Get the VertexBuffer of the given type for this mesh
-     * @param type The type of VertexBuffer
-     * @return The VertexBuffer (null if not set)
-     */
-    public GLBuffer getBuffer(GLBuffer.Type type)
-    {
-        return buffers[type.ordinal()];
-    }
-    
-    public FloatBuffer getFloatBuffer(GLBuffer.Type type) 
-    {
-        GLBuffer vb = getBuffer(type);
-        if (vb == null)
-            return null;
-        return (FloatBuffer) vb.getData();
-    }
-    
-    public static int parseIntSafe(String s)
-    {
-    	s = s.replaceAll("[^\\d]", "");
-    	int i = 0;
-    	try
-    	{
-        	i = Integer.valueOf(s);
-    	} catch(NumberFormatException e) {
-    		return -1;
-    	}
-    	return i;
-    }
-    
-    public static Mesh loadFromFile(File f) throws NumberFormatException, IOException
-    {
-        BufferedReader reader = new BufferedReader(new FileReader(f));
-        Mesh m = new Mesh();
-        List<Vector3f> verts = new ArrayList<Vector3f>();
-        List<Vector3f> norms = new ArrayList<Vector3f>();
-        List<Vector2f> texcoords = new ArrayList<Vector2f>();
-        List<Integer> indexes = new ArrayList<Integer>();
-        List<Integer> tindexes = new ArrayList<Integer>();
-        List<Integer> nindexes = new ArrayList<Integer>();
-        
-        String line;
-        while ((line = reader.readLine()) != null) 
-        {
-            String prefix = line.split(" ")[0];
-            if (prefix.equals("v")) 
-            {
-                String[] xyz = line.split(" ");
-            	Vector3f r = new Vector3f(Float.valueOf(xyz[1]), Float.valueOf(xyz[2]), Float.valueOf(xyz[3]));
-                verts.add(r);
-            } 
-            else if (prefix.equals("vn")) 
-            {
-                String[] xyz = line.split(" ");
-            	Vector3f r = new Vector3f(Float.valueOf(xyz[1]), Float.valueOf(xyz[2]), Float.valueOf(xyz[3]));
-                norms.add(r);
-            } 
-            else if (prefix.equals("vt")) 
-            {
-                String[] xy = line.split(" ");
-            	Vector2f r = new Vector2f(Float.valueOf(xy[1]), Float.valueOf(xy[2]));
-                texcoords.add(r);
-            } 
-            else if (prefix.equals("f")) 
-            {
-                String[] faceIndices = line.split(" ");
-                if(faceIndices.length == 5)
-                	m.setMode(Mesh.Mode.QUAD);
-                else if(faceIndices.length == 4)
-                    m.setMode(Mesh.Mode.TRIANGLE);
-                for(int i = 1; i < faceIndices.length; i++)
-                {
-                	String[] faceparts = faceIndices[i].split("/");
-                	int vparse = parseIntSafe(faceparts[0])-1;
-                	int tparse = parseIntSafe(faceparts[1])-1;
-                	int nparse = parseIntSafe(faceparts[2])-1;
-                	if(vparse >= 0)
-                		indexes.add(vparse);	// vert
-                	if(tparse >= 0)
-                		tindexes.add(tparse);	// texcoords
-                	if(nparse >= 0)
-                    	nindexes.add(nparse);	// norm
-                }
-            } 
-            else
-                continue;
-        }
-        
-        FloatBuffer vertbuf = BufferUtils.createFloatBuffer(indexes.size() * 3);
-        FloatBuffer normbuf = BufferUtils.createFloatBuffer(nindexes.size() * 3);
-        FloatBuffer tangentbuf = BufferUtils.createFloatBuffer(nindexes.size() * 4);
-        FloatBuffer texcoordbuf = BufferUtils.createFloatBuffer(tindexes.size() * 2);
-        
-        int numVerts = m.getMode().getNumVertices();
-        int numFloats = m.getMode().getNumVertices();
-    	Vector3f[] tri_verts = new Vector3f[numVerts];
-    	Vector3f[] tri_norms = new Vector3f[numVerts];
-    	Vector2f[] tri_texcoords = new Vector2f[numVerts];
-        
-        int vertCounter = 0;
-        for(int i = 0; i < indexes.size(); i++)
-        {
-        	int vert_i = indexes.get(i);
-        	int texcoord_i = tindexes.get(i);
-        	int norm_i = nindexes.get(i);
-
-        	Vector3f vv = verts.get(vert_i);
-        	vertbuf.put(vv.x).put(vv.y).put(vv.z);
-        	tri_verts[vertCounter] = vv;
-        	Vector2f vt = texcoords.get(texcoord_i);
-        	texcoordbuf.put(vt.x).put(vt.y);
-        	tri_texcoords[vertCounter] = vt;
-        	Vector3f vn = norms.get(norm_i);
-        	normbuf.put(vn.x).put(vn.y).put(vn.z);
-        	tri_norms[vertCounter] = vn;
-        	
-        	vertCounter++;
-        	if(vertCounter >= numVerts)
-        	{
-        		//System.out.println("Triangle:");
-				vertCounter = 0;
-				Vector4f[] tangent = calculateTangents(tri_verts, tri_norms, tri_texcoords);
-				for(int j = 0; j < 3; j++)
-				{
-					//System.out.println("Normal: " + tri_norms[j] + " Tangent: " + tangent[j]);
-					tangentbuf.put(tangent[j].x).put(tangent[j].y).put(tangent[j].z).put(tangent[j].w);
-				}
-        	}
-        }
-
-        vertbuf.flip();
-        normbuf.flip();
-        tangentbuf.flip();
-        texcoordbuf.flip();
-        
-        m.setBuffer(GLBuffer.Type.POSITION, vertbuf);
-        m.setBuffer(GLBuffer.Type.NORMAL, normbuf);
-        m.setBuffer(GLBuffer.Type.TANGENT, tangentbuf);
-        m.setBuffer(GLBuffer.Type.TEXCOORDS, texcoordbuf);
-        
-        System.out.println("Vertices=" + verts.size() + 
-        		" TexCoords=" + texcoords.size() + 
-        		" Normals=" + norms.size() + 
-        		" Indices=" + indexes.size() + 
-        		" TIndices=" + tindexes.size() + 
-        		" NIndices=" + nindexes.size());
-        
-        reader.close();
-        return m;
-    }
-    
-	public static Vector4f[] calculateTangents(Vector3f[] vertices, Vector3f[] normals, Vector2f[] texcoords)
-	{
-		Vector4f[] result = new Vector4f[3];
-	    
-	    Vector3f v1 = vertices[0];
-	    Vector3f v2 = vertices[1];
-	    Vector3f v3 = vertices[2];
-	    
-	    Vector2f w1 = texcoords[0];
-	    Vector2f w2 = texcoords[1];
-	    Vector2f w3 = texcoords[2];
-	    
-	    float x1 = v2.x - v1.x;
-	    float y1 = v2.y - v1.y;
-	    float z1 = v2.z - v1.z;
-	
-	    float x2 = v3.x - v1.x;
-	    float y2 = v3.y - v1.y;
-	    float z2 = v3.z - v1.z;
-	    
-	    float s1 = w2.x - w1.x;
-	    float s2 = w3.x - w1.x;
-	    float t1 = w2.y - w1.y;
-	    float t2 = w3.y - w1.y;
-	    
-	    float r = 1.0F / (s1 * t2 - s2 * t1);
-	    Vector3f sdir = new Vector3f((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
-	            (t2 * z1 - t1 * z2) * r);
-	    Vector3f tdir = new Vector3f((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
-	            (s1 * z2 - s2 * z1) * r);
-	    
-        for (int i = 0; i < 3; i++)
-        {
-            Vector3f normal = normals[i];
-            Vector3f tan = new Vector3f(sdir);
-            Vector3f tan2 = new Vector3f(tdir);
-
-            // Gram-Schmidt orthogonalize
-            Vector3f tangent = (tan.subtractInto(normal.scaleInto(normal.dot(tan), null), null)).normalize();
-
-            //tangent[i] = tan.crossInto(normal, null).crossInto(normal, null).normalize();
-            
-	        result[i] = new Vector4f(normal.crossInto(tan, null).dot(tan2) < 0.0f ? -1.0F : 1.0F, 
-	        		tangent.x, 
-	        		tangent.y, 
-	        		tangent.z);
-        }
-	    return result;
-	}
-    
-    public int getVertexCount()
-    {
-    	GLBuffer vb = getBuffer(GLBuffer.Type.POSITION);
-    	if(vb == null)
-    		return 0;
-    	return vb.getNumElements();
-    }
-    
-    public void draw()
-    {
-
-		glBindVertexArray(id);
-	    //If you are not using IBOs:
-	    GL11.glDrawArrays(mode.getGLParam(), 0, getVertexCount());
-
-		glBindVertexArray(0);
-		
-		
-		
-		
-		
-//	    //If you are using IBOs:
-//	    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferID);
-//	    GL11.glDrawElements(GL11.GL_TRIANGLES, numberIndices, GL11.GL_UNSIGNED_INT, 0);
-//
-//	    //The alternate glDrawElements.    
-//	    glDrawRangeElements(GL11.GL_TRIANGLES, 0, maxIndex, numberIndices,
-//						GL11.GL_UNSIGNED_INT, 0);
-    }
-    
-	@Override
-	public boolean create()
-	{
-		id = glGenVertexArrays();
-		glBindVertexArray(id);
-		for(GLBuffer vb : buffers)
-		{
-			if(vb == null)
-				continue;
-			if(vb.getId() == -1)
-				vb.create();
-			GLBuffer.Type type = vb.getType();
-		    glBindBuffer(GL15.GL_ARRAY_BUFFER, vb.getId());
-		    glEnableVertexAttribArray(type.ordinal());
-		    glVertexAttribPointer(type.ordinal(), type.getComponentSize(), vb.getFormat().getGLParam(), vb.isNormalized(), vb.getStride(), vb.getOffset()); 
-		}
-		glBindVertexArray(0);
-		return true;
-	}
-
-	@Override
-	public void destroy()
-	{
-		glDeleteVertexArrays(id);
-		for(GLBuffer vb : buffers)
-		{
-			if(vb == null || vb.getId() != -1)
-				continue;
-			vb.destroy();
-		}
+		String s = "mesh[mode=" + mode.name() +
+				", verts=" + size() +
+				", id=" + getID();
+		for(Attribute a : Attribute.values())
+			s += ", " + a.name() + "=[" + getBuffer(a) + "]";
+		s += "]";
+		return s;
 	}
 }
 

@@ -13,14 +13,16 @@ import java.util.ArrayList;
 import org.lwjgl.opengl.Display;
 
 import com.javagameengine.console.Console;
+import com.javagameengine.scene.Scene;
 
 public abstract class GUI {
 	
-	static private boolean visible = true;
-	int width;
-	int height;
-	int centerX;
-	int centerY;
+	static protected boolean visible = true;
+	protected int width;
+	protected int height;
+	protected int centerX;
+	protected int centerY;
+	protected Scene scene;
 	ArrayList<GUIcomponent> rootComponents; 
 	
 	public GUI(){
@@ -60,5 +62,14 @@ public abstract class GUI {
 	}
 	
 	public abstract void create();
+
+	public void setScene(Scene newScene) {
+		scene = newScene;
+	}
+	
+	public Scene getScene()
+	{
+		return scene;
+	}
 	
 }
