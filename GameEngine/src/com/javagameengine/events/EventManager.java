@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.javagameengine.Game;
+import com.javagameengine.scene.Scene;
+
 /**
  * Handles Events and Listeners. When callEvent is called, this class looks through all of its registered 
  * Listener objects and calls each method that has the annotation @EventClass before it, only has one
@@ -23,8 +26,6 @@ public class EventManager
 	
 	public EventManager()
 	{
-		if(global != null)
-			global.addEventManager(this);
 	}
 	
 	public List<EventManager> getEventManagers()
@@ -144,6 +145,12 @@ public class EventManager
 		}
 		for(EventManager em : subManagers)
 			em.callEvent(e);
+		if(this == global)
+		{
+			Scene s = Game.getHandle().getActiveScene();
+			if(s != null)
+				s.getEventManager().callEvent(e);
+		}
 	}
 	
 	public void debugPrint()
