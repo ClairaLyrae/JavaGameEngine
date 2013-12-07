@@ -11,7 +11,8 @@ import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.util.WaveData;
 
-public class SoundTest {
+public class SoundTest 
+{
   /** Buffers hold sound data. */
   IntBuffer buffer = BufferUtils.createIntBuffer(1);
 
@@ -90,9 +91,10 @@ public class SoundTest {
    *  We have allocated memory for our buffers and sources which needs
    *  to be returned to the system. This function frees that memory.
    */
-  void killALData() {
-    AL10.alDeleteSources(source);
-    AL10.alDeleteBuffers(buffer);
+  void killALData() 
+  {
+	  AL10.alDeleteSources(source);
+	  AL10.alDeleteBuffers(buffer);
   }
 
   public static void main(String[] args) {
