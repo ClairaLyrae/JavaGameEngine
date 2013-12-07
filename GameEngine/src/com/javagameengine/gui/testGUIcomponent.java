@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 
 
+
+import com.javagameengine.assets.material.Texture;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.Scene;
 
@@ -26,6 +28,8 @@ public class testGUIcomponent extends GUIcomponent {
 		}
 		children = new ArrayList<GUIcomponent>();
 	}
+	
+
 	
 	//@Override
 	public void onUpdate(int delta) {

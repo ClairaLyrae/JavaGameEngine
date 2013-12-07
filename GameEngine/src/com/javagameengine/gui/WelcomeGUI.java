@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.Display;
 
+import com.javagameengine.assets.AssetManager;
+import com.javagameengine.assets.material.Texture;
 import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.testGUIcomponent;
 import com.javagameengine.gui.GUI;
@@ -21,6 +23,11 @@ public class WelcomeGUI extends GUI {
 		mainBox.addChild(new testButton(100, 100, 50, 50, Color4f.black.setTrans(), 
 				Color4f.black.setTrans(), null));
 		mainBox.addChild(new TextBox(20, 350, "Welcome", Color4f.black));
+		
+		Texture t = AssetManager.getTexture("ship_diff");
+		if(t == null)
+			System.out.println("CADSKJGHSKJDG");
+		mainBox.setBackground(t);
 		
 		rootComponents.add(mainBox);
 	}

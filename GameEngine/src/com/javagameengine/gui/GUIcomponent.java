@@ -2,6 +2,7 @@ package com.javagameengine.gui;
 
 import java.util.ArrayList;
 
+import com.javagameengine.assets.material.Texture;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.Scene;
 import com.javagameengine.util.SimpleText;
@@ -37,6 +38,7 @@ public abstract class GUIcomponent {
 	protected Scene scene;
 	protected String text;
 	protected Color4f textColor;
+	protected Texture texture;
 	
 
 	public GUIcomponent()
@@ -65,6 +67,12 @@ public abstract class GUIcomponent {
 
 	}
 	*/
+	
+	public void setBackground(Texture t)
+	{
+		texture = t;
+	}
+	
 	public void addChild(GUIcomponent newChild)
 	{
 		newChild.parent = this;
@@ -98,12 +106,28 @@ public abstract class GUIcomponent {
 		
 		// draw current component
 		glBegin(GL_QUADS);
-		glColor4f(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
 		
-		glVertex2f(parentX + xPos, parentY + yPos); // bottom left
-		glVertex2f(parentX + xPos, parentY + yPos + height); // top left
-		glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
-		glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+		if(texture == null)
+		{
+			glColor4f(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+			
+			glVertex2f(parentX + xPos, parentY + yPos); // bottom left
+			glVertex2f(parentX + xPos, parentY + yPos + height); // top left
+			glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
+			glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+		}
+		else
+		{
+			texture.bind();
+			GL11.glTexCoord2f(0f, 0f);
+			glVertex2f(parentX + xPos, parentY + yPos); // bottom left
+			GL11.glTexCoord2f(0f, 1f);
+			glVertex2f(parentX + xPos, parentY + yPos + height); // top left
+			GL11.glTexCoord2f(1f, 1f);
+			glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
+			GL11.glTexCoord2f(1f, 0f);
+			glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+		}
 
 		glEnd();
 		
