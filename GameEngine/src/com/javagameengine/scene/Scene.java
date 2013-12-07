@@ -6,9 +6,11 @@ import java.util.Set;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
+import com.javagameengine.gui.GUI;
 import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.component.Camera;
 import com.javagameengine.scene.component.PhysicsComponent;
+
 
 /**
  * A Scene object describes a particular state of the game world, and manages a scene graph comprised of Node objects.
@@ -23,6 +25,7 @@ public class Scene
 	private Node root;
 	private EventManager eventManager = new EventManager();
 	private Camera camera = null;
+	private GUI gui;
 	
 	public Scene(String name)
 	{
@@ -94,5 +97,16 @@ public class Scene
 			return;
 		root.update(deltaf);
 		//PhysicsComponent.calculateCollisions();
+	}
+	
+	public void addGUI(GUI newGUI) {
+		gui = newGUI;
+		gui.setScene(this);
+		gui.onCreate();
+	}
+
+	public GUI getGui() {
+		
+		return gui;
 	}
 }

@@ -1,17 +1,11 @@
 package com.javagameengine.renderer;
 
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 import org.lwjgl.LWJGLException;
@@ -22,9 +16,17 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
+import com.javagameengine.Game;
 import com.javagameengine.console.Console;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.Matrix4f;
+import com.javagameengine.math.Transform;
+import com.javagameengine.math.Vector3f;
+import com.javagameengine.math.Vector4f;
+import com.javagameengine.math.Color4f;
+import com.javagameengine.scene.component.CoordinateGrid;
+import com.javagameengine.gui.GUI;
+import com.javagameengine.gui.WelcomeGUI;
 import com.javagameengine.math.Transform;
 import com.javagameengine.scene.component.Camera;
 import com.javagameengine.scene.component.Light;
@@ -95,6 +97,7 @@ public class Renderer
 		// First off, we need to set up the render target & viewport & buffers
 		int width = Display.getWidth();
 		int height = Display.getHeight();
+		GUI gui = Game.getHandle().getActiveScene().getGui();
 		
 		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
 
@@ -135,10 +138,13 @@ public class Renderer
 				q.render();
 			glDepthMask(true);
 		}
-		
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	    glUseProgram(0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	    // DRAW CONSOLE
 	    GL11.glDisable(GL11.GL_CULL_FACE);
 	    GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -146,17 +152,20 @@ public class Renderer
 		glOrtho(0, Display.getWidth(), 0, Display.getHeight(), 0f, 1f);
 	    GL11.glMatrixMode(GL11.GL_MODELVIEW);   
 	    glLoadIdentity();
-	    GL11.glPushMatrix();
-	    Console.draw();
-	    GL11.glPopMatrix();
 	    
 	    GL11.glPushMatrix();
 	    // draw gui
 	    //  Scene s = Game.getHandle().getActiveScene();
-	    //WelcomeGUI welcome = new WelcomeGUI();
-	    //welcome.draw();
+	    
+	    if(gui != null)
+	    	gui.draw();
+
 	    
 	    // GLMenuWindow.draw();
+	    GL11.glPopMatrix();
+	    
+	    GL11.glPushMatrix();
+	    Console.draw();
 	    GL11.glPopMatrix();
 	    
 	    

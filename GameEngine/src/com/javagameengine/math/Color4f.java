@@ -7,12 +7,12 @@ public class Color4f
 	public static final Color4f gray = new Color4f(0.5f, 0.5f, 0.5f, 1f);
 	public static final Color4f light_gray = new Color4f(0.75f, 0.75f, 0.75f, 1f);
 	public static final Color4f dark_gray = new Color4f(0.25f, 0.25f, 0.25f, 1f);
-	public static final Color4f green = new Color4f(0f, 0f, 1f, 1f);
+	public static final Color4f green = new Color4f(0f, 1f, 0f, 1f);
 	public static final Color4f red = new Color4f(1f, 0f, 0f, 1f);
-	public static final Color4f blue = new Color4f(0f, 1f, 0f, 1f);
-	public static final Color4f purple = new Color4f(1f, 1f, 0f, 1f);
+	public static final Color4f blue = new Color4f(0f, 0f, 1f, 1f);
+	public static final Color4f purple = new Color4f(1f, 0f, 1f, 1f);
 	public static final Color4f cyan = new Color4f(0f, 1f, 1f, 1f);
-	public static final Color4f yellow = new Color4f(1f, 0f, 1f, 1f);
+	public static final Color4f yellow = new Color4f(1f, 1f, 0f, 1f);
 	
 	public final float r, g, b, a;
 	
@@ -45,5 +45,27 @@ public class Color4f
 	public static Color4f fromVector(Vector4f v)
 	{
 		return new Color4f(v.w, v.x, v.y, v.z);
+	}
+	
+	// return color at half transparency
+	public Color4f setTrans()
+	{
+		Color4f transColor = new Color4f(this.r, this.g, this.b, 0.5f);;
+		
+		return transColor;
+	}
+	
+	// return color at specified transparency
+	public Color4f setTrans(float trans)
+	{
+		Color4f transColor = new Color4f(this.r, this.g, this.b, trans);;
+		
+		return transColor;
+	}
+	
+	public Color4f inverse()
+	{
+		Color4f inverseC = new Color4f(1 - this.r, 1 - this.g, 1 - this.b, this.a);
+		return inverseC;
 	}
 }

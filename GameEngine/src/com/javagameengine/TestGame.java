@@ -18,6 +18,9 @@ import com.javagameengine.console.MeshCommand;
 import com.javagameengine.console.SceneCommand;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyPressEvent;
+
+import com.javagameengine.gui.WelcomeGUI;
+
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Vector3f;
@@ -49,6 +52,12 @@ public class TestGame extends Game
 		// Build the 3D scene
 		Node root = s.getRoot();
 		
+
+
+		// SETUP GUI
+		s2.addGUI(new WelcomeGUI());
+	
+
 		// Lights
 		{
 			Light light1 = new Light();
@@ -72,6 +81,7 @@ public class TestGame extends Game
 		}
 
 		// SETUP SHIP
+
 		{
 			Node ship = new Node("ship");
 			Mesh ship_mesh = AssetManager.getMesh("ship");
@@ -105,7 +115,7 @@ public class TestGame extends Game
 			ship.addComponent(ship_laser);
 			camera_node.addComponent(ship_camera);
 		}
-		
+
 		// SETUP SKYBOX
 		{
 			Node skybox_node = new Node("Skybox");

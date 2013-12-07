@@ -2,7 +2,10 @@ package com.javagameengine.gui;
 
 import java.util.ArrayList;
 
+import com.javagameengine.assets.material.Texture;
 import com.javagameengine.math.Color4f;
+import com.javagameengine.scene.Scene;
+import com.javagameengine.util.SimpleText;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import static org.lwjgl.opengl.GL11.GL_LINE;
@@ -25,17 +28,29 @@ public abstract class GUIcomponent {
 	protected int height;
 	protected int xPos;
 	protected int yPos;
+	protected int absoluteX;
+	protected int absoluteY;
 	protected Color4f borderColor;
 	protected Color4f backgroundColor;
 	protected GUIcomponent parent;
 	protected ArrayList<GUIcomponent> children;
 	protected boolean visible = true;
+	protected Scene scene;
+	protected String text;
+	protected Color4f textColor;
+	protected Texture texture;
+	
 
 	public GUIcomponent()
 	{
+		absoluteX = 0;
+		absoluteY = 0;
+		text = null;
+		textColor = null;
 		children = new ArrayList<GUIcomponent>();
 	}
 	
+	/*
 	public GUIcomponent(int w, int h, int x, int y, 
 			Color4f borC, Color4f bgC, GUIcomponent p)
 	{
@@ -47,12 +62,26 @@ public abstract class GUIcomponent {
 		backgroundColor = bgC;
 		parent = p;
 		children = new ArrayList<GUIcomponent>();
+		
+		
+
+	}
+	*/
+	
+	public void setBackground(Texture t)
+	{
+		texture = t;
 	}
 	
-	public void addChild(int w, int h, int x, int y, 
-			Color4f borC, Color4f bgC, GUIcomponent newChild)
+	public void addChild(GUIcomponent newChild)
 	{
 		newChild.parent = this;
+		if(newChild.parent!=null)
+		{
+			newChild.absoluteX = xPos + newChild.xPos;
+			newChild.absoluteY = yPos + newChild.yPos;
+		}
+		// add scene to child
 		this.children.add(newChild);
 	}
 
@@ -75,16 +104,46 @@ public abstract class GUIcomponent {
 		if(!visible)
 			return;
 		
-		// draw current component
-		glBegin(GL_QUADS);
-		glColor4f(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
-		
+		if(texture == null)
+		{
+			glBegin(GL_QUADS);
+			glColor4f(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+			glVertex2f(parentX + xPos, parentY + yPos); // bottom left
+			glVertex2f(parentX + xPos, parentY + yPos + height); // top left
+			glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
+			glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+			glEnd();
+		}
+		else
+		{
+			texture.bind();
+			glBegin(GL_QUADS);
+			glColor4f(1f, 1f, 1f, 1f);
+			GL11.glTexCoord2f(0f, 0f);
+			glVertex2f(parentX + xPos, parentY + yPos); // bottom left
+			GL11.glTexCoord2f(0f, 1f);
+			glVertex2f(parentX + xPos, parentY + yPos + height); // top left
+			GL11.glTexCoord2f(1f, 1f);
+			glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
+			GL11.glTexCoord2f(1f, 0f);
+			glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+			glEnd();
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+		}
+
+		glBegin(GL11.GL_LINES);
+		glColor4f(borderColor.r, borderColor.g, borderColor.b, borderColor.a);
 		glVertex2f(parentX + xPos, parentY + yPos); // bottom left
 		glVertex2f(parentX + xPos, parentY + yPos + height); // top left
 		glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
 		glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
-
 		glEnd();
+		
+		if(text != null)
+		{
+			glColor4f(textColor.r, textColor.g, textColor.b, textColor.a);
+			SimpleText.drawString(text, absoluteX, absoluteY);
+		}
 		
 		// draw children of current component
 		drawChildren();
@@ -100,9 +159,27 @@ public abstract class GUIcomponent {
 		}
 	}
 	
+	
+	public Scene getScene()
+	{
+		return scene;
+	}
+	
 	public abstract void onUpdate(int delta);
 	public abstract void onDestroy();
 	public abstract void onCreate();
+
+	public void setScene(Scene newScene) {
+		
+		int i;
+		
+		scene = newScene;
+		
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).setScene(scene);
+		}
+	}
 }
 
 

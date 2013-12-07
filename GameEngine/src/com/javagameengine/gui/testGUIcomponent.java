@@ -3,7 +3,11 @@ package com.javagameengine.gui;
 import java.util.ArrayList;
 
 
+
+
+import com.javagameengine.assets.material.Texture;
 import com.javagameengine.math.Color4f;
+import com.javagameengine.scene.Scene;
 
 public class testGUIcomponent extends GUIcomponent {
 
@@ -17,8 +21,15 @@ public class testGUIcomponent extends GUIcomponent {
 		borderColor = borC;
 		backgroundColor = bgC;
 		parent = p;
+		if(parent!=null)
+		{
+			absoluteX = parent.xPos + xPos;
+			absoluteY = parent.yPos + yPos;
+		}
 		children = new ArrayList<GUIcomponent>();
 	}
+	
+
 	
 	//@Override
 	public void onUpdate(int delta) {
@@ -34,8 +45,12 @@ public class testGUIcomponent extends GUIcomponent {
 
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
-
+		int i;
+		
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onCreate();
+		}
 	}
 
 }
