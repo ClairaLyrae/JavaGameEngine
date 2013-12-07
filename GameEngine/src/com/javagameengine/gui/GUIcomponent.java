@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.Scene;
+import com.javagameengine.util.SimpleText;
 
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import static org.lwjgl.opengl.GL11.GL_LINE;
@@ -26,21 +27,29 @@ public abstract class GUIcomponent {
 	protected int height;
 	protected int xPos;
 	protected int yPos;
+	protected int absoluteX;
+	protected int absoluteY;
 	protected Color4f borderColor;
 	protected Color4f backgroundColor;
 	protected GUIcomponent parent;
 	protected ArrayList<GUIcomponent> children;
 	protected boolean visible = true;
 	protected Scene scene;
+	protected String text;
+	protected Color4f textColor;
 	
 
 	public GUIcomponent()
 	{
+		absoluteX = 0;
+		absoluteY = 0;
+		text = null;
+		textColor = null;
 		children = new ArrayList<GUIcomponent>();
-		onCreate();
 	}
 	
-	public GUIcomponent(Scene newScene, int w, int h, int x, int y, 
+	/*
+	public GUIcomponent(int w, int h, int x, int y, 
 			Color4f borC, Color4f bgC, GUIcomponent p)
 	{
 		width = w;
@@ -51,14 +60,19 @@ public abstract class GUIcomponent {
 		backgroundColor = bgC;
 		parent = p;
 		children = new ArrayList<GUIcomponent>();
-		scene = newScene;
-		onCreate();
+		
+		
 
 	}
-	
+	*/
 	public void addChild(GUIcomponent newChild)
 	{
 		newChild.parent = this;
+		if(newChild.parent!=null)
+		{
+			newChild.absoluteX = xPos + newChild.xPos;
+			newChild.absoluteY = yPos + newChild.yPos;
+		}
 		// add scene to child
 		this.children.add(newChild);
 	}
@@ -93,6 +107,12 @@ public abstract class GUIcomponent {
 
 		glEnd();
 		
+		if(text != null)
+		{
+			glColor4f(textColor.r, textColor.g, textColor.b, textColor.a);
+			SimpleText.drawString(text, absoluteX, absoluteY);
+		}
+		
 		// draw children of current component
 		drawChildren();
 	}
@@ -116,6 +136,18 @@ public abstract class GUIcomponent {
 	public abstract void onUpdate(int delta);
 	public abstract void onDestroy();
 	public abstract void onCreate();
+
+	public void setScene(Scene newScene) {
+		
+		int i;
+		
+		scene = newScene;
+		
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).setScene(scene);
+		}
+	}
 }
 
 

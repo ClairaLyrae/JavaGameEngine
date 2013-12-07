@@ -102,6 +102,7 @@ public class Scene
 	public void addGUI(GUI newGUI) {
 		gui = newGUI;
 		gui.setScene(this);
+		gui.onCreate();
 	}
 
 	public GUI getGui() {

@@ -9,7 +9,7 @@ import com.javagameengine.scene.Scene;
 
 public class testGUIcomponent extends GUIcomponent {
 
-	public testGUIcomponent(Scene newScene, int w, int h, int x, int y, 
+	public testGUIcomponent(int w, int h, int x, int y, 
 			Color4f borC, Color4f bgC, GUIcomponent p)
 	{
 		width = w;
@@ -19,7 +19,11 @@ public class testGUIcomponent extends GUIcomponent {
 		borderColor = borC;
 		backgroundColor = bgC;
 		parent = p;
-		scene = newScene;
+		if(parent!=null)
+		{
+			absoluteX = parent.xPos + xPos;
+			absoluteY = parent.yPos + yPos;
+		}
 		children = new ArrayList<GUIcomponent>();
 	}
 	
@@ -37,8 +41,12 @@ public class testGUIcomponent extends GUIcomponent {
 
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
-
+		int i;
+		
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onCreate();
+		}
 	}
 
 }

@@ -52,7 +52,7 @@ public class TestGame extends Game
 		
 
 		// SETUP GUI
-//		s2.addGUI(new WelcomeGUI());
+		s2.addGUI(new WelcomeGUI());
 	
 		// SETUP SHIP
 

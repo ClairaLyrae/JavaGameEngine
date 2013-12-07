@@ -1,1 +1,2 @@
 /mesh laser 1 laser
+/scene setactive menu

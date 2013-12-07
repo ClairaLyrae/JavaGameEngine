@@ -66,13 +66,30 @@ public abstract class GUI {
 	
 	public void setScene(Scene newScene)
 	{
+		int i;
+		
 		scene = newScene;
+		
+		for(i=0; i<rootComponents.size();i++)
+		{
+			rootComponents.get(i).setScene(scene);
+		}
 	}
 	
 	
 	public Scene getScene()
 	{
 		return scene;
+		
+	}
+
+	public void onCreate() {
+		int i;
+		
+		for(i=0; i<rootComponents.size();i++)
+		{
+			rootComponents.get(i).onCreate();
+		}
 	}
 	
 }

@@ -29,9 +29,11 @@ import com.javagameengine.scene.component.LaserShot;
 
 public abstract class Button extends GUIcomponent implements Listener {
 	
+	boolean clicked;
+	
 	public Button()
 	{
-		
+		clicked = false;
 	}
 	
     public Button(int w, int h, int x, int y, 
@@ -44,6 +46,11 @@ public abstract class Button extends GUIcomponent implements Listener {
 		borderColor = borC;
 		backgroundColor = bgC;
 		parent = p;
+		if(parent!=null)
+		{
+			absoluteX = parent.xPos + xPos;
+			absoluteY = parent.yPos + yPos;
+		}
 		children = new ArrayList<GUIcomponent>();
     	
 		

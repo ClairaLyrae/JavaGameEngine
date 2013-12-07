@@ -74,6 +74,7 @@ public class Renderer
 		// First off, we need to set up the render target & viewport & buffers
 		int width = Display.getWidth();
 		int height = Display.getHeight();
+		GUI gui = Game.getHandle().getActiveScene().getGui();
 		
 		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
 
@@ -133,8 +134,8 @@ public class Renderer
 	    // draw gui
 	    //  Scene s = Game.getHandle().getActiveScene();
 	    
-	    if(Game.getHandle().getActiveScene().getGui() != null)
-	    	Game.getHandle().getActiveScene().getGui().draw();
+	    if(gui != null)
+	    	gui.draw();
 
 	    
 	    //  GLMenuWindow.draw();
