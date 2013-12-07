@@ -20,6 +20,13 @@ public abstract class Component
 		
 	}
 	
+	private boolean isDestroyed = false;
+	
+	public boolean isDestroyed()
+	{
+		return isDestroyed;
+	}
+	
 	public void destroy()
 	{
 		onDestroy();
@@ -27,6 +34,7 @@ public abstract class Component
 			node.removeComponent(this);
 		node = null;
 		scene = null;
+		isDestroyed = true;
 	}
 	
 	public abstract void onUpdate(float deltaf);

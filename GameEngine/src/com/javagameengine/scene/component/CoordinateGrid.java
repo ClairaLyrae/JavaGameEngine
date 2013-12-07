@@ -122,6 +122,12 @@ public class CoordinateGrid extends RenderableComponent implements Renderable, D
 	{
 		return null;
 	}
+	
+	@Override
+	public boolean isTransparent()
+	{
+		return false;
+	}
 
 	@Override
 	public Drawable getDrawable()

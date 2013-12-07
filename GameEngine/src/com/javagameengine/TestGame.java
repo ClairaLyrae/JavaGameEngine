@@ -24,6 +24,7 @@ import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.Camera;
 import com.javagameengine.scene.component.CameraStatic;
 import com.javagameengine.scene.component.CoordinateGrid;
+import com.javagameengine.scene.component.LaserComponent;
 import com.javagameengine.scene.component.Light;
 import com.javagameengine.scene.component.MeshRenderer;
 import com.javagameengine.scene.component.PhysicsComponent;
@@ -88,6 +89,7 @@ public class TestGame extends Game
 			ship_camera.useDisplayBorders(true);
 			ship_camera.setType(Camera.Type.PERSPECTIVE);
 			
+			LaserComponent ship_laser = new LaserComponent();
 			ShipControlComponent ship_control = new ShipControlComponent(ship_physics, ship_camera);
 			
 			Light ship_light = new Light();
@@ -100,6 +102,7 @@ public class TestGame extends Game
 			ship.addComponent(ship_renderer);
 			ship.addComponent(ship_physics);
 			ship.addComponent(ship_control);
+			ship.addComponent(ship_laser);
 			camera_node.addComponent(ship_camera);
 		}
 		

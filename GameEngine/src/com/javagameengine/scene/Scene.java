@@ -92,7 +92,7 @@ public class Scene
 	{
 		if(root == null)
 			return;
-		root.logic(deltaf);
+		root.update(deltaf);
 		PhysicsComponent.calculateCollisions();
 	}
 }

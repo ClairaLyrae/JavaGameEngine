@@ -26,7 +26,7 @@ public class AssetManager
 	
 	public static final String[] meshExtensions = {"obj"};
 	public static final String[] shaderExtensions = {"vert", "frag", "geom", "geo", "vs", "fs", "gs", "glsl"};
-	public static final String[] textureExtensions = {"bmp", "jpg", "jpeg", "gif"};
+	public static final String[] textureExtensions = {"bmp", "jpg", "jpeg", "gif", "png"};
 	public static final String[] materialExtensions = {"mtl"};
 	
 	public static final String dir = "assets";

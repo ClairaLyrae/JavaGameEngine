@@ -82,6 +82,13 @@ public class Node implements Bounded
 		if(scene != null && scene.getRoot() != this)
 			scene = null;
 		parent = null;
+		isDestroyed = true;
+	}
+	private boolean isDestroyed = false;
+	
+	public boolean isDestroyed()
+	{
+		return isDestroyed;
 	}
 	
 	public Scene getScene()
@@ -322,18 +329,58 @@ public class Node implements Bounded
 		return boundingBoxNode;
 	}
 
+	private boolean isTransient = false;
+	private float timeRemaining;
+	
 	/**
-	 * Iteration through the tree calling logic on child nodes and components. 
+	 * Checks to see if this node is marked as transient by <code>markAsTransient</code>;
+	 * @return True if this node is transient
 	 */
-	public void logic(float deltaf)
+	public boolean isTransient()
 	{
+		return isTransient;
+	}
+	
+	/**
+	 * Marks the current node as a transient node. When the node is marked as transient, it will only exist
+	 * for the number of seconds given. 
+	 * @param time Time until node is destroyed
+	 */
+	public void markAsTransient(float time)
+	{
+		isTransient = true;
+		timeRemaining = time;
+	}
+	
+	/**
+	 * Iteration through the tree calling <code>update</code> on child nodes and components. 
+	 */
+	public void update(float deltaf)
+	{
+		if(isTransient)
+		{
+			timeRemaining -= deltaf;
+			if(timeRemaining <= 0)
+			{
+				destroy();
+				return;
+			}
+		}
+		Component[] componentArr = components.toArray(new Component[0]);
+		Node[] nodeArr = children.toArray(new Node[0]);
+		
 		// Call logic method on child nodes
-		for(Component c : components)
-			c.onUpdate(deltaf);	
-
+		for(Component c : componentArr)
+		{
+			if(!c.isDestroyed())
+				c.onUpdate(deltaf);	
+		}
 		// Call logic method on child nodes
-		for(Node n : children)
-			n.logic(deltaf);	
+		for(Node n : nodeArr)
+		{
+			if(!n.isDestroyed())
+				n.update(deltaf);	
+		}
 	}
 	
 	/**

@@ -77,6 +77,14 @@ public class MeshRenderer extends RenderableComponent
 	{
 		// Update mesh bounds and vertex buffers... if needed!
 	}
+	
+	@Override
+	public boolean isTransparent()
+	{
+		if(material == null)
+			return false;
+		return material.isTransparent();
+	}
 
 	@Override
 	public Bindable getBindable()

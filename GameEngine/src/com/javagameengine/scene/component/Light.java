@@ -24,6 +24,12 @@ public class Light extends Component
 		DIRECTIONAL;
 	}
 	
+	public enum Usage {
+		STATIC,
+		TRANSIENT;
+	}
+	
+	private Usage usage = Usage.STATIC;
 	private Type type = Type.DIRECTIONAL;
 	private float spotAngle = 0.0f;
 	private float spotExp = 0.0f;
@@ -35,6 +41,16 @@ public class Light extends Component
 	protected Color4f colorAmbient = Color4f.black;
 	
 	private boolean shadows = false;
+	
+	public Usage getUsage()
+	{
+		return usage;
+	}
+	
+	public void setUsage(Usage u)
+	{
+		usage = u;
+	}
 	
 	public Type getType()
 	{
@@ -149,6 +165,12 @@ public class Light extends Component
 	@Override
 	public void onCreate()
 	{
+	}
+	
+	public static void bindInvalid(int progID, int lightIndex)
+	{
+		int loc = glGetUniformLocation(progID, "light_valid[" + lightIndex + "]");
+		GL20.glUniform1i(loc, 0);
 	}
 	
 	public void bind(int progID, int lightIndex)

@@ -80,7 +80,7 @@ public class ShipControlComponent extends Component implements Listener
 		
 		Vector3f deltav = new Vector3f();
 //		Vector3f deltaw = new Vector3f(0f, 0f, 0f); 
-		float incTrans = 20f*delta;
+		float incTrans = 30f*delta;
 //		float incRot = 2f;
 
 		Vector3f v_lin = phys.getLinearVelocity();
@@ -97,6 +97,7 @@ public class ShipControlComponent extends Component implements Listener
 			deltav.y = incTrans;
 		if(Keyboard.isKeyDown(Keyboard.KEY_A))
 			deltav.y = -incTrans;
+		float forwardThrust = deltav.z;
 		Matrix3f world_rot = phys.getNode().getWorldTransform().getRotation().toRotationMatrix3f();
 		// Rotate the velocity vector to face the ship direction
 		deltav = world_rot.multiplyInto(deltav, deltav);
@@ -121,6 +122,10 @@ public class ShipControlComponent extends Component implements Listener
 			targetHeading.z = -1.5f;
 		if(targetHeading.z > 1.5f)
 			targetHeading.z = 1.5f;
+		
+		Transform camerat = camera.getNode().getTransform();
+		camerat.getPosition().set(targetHeading.y, 0.5f - 0.5f*targetHeading.x, -4f + 0.1f*forwardThrust);
+		
 		world_rot.multiplyInto(targetHeading, phys.getAngularVelocity());	
 	}
 

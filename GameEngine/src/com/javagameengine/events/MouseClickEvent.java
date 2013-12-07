@@ -13,22 +13,27 @@ public class MouseClickEvent extends MouseEvent
 	private int y;
 	
 	
-	public MouseClickEvent(int x, int y, int key, boolean state, long timeHeld)
+	public MouseClickEvent(int x, int y, int button, boolean state, long timeHeld)
 	{
 		this.x = x;
 		this.y = y;
-		this.button = key;
+		this.button = button;
 		this.state = state;
 		this.timeHeld = timeHeld;
 	}
 	
-	public MouseClickEvent(int x, int y, int key, boolean state)
+	public MouseClickEvent(int x, int y, int button, boolean state)
 	{
 		this.x = x;
 		this.y = y;
-		this.button = key;
+		this.button = button;
 		this.state = state;
 		this.timeHeld = 0;
+	}
+	
+	public int getButton()
+	{
+		return button;
 	}
 	
 	public boolean state()
