@@ -156,7 +156,7 @@ public class Renderer
 	    //WelcomeGUI welcome = new WelcomeGUI();
 	    //welcome.draw();
 	    
-	    //  GLMenuWindow.draw();
+	    // GLMenuWindow.draw();
 	    GL11.glPopMatrix();
 	    
 	    
