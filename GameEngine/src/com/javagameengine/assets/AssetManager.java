@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.javagameengine.assets.audio.Sound;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Shader;
 import com.javagameengine.assets.material.Texture;
@@ -28,6 +29,7 @@ public class AssetManager
 	public static final String[] shaderExtensions = {"vert", "frag", "geom", "geo", "vs", "fs", "gs", "glsl"};
 	public static final String[] textureExtensions = {"bmp", "jpg", "jpeg", "gif", "png"};
 	public static final String[] materialExtensions = {"mtl"};
+	public static final String[] audioExtensions = {"wav"};
 	
 	public static final String dir = "assets";
 	public static final String meshDir = "assets/meshes";
@@ -44,12 +46,8 @@ public class AssetManager
 	private static Map<String, Scene> scenes;
 	private static Map<String, GUI> guis;
 	
-	private static Set<NativeObject> nativeObjects;
-	
 	private AssetManager()
 	{
-		nativeObjects = new HashSet<NativeObject>();
-		
 		meshes = new HashMap<String, Mesh>();
 		textures = new HashMap<String, Texture>();
 		shaders = new HashMap<String, Shader>();
@@ -59,26 +57,41 @@ public class AssetManager
 		guis = new HashMap<String, GUI>();
 	}
 	
+	/**
+	 * @return List of the names of all loaded GUIs
+	 */
 	public static List<String> getGUIList()
 	{
 		return new ArrayList<String>(guis.keySet());
 	}
 	
+	/**
+	 * @return List of the names of all loaded Scenes
+	 */
 	public static List<String> getSceneList()
 	{
 		return new ArrayList<String>(scenes.keySet());
 	}
-	
+
+	/**
+	 * @return List of the names of all loaded Meshes
+	 */
 	public static List<String> getMeshList()
 	{
 		return new ArrayList<String>(meshes.keySet());
 	}
-	
+
+	/**
+	 * @return List of the names of all loaded Shaders
+	 */
 	public static List<String> getShaderList()
 	{
 		return new ArrayList<String>(shaders.keySet());
 	}
-	
+
+	/**
+	 * @return List of the names of all loaded Textures
+	 */
 	public static List<String> getTextureList()
 	{
 		return new ArrayList<String>(textures.keySet());
@@ -129,6 +142,13 @@ public class AssetManager
 			materials.put(fname, m);
 			System.out.println("Material '" + fname + "' loaded: " + m.toString());
 		}
+		else if(isFileType(ext, audioExtensions))
+		{
+			Sound s = Sound.loadFromFile(f);
+			s.create();
+			//materials.put(fname, m);
+			//System.out.println("Material '" + fname + "' loaded: " + m.toString());
+		}
 		else
 			System.out.println("Unknown filetype");
 			// Generic file
@@ -144,6 +164,10 @@ public class AssetManager
 		return false;
 	}
 	
+	/**
+	 * Loads all files in a given dire
+	 * @param dir Directory to load from
+	 */
 	public static void loadDir(String dir)
 	{
 		File fdir = new File(dir);
@@ -166,6 +190,30 @@ public class AssetManager
 		}
 	}
 
+	/**
+	 * Loads the given object into the asset manager if the obect is of a valid type.
+	 * @param name Name to give object
+	 * @param o Object to load into manager
+	 */
+	public static boolean addObject(String name, Object o)
+	{
+		if(o instanceof Mesh)
+			addMesh(name, (Mesh)o);
+		else if(o instanceof Material)
+			addMaterial(name, (Material)o);
+		else if(o instanceof GUI)
+			addGUI(name, (GUI)o);
+		else if(o instanceof Scene)
+			addScene((Scene)o);
+		else if(o instanceof Texture)
+			addTexture(name, (Texture)o);
+		else if(o instanceof Shader)
+			addShader(name, (Shader)o);
+		else
+			return false;
+		return true;
+	}
+	
 	public static void addMesh(String name, Mesh m)
 	{
 		if(meshes.containsKey(name))

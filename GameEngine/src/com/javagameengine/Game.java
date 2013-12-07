@@ -285,7 +285,7 @@ public abstract class Game
 				onRender();
 			}
 			
-			Display.sync(framerateCap);		// If we are running at an FPS above framerateCap, idle until we are synced
+			//Display.sync(framerateCap);		// If we are running at an FPS above framerateCap, idle until we are synced
 		}
 		
 		// Cleanup

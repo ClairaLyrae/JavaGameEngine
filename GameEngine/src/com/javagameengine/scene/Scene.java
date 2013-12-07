@@ -96,7 +96,7 @@ public class Scene
 		if(root == null)
 			return;
 		root.update(deltaf);
-		PhysicsComponent.calculateCollisions();
+		//PhysicsComponent.calculateCollisions();
 	}
 	
 	public void addGUI(GUI newGUI) {
