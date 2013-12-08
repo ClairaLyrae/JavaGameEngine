@@ -71,7 +71,9 @@ public class Button extends GUIcomponent implements Listener {
     }
 	
 	private void addText() {
-		this.addChild(new TextBox(5, 5, text, Color4f.black));
+		int x = (width/2) - (text.length()/2)*8;
+		int y = (height/2) - 4;
+		this.addChild(new TextBox(x, y, text, Color4f.black));
 	}
 	
 	@EventMethod
