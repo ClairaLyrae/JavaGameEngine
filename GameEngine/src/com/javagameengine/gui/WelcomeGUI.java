@@ -7,7 +7,7 @@ import org.lwjgl.opengl.Display;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.gui.GUIcomponent;
-import com.javagameengine.gui.testGUIcomponent;
+import com.javagameengine.gui.GLquadGUIcomponent;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.math.Color4f;
 
@@ -18,9 +18,9 @@ public class WelcomeGUI extends GUI {
 	@Override
 	public void create() {
 		
-		testGUIcomponent mainBox = new testGUIcomponent(Display.getWidth(), Display.getHeight(), 0, 0,
+		GLquadGUIcomponent mainBox = new GLquadGUIcomponent(Display.getWidth(), Display.getHeight(), 0, 0,
 				Color4f.white.setTrans(), Color4f.white.setTrans(), null);
-		testGUIcomponent innerBox = new testGUIcomponent(200, 400, centerX-100, centerY-200,
+		GLquadGUIcomponent innerBox = new GLquadGUIcomponent(200, 400, centerX-100, centerY-200,
 				Color4f.white.setTrans(), Color4f.red.setTrans(), null);
 		innerBox.addChild(new testButton(100, 100, 50, 50, Color4f.white.setTrans(), 
 				Color4f.black.setTrans(), null));

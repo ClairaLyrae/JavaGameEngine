@@ -153,7 +153,7 @@ public class TestGame extends Game
 		Console.registerCommand(new MeshCommand());
 		Console.registerCommand(new SceneCommand());
 		
-		setActiveScene(s.getName());
+		setActiveScene(s2.getName());
 		
 		// Auto load commands to console from file! Also we are manually firing some events
 		Console.executeFromFile(new File("commands.txt"));

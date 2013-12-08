@@ -12,7 +12,7 @@ public class HUD extends GUI{
 	public void create() {
 		
 		Crosshairs cursor = new Crosshairs();
-		testGUIcomponent laserCount = new testGUIcomponent(200, 30, 
+		GLquadGUIcomponent laserCount = new GLquadGUIcomponent(200, 30, 
 				Display.getWidth() - 200, Display.getHeight() - 31,
 				Color4f.white.setTrans(), Color4f.red.setTrans(), null);
 		laserCount.addChild(new TextBox(5, 5, "LASERS SHOT:", Color4f.black));

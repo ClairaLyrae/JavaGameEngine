@@ -9,9 +9,9 @@ import com.javagameengine.assets.material.Texture;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.Scene;
 
-public class testGUIcomponent extends GUIcomponent {
+public class GLquadGUIcomponent extends GUIcomponent {
 
-	public testGUIcomponent(int w, int h, int x, int y, 
+	public GLquadGUIcomponent(int w, int h, int x, int y, 
 			Color4f borC, Color4f bgC, GUIcomponent p)
 	{
 		width = w;

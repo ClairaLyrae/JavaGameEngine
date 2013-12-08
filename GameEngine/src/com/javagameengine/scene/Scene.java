@@ -70,12 +70,16 @@ public class Scene
 	public void clear()
 	{
 		if(root.getScene() != null)
-		{
 			root.destroy();
-//			gui.destroy();
-		}
+			
 		root = new Node("root");
 		root.scene = this;
+		
+//		if(gui.getScene() != null)
+//			gui.destroy();
+		
+		
+
 	}
 
 	public EventManager getEventManager()
@@ -99,6 +103,9 @@ public class Scene
 		if(root == null)
 			return;
 		root.update(deltaf);
+		
+		if(gui == null)
+			return;
 		gui.update(deltaf);
 		//PhysicsComponent.calculateCollisions();
 	}
