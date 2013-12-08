@@ -13,10 +13,14 @@ import java.util.ArrayList;
 import org.lwjgl.opengl.Display;
 
 import com.javagameengine.console.Console;
+import com.javagameengine.events.EventManager;
 import com.javagameengine.scene.Scene;
 
 public abstract class GUI {
 	
+	private EventManager eventmanager = new EventManager();
+	
+	private boolean hasCursor = true;
 	static protected boolean visible = true;
 	protected int width;
 	protected int height;
@@ -25,8 +29,23 @@ public abstract class GUI {
 	protected Scene scene;
 	ArrayList<GUIcomponent> rootComponents; 
 	
-	public GUI(){
-		
+	public EventManager getEventManager()
+	{
+		return eventmanager;
+	}
+	
+	public boolean hasCursor()
+	{
+		return hasCursor;
+	}
+	
+	public void setCursor(boolean state)
+	{
+		hasCursor = state;
+	}
+	
+	public GUI()
+	{
 		height = Display.getHeight();
 		width = Display.getWidth();
 		centerX = width/2;
@@ -48,17 +67,10 @@ public abstract class GUI {
 
 	public void draw()
 	{
-		int i;
-		
 		if(!visible)
 			return;
-		
-
-
-		for(i=0; i<rootComponents.size();i++)
-		{
-			rootComponents.get(i).draw();
-		}
+		for(GUIcomponent c : rootComponents)
+			c.draw();
 	}
 	
 	public abstract void create();
@@ -67,57 +79,31 @@ public abstract class GUI {
 	public void addComponent(GUIcomponent comp)
 	{
 		rootComponents.add(comp);
+		comp.setGUI(this);
 	}
 	
 	public void removeComponent(GUIcomponent comp)
 	{
 		rootComponents.remove(comp);
+		comp.setGUI(null);
 	}
 	
 	public void setScene(Scene newScene)
 	{
-		int i;
-		
 		scene = newScene;
-		
-		for(i=0; i<rootComponents.size();i++)
-		{
-			rootComponents.get(i).setScene(scene);
-		}
+		for(GUIcomponent c : rootComponents)
+			c.setGUI(this);
 	}
-	
 	
 	public Scene getScene()
 	{
 		return scene;
 		
 	}
-
-	public void onCreate() {
-		int i;
-		
-		for(i=0; i<rootComponents.size();i++)
-		{
-			rootComponents.get(i).onCreate();
-		}
-	}
 	
 	public void update(float delta)
 	{
-		int i;
-		for(i=0; i<rootComponents.size();i++)
-		{
-			rootComponents.get(i).onUpdate(delta);
-		}
+		for(GUIcomponent c : rootComponents)
+			c.update(delta);
 	}
-	
-	public void destroy()
-	{
-		int i;
-		for(i=0; i<rootComponents.size();i++)
-		{
-			rootComponents.get(i).onDestroy();
-		}
-	}
-	
 }

@@ -406,6 +406,7 @@ public class Texture extends NativeObject
 	 */
 	public void unbind()
 	{
+		glBindTexture(type.getGLParam(), 0);
 		GL11.glDisable(type.getGLParam());
 	}
 }

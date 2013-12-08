@@ -142,15 +142,13 @@ public class Renderer
 				q.render();
 			glDepthMask(true);
 		}
-
+		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	    glUseProgram(0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
-
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
 	    GL11.glDisable(GL11.GL_CULL_FACE);
 	    GL11.glMatrixMode(GL11.GL_PROJECTION);
 	    GL11.glLoadIdentity();
@@ -158,13 +156,13 @@ public class Renderer
 	    GL11.glMatrixMode(GL11.GL_MODELVIEW);   
 	    glLoadIdentity();
 
-
 	    // draw gui
 	    //  Scene s = Game.getHandle().getActiveScene();
-	    if(gui != null || Console.isVisible())
+	    if((gui != null && gui.hasCursor()) || Console.isVisible())
 	    	Mouse.setGrabbed(false);
 	    else
 	    	Mouse.setGrabbed(true);
+	    
 	    GL11.glPushMatrix();
 	    if(gui != null)
 	    	gui.draw();
@@ -174,8 +172,6 @@ public class Renderer
 	    GL11.glPushMatrix();
 	    Console.draw();
 	    GL11.glPopMatrix();
-
-	    
 
 		Display.update();
 	}

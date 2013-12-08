@@ -94,28 +94,13 @@ public class Crosshairs extends GUIcomponent implements Listener{
 	@Override
 	public void onDestroy()
 	{
-		int i;
-
-		for(i=0; i<children.size();i++)
-		{
-			children.get(i).onDestroy();
-		}
-		getScene().getEventManager().unregisterListener(this);
+		getGUI().getEventManager().unregisterListener(this);
 	}
 
 	@Override
 	public void onCreate()
 	{
-		int i;
-		
-		getScene().getEventManager().registerListener(this);
-		
-		for(i=0; i<children.size();i++)
-		{
-			children.get(i).onCreate();
-		}
-	
-		getScene().getEventManager().registerListener(this);
+		getGUI().getEventManager().registerListener(this);
 	}
 
 }

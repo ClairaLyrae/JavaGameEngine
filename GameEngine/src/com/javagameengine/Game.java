@@ -267,7 +267,6 @@ public abstract class Game
 					activeScene.update(deltaf);
 					onUpdate(deltaf);
 				}
-				
 				Renderer.reset();
 				activeScene.queueRender();	
 				Renderer.render();

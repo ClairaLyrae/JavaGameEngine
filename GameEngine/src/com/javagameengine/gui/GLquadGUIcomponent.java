@@ -25,39 +25,18 @@ public class GLquadGUIcomponent extends GUIcomponent {
 		children = new ArrayList<GUIcomponent>();
 	}
 	
-
-	
-	//@Override
-	public void onUpdate(float delta) {
-		int i;
-		
-		
-		
-		for(i=0; i<children.size();i++)
-		{
-			children.get(i).onUpdate(delta);
-		}
+	public void onUpdate(float delta) 
+	{
 	}
 
 	@Override
-	public void onDestroy() {
-		
-		int i;
-
-		for(i=0; i<children.size();i++)
-		{
-			children.get(i).onDestroy();
-		}
+	public void onDestroy() 
+	{
 	}
 
 	@Override
-	public void onCreate() {
-		int i;
-		
-		for(i=0; i<children.size();i++)
-		{
-			children.get(i).onCreate();
-		}
+	public void onCreate() 
+	{
 	}
 
 }

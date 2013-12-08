@@ -89,12 +89,6 @@ public class Scene
 			
 		root = new Node("root");
 		root.scene = this;
-		
-//		if(gui.getScene() != null)
-//			gui.destroy();
-		
-		
-
 	}
 
 	public EventManager getEventManager()
@@ -127,9 +121,17 @@ public class Scene
 	
 	public void addGUI(GUI newGUI) 
 	{
+		if(gui != null)
+		{
+			eventManager.removeEventManager(gui.getEventManager());
+			gui.setScene(null);
+		}
 		gui = newGUI;
-		gui.setScene(this);
-		gui.onCreate();
+		if(newGUI != null)
+		{
+			eventManager.addEventManager(gui.getEventManager());
+			gui.setScene(this);
+		}
 	}
 
 	public GUI getGui() 

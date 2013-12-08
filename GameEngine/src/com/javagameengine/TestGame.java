@@ -59,11 +59,16 @@ public class TestGame extends Game
 		// Build the 3D scene
 		Node root = s.getRoot();
 		
-
-
+		GUI welcomegui = new WelcomeGUI();
+		GUI hud = new HUD();
+		welcomegui.setCursor(true);
+		hud.setCursor(false);
+		
 		// SETUP GUI
-		s2.addGUI(new WelcomeGUI());
-		s.addGUI(new HUD());
+		s2.addGUI(welcomegui);
+		s.addGUI(hud);
+		
+		
 
 		// Lights
 		{
@@ -159,7 +164,7 @@ public class TestGame extends Game
 		
 		setActiveScene(s2.getName());
 		
-		// Auto load commands to console from file! Also we are manually firing some events
+		// Auto load commands to console from file! 
 		Console.executeFromFile(new File("commands.txt"));
 	}
 
@@ -201,6 +206,9 @@ public class TestGame extends Game
 			{
 			}
 		};
+		
+		gui.setCursor(true);
+		
 		// Create a new scene
 		Scene s = new Scene("menu3d");
 		s.addGUI(gui);

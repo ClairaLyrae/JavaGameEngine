@@ -24,6 +24,7 @@ public class SceneCommand extends Command
 			else
 				Console.println("Active scene failed to set.");
 		}
+		
 		if(args.length == 1 && args[0].equalsIgnoreCase("list"))
 		{
 			Console.println("Scene List");
@@ -36,6 +37,7 @@ public class SceneCommand extends Command
 					Console.println("- " + s + " [ACTIVE]");
 			}
 		}
+		
 		else if(args[0].equalsIgnoreCase("print"))
 		{
 			Scene s = Game.getHandle().getActiveScene();
@@ -50,6 +52,7 @@ public class SceneCommand extends Command
 			Console.println("Scene " + s.getName() + ":");
 			printScene(s);
 		}
+		
 		return null;
 	}
 	
