@@ -66,7 +66,8 @@ public class Button extends GUIcomponent implements Listener {
 		textColor = Color4f.black;
 		text = t;
 		
-		addText();
+		if(text!=null)
+			addText();
 
     }
 	
