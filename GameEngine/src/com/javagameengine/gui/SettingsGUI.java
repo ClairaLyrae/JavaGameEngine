@@ -18,11 +18,12 @@ public class SettingsGUI extends GUI {
 	@Override
 	public void create() {
 		
+		//Main boxes
 		GLquadGUIcomponent mainBox = new GLquadGUIcomponent(Display.getWidth(), Display.getHeight(), 0, 0,
 				Color4f.white.setTrans(), Color4f.white.setTrans(), null);
 		GLquadGUIcomponent innerBox = new GLquadGUIcomponent(400, 500, centerX-200, centerY-250,
 				Color4f.white.setTrans(), Color4f.red.setTrans(), null);
-		
+				
 		//Slider box
 		GLquadGUIcomponent slider = new GLquadGUIcomponent(100, 2, 225, 375,
 				Color4f.white.setTrans(), Color4f.white.setTrans(), null);
@@ -41,27 +42,76 @@ public class SettingsGUI extends GUI {
 		
 		
 		//Sound on/off
-		innerBox.addChild(new Button(50, 20, 250, 405, "On", 1));
+		Button sound_onoff = new Button(50, 20, 250, 405, "On", 1)
+		{
+			@Override
+			public void onClick(){
+			}
+		}
+		innerBox.addChild(sound_onoff);
+		
 		
 		//Volume Slider
-		innerBox.addChild(new Button(10, 25, 270, 365, null, 0));
+		Button volume_slider = new Button(10, 25, 270, 365, null, 0)
+		{
+			@Override
+			public void onClick(){
+			}
+		}
+		innerBox.addChild(volume_slider);
+		
 		
 		//Music on/off
-		innerBox.addChild(new Button(50, 20, 250, 325, "On", 1));
+		Button music_onoff = new Button(50, 20, 250, 325, "On", 1)
+		{
+			@Override
+			public void onClick(){
+			}
+		}
+		innerBox.addChild(music_onoff);
+		
 		
 		//Crosshair
-		innerBox.addChild(new Button(50, 20, 250, 245, "On", 1));
+		Button crosshair_onoff = new Button(50, 20, 250, 245, "On", 1)
+		{
+			@Override
+			public void onClick(){
+			}
+		}
+		innerBox.addChild(crosshair_onoff);
+		
 		
 		//Resolution
 		
-		//FullScreen
-		innerBox.addChild(new Button(50, 20, 250, 165, "On", 1));
 		
-		//Crosshair
-		innerBox.addChild(new Button(50, 20, 250, 125, "On", 1));
+		//FullScreen
+		Button fullscreen_onoff = new Button(50, 20, 250, 165, "On", 1)
+		{
+			@Override
+			public void onClick(){
+			}
+		}
+		innerBox.addChild(fullscreen_onoff);
+		
+		
+		//VSync
+		Button vsync_onoff = new Button(50, 20, 250, 125, "On", 1)
+		{
+			@Override
+			public void onClick(){
+			}
+		}
+		innerBox.addChild(vsync_onoff);
+		
 		
 		//Multisamp
-		innerBox.addChild(new Button(50, 20, 250, 85, "On", 1));
+		Button mult_onoff = new Button(50, 20, 250, 85, "On", 1)
+		{
+			@Override
+			public void onClick(){
+			}
+		}
+		innerBox.addChild(mult_onoff);
 				
 				
 		mainBox.addChild(innerBox);
