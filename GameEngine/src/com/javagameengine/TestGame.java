@@ -239,7 +239,7 @@ public class TestGame extends Game
 		
 		// SETUP SKYBOX
 		{
-			Skybox skybox = AssetManager.getSkybox("space");
+			Skybox skybox = AssetManager.getSkybox("space2");
 			s.setSkybox(skybox);
 		}
 		
