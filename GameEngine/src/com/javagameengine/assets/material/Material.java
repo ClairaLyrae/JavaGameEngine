@@ -47,6 +47,7 @@ public class Material extends NativeObject implements Bindable
 		NORMAL("tex_normal"),
 		SPECULAR("tex_specular"),
 		EMISSIVE("tex_emissive"),
+		CUBE("tex_cube"),
 		ALPHA("tex_alpha");
 		
 		private String name;
@@ -142,15 +143,19 @@ public class Material extends NativeObject implements Bindable
             			throw new IllegalStateException("Shader " + split[1] + " could not be found.");
             		m.setShader(s);
             	}
-            	if(split.length == 3 && split[0].equalsIgnoreCase("t"))
+            	if(split.length > 2 && split[0].equalsIgnoreCase("t"))
             	{
-            		Texture t = AssetManager.getTexture(split[2]);
-            		if(t == null)
-            			throw new IllegalStateException("Texture " + split[2] + " could not be found.");
+            		Texture t;
             		TextureType type = TextureType.valueOf(TextureType.class, split[1].toUpperCase());
             		if(type == null)
             			throw new IllegalStateException("Texture type " + split[1] + " for texture " + split[2] + " is not valid.");
-            		m.setTexture(type, t);
+            		if(type == TextureType.CUBE)
+            			t = AssetManager.createCubeMap(split[2]);
+            		else
+            			t = AssetManager.getTexture(split[2]);
+                	if(t == null)
+                		throw new IllegalStateException("Texture " + split[2] + " could not be found.");
+                	m.setTexture(type, t);
             	}
             	if(split.length == 3 && split[0].equalsIgnoreCase("p"))
             	{
@@ -251,7 +256,7 @@ public class Material extends NativeObject implements Bindable
 			if(textures[i] == null)
 				continue;
 			glActiveTexture(GL_TEXTURE0 + i); 
-			glBindTexture(GL_TEXTURE_2D, textures[i].getID()); 
+			glBindTexture(textures[i].getType().getGLParam(), textures[i].getID()); 
 			int loc = glGetUniformLocation(id, type.getUniformName());
 			glUniform1i(loc, i);
 		}

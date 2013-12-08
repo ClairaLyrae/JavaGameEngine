@@ -46,10 +46,37 @@ public abstract class GUIcomponent {
 		absoluteX = 0;
 		absoluteY = 0;
 		text = null;
-		textColor = null;
+		textColor = Color4f.white;
 		children = new ArrayList<GUIcomponent>();
 	}
 	
+	/*
+	public GUIcomponent(int w, int h, int x, int y, 
+			Color4f borC, Color4f bgC, GUIcomponent p)
+	{
+		width = w;
+		height = h;
+		xPos = x;
+		yPos = y;
+		borderColor = borC;
+		backgroundColor = bgC;
+		parent = p;
+		children = new ArrayList<GUIcomponent>();
+		
+		
+
+	}
+	*/
+	
+	public void setText(String s)
+	{
+		text = s;
+	}
+
+	public void setTextColor(Color4f color)
+	{
+		textColor = color;
+	}
 	
 	public void setBackground(Texture t)
 	{
@@ -125,7 +152,7 @@ public abstract class GUIcomponent {
 		if(text != null)
 		{
 			glColor4f(textColor.r, textColor.g, textColor.b, textColor.a);
-			SimpleText.drawString(text, absoluteX, absoluteY);
+			SimpleText.drawString(text, parentX + xPos, parentY + yPos);
 		}
 		
 		// draw children of current component

@@ -1,13 +1,12 @@
 #version 150
 
-uniform sampler2D tex_diffuse;
+uniform samplerCube tex_cube;
 
-in vec2 texcoord;
+in vec3 texcoords;
 
 out vec4 fragColor;
 
-void main(void) 
+void main () 
 {
-	vec4 diffuse = texture2D(tex_diffuse, texcoord);
-    fragColor = diffuse;
+	fragColor = texture(tex_cube, texcoords);
 }

@@ -98,20 +98,6 @@ public class CoordinateGrid extends RenderableComponent implements Renderable, D
 	}
 
 	@Override
-	public void onDestroy()
-	{
-	}
-
-	@Override
-	public void onCreate()
-	{
-	}
-
-	public void onUpdate(float delta)
-	{
-	}
-
-	@Override
 	public Matrix4f getMatrix()
 	{
 		return node.getWorldTransform().getTransformMatrix();

@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import com.javagameengine.Game;
 import com.javagameengine.math.Transform;
 import com.javagameengine.renderer.Renderable;
 import com.javagameengine.renderer.Renderer;
@@ -44,13 +45,13 @@ public class Node implements Bounded
 	
 	protected Bounds boundingBox = Bounds.getVoid();
 	protected Bounds boundingBoxNode = Bounds.getVoid();
-	
+
+	protected Node parent;
 	protected Scene scene;
 	
 	protected Transform transform = new Transform();
 	protected Transform worldTransform = new Transform();
 
-	protected Node parent;
 	private LinkedHashSet<Node> children = new LinkedHashSet<Node>();
 	
 	private LinkedHashSet<Renderable> graphicsComponents = new LinkedHashSet<Renderable>();
@@ -84,6 +85,7 @@ public class Node implements Bounded
 		parent = null;
 		isDestroyed = true;
 	}
+	
 	private boolean isDestroyed = false;
 	
 	public boolean isDestroyed()
@@ -121,33 +123,88 @@ public class Node implements Bounded
 		return new ArrayList<Node>(children);
 	}
 	
-	private void updateLinks(Node n)
+	public boolean isActive()
 	{
+		if(scene == null)
+			return false;
+		return scene == Game.getHandle().getActiveScene();
+	}
+	
+	private void unlink()
+	{
+		parent = null;
+		scene = null;
+		boolean active = isActive();
+		for(Component c : components)
+		{
+			c.onUnlink();
+			if(active)
+				c.onDeactivate();
+			c.node = null;
+			c.scene = null;
+		}
+		for(Node child : children)
+			child.unlink();
+	}
+	
+	/**
+	 * Relinks all components in node and subnodes. Only call during scene load or unloads.
+	 */
+	public void relink()
+	{
+		boolean active = isActive();
+		for(Component c : components)
+		{
+			if(active)
+				c.onActivate();
+			else
+				c.onDeactivate();
+		}
+		for(Node child : children)
+			child.relink();
+	}
+	
+	private void linkTo(Node n)
+	{
+		if(n == null || !n.isLinked())
+			return;
 		parent = n;
 		scene = n.scene;
+		boolean active = isActive();
+		for(Component c : components)
+		{
+			c.node = this;
+			c.scene = scene;
+			c.onLink();
+			if(active)
+				c.onActivate();
+		}
 		for(Node child : children)
-			child.updateLinks(this);
+			child.linkTo(this);
 	}
 	
 	public boolean addChild(Node n)
 	{
-		if(n.isLinked())
+		if(n.isLinked() || hasChild(n))
 			return false;
-		n.updateLinks(this);
-		return children.add(n);
+		children.add(n);
+		n.linkTo(this);
+		return true;
 	}
 	
 	public boolean removeChild(Node n)
 	{
 		if(!children.contains(n))
 			return false;
-		n.destroy();
+		children.remove(n);
+		n.unlink();
 		return true;
 	}
 	
 	public void removeChildren()
 	{
-		for(Node n : children)
+		Node[] childrenarr = children.toArray(new Node[0]);
+		for(Node n : childrenarr)
 			removeChild(n);
 	}
 	
@@ -218,51 +275,56 @@ public class Node implements Bounded
 	{
 		if(components.contains(c))
 			return false;
+		
 		if(c instanceof Renderable)
 			graphicsComponents.add((Renderable)c);
+		
 		components.add(c);
-		c.node = this;
-		c.scene = scene;
-		c.onCreate();
+		if(isLinked())
+		{
+			c.node = this;
+			c.scene = scene;
+			c.onLink();
+			if(isActive())
+				c.onActivate();
+		}
 		return true;
 	}
 
 	public boolean removeComponent(Component c)
 	{
-		boolean removed = components.remove(c);
-		if(!removed)
+		if(!components.remove(c))
 			return false;
 		if(c instanceof Renderable)
 			graphicsComponents.remove((Renderable)c);
+		
+		if(isLinked())
+		{
+			if(isActive())
+				c.onDeactivate();
+			c.onUnlink();
+			c.node = null;
+			c.scene = null;
+		}
 		return true;
 	}
 	
-	public List<Component> removeComponents()
+	public void removeComponents()
 	{
-		if(components.size() == 0)
-			return Collections.emptyList();
-		List<Component> list = getComponents();
-		components.clear();
-		graphicsComponents.clear();
-		for(Component c : list)
-			c.node = null;
-		return list;
+		Component[] comparr = components.toArray(new Component[0]);
+		for(Component c : comparr)
+			removeComponent(c);
 	}
 	
-	public List<Component> removeComponents(List<Component> list)
+	public void removeComponents(List<Component> list)
 	{
-		List<Component> rem = new ArrayList<Component>();
 		for(Component c : list)
-		{
-			if(removeComponent(c))
-				rem.add(c);
-		}
-		return rem;
+			removeComponent(c);
 	}
 	
-	public List<Component> removeComponents(Class<? extends Component> clazz)
+	public void removeComponents(Class<? extends Component> clazz)
 	{
-		return removeComponents(getComponents(clazz));
+		removeComponents(getComponents(clazz));
 	}
 
 	public boolean hasComponent(Component c)
@@ -423,10 +485,11 @@ public class Node implements Bounded
 		return String.format("Node[name=%s, " +
 				"numChildren=%d, " +
 				"numComponents=%d, " +
+				"numRenderableComponents=%d, " +
 				"hasParent=%b, " +
 				"hasScene=%b, " +
 				"transform=%s" +
 				"world=%s]",
-				name, getChildren().size(), getComponents().size(), parent != null, scene != null, transform, worldTransform);
+				name, getChildren().size(), components.size(), graphicsComponents.size(), parent != null, scene != null, transform, worldTransform);
 	}
 }

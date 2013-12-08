@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
@@ -24,6 +25,7 @@ import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.math.Vector4f;
 import com.javagameengine.math.Color4f;
+import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.CoordinateGrid;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.gui.WelcomeGUI;
@@ -97,26 +99,28 @@ public class Renderer
 		// First off, we need to set up the render target & viewport & buffers
 		int width = Display.getWidth();
 		int height = Display.getHeight();
-		GUI gui = Game.getHandle().getActiveScene().getGui();
+		Scene scene = Game.getHandle().getActiveScene();
+		GUI gui = scene.getGui();
 		
 		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
 
+		GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
+		GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
+	    GL11.glEnable(GL11.GL_CULL_FACE);
+	    GL11.glEnable(GL11.GL_NORMALIZE);
+	    
+		glClear(GL_DEPTH_BUFFER_BIT);
+		GL11.glClearDepth(1.0f); // Depth Buffer Setup
 
+		if(scene.getSkybox() != null)
+		{
+			glDepthMask(false);
+			scene.getSkybox().draw();
+		}
+		
+		glDepthMask(true);
 		if(camera != null)
 		{
-
-			GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
-			GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
-		    GL11.glEnable(GL11.GL_CULL_FACE);
-		    GL11.glEnable(GL11.GL_NORMALIZE);
-		    
-			glClear(GL_DEPTH_BUFFER_BIT);
-			glDepthMask(true);
-			GL11.glClearDepth(1.0f); // Depth Buffer Setup
-			
-			
-			
-			
 		    GL11.glMatrixMode(GL11.GL_PROJECTION);
 		    GL11.glLoadIdentity();
 		    //GLU.gluPerspective(45.0f, ((float) width / (float) height), 0.1f, 100.0f);
@@ -156,6 +160,11 @@ public class Renderer
 
 
 	    // draw gui
+	    //  Scene s = Game.getHandle().getActiveScene();
+	    if(gui != null || Console.isVisible())
+	    	Mouse.setGrabbed(false);
+	    else
+	    	Mouse.setGrabbed(true);
 	    GL11.glPushMatrix();
 	    if(gui != null)
 	    	gui.draw();

@@ -2,19 +2,22 @@ package com.javagameengine.sound;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 
-import com.javagameengine.assets.audio.Sound;
+import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.math.Vector3f;
+import com.javagameengine.scene.Scene;
 
 public class SoundManager
 {
-	private static SoundManager global = new SoundManager();
 	private static int MAX_SOURCES = 16;
 
 	/** Position of the listener. */
@@ -49,19 +52,32 @@ public class SoundManager
 		listenerOri.rewind();
 		AL10.alListener(AL10.AL_POSITION, listenerPos);
 	}
+
+
+	private static SoundManager global = new SoundManager();
+	private static HashMap<Scene, List<Sound>> registeredSounds = new HashMap<Scene, List<Sound>>();
 	
-	private static Map<String, SoundSource> sourcemap = new HashMap<String, SoundSource>();
+	private static Sound[] sources;
 	
-	private static SoundSource[] sources;
-	
-	public static void play(Sound s)
+	public static void play(SoundBuffer s)
 	{
-		SoundSource source = getNewSource();
+		Sound source = getSource();
 		source.setSound(s);
 		source.play();
 	}
 	
-	public static SoundSource getNewSource()
+	public static void play(SoundBuffer s, Vector3f position, Vector3f velocity)
+	{
+		Sound source = getSource();
+		if(source == null)
+			return;
+		source.setPosition(position);
+		source.setVelocity(velocity);
+		source.setSound(s);
+		source.play();
+	}
+	
+	public static Sound getSource()
 	{
 		for(int i = 0; i < sources.length; i++)
 		{
@@ -81,11 +97,12 @@ public class SoundManager
 			le.printStackTrace();
 			return;
 		}
-		AL10.alGetError();
-		sources = new SoundSource[MAX_SOURCES];
+		if(AL10.alGetError() != AL10.AL_NO_ERROR)
+			throw new IllegalStateException("Failed to create OpenAL environment.");
+		sources = new Sound[MAX_SOURCES];
 		for(int i = 0; i < sources.length; i++)
 		{
-			sources[i] = new SoundSource();
+			sources[i] = new Sound();
 			sources[i].create();
 		}
 		setListenerOrientation(Vector3f.zero, Vector3f.zero);

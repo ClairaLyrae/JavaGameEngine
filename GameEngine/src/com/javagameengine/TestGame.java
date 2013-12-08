@@ -10,31 +10,38 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 import com.javagameengine.assets.AssetManager;
-import com.javagameengine.assets.audio.Sound;
 import com.javagameengine.assets.material.Material;
+import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
+import com.javagameengine.assets.skybox.Skybox;
+import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.console.Console;
 import com.javagameengine.console.MeshCommand;
 import com.javagameengine.console.SceneCommand;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyPressEvent;
+
+import com.javagameengine.gui.GUI;
+import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.HUD;
 import com.javagameengine.gui.WelcomeGUI;
+import com.javagameengine.gui.testGUIcomponent;
+
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.Camera;
-import com.javagameengine.scene.component.CameraStatic;
 import com.javagameengine.scene.component.CoordinateGrid;
 import com.javagameengine.scene.component.LaserComponent;
 import com.javagameengine.scene.component.Light;
 import com.javagameengine.scene.component.MeshRenderer;
+import com.javagameengine.scene.component.Music;
 import com.javagameengine.scene.component.PhysicsComponent;
 import com.javagameengine.scene.component.ShipControlComponent;
 import com.javagameengine.sound.SoundManager;
-import com.javagameengine.sound.SoundSource;
+import com.javagameengine.sound.Sound;
 
 public class TestGame extends Game
 {
@@ -47,6 +54,7 @@ public class TestGame extends Game
 		// Load the scene into the game
 		AssetManager.addScene(s);
 		AssetManager.addScene(s2);
+		AssetManager.addScene(createMenuScene());
 		
 		// Build the 3D scene
 		Node root = s.getRoot();
@@ -117,27 +125,23 @@ public class TestGame extends Game
 
 		// SETUP SKYBOX
 		{
-			Node skybox_node = new Node("Skybox");
-			MeshRenderer mrsky = new MeshRenderer(AssetManager.getMaterial("skybox"), AssetManager.getMesh("skybox"));
-			root.addChild(skybox_node);
-			skybox_node.addComponent(mrsky);
-			skybox_node.getTransform().scale(5000f);
-			//root.addComponent(new CoordinateGrid(5f, 50f));
+			Skybox mrsky = AssetManager.getSkybox("space2");
+			s.setSkybox(mrsky);
 		}
 		
 		// ADD ASTEROIDS!
 		{
 			float posSpread = 400f;
-			int numAsteroids = 4;
+			int numAsteroids = 400;
 			for(int i = 0; i < numAsteroids; i++)
 			{
-				Random r =  new Random(System.currentTimeMillis());
+				Random r =  new Random(System.nanoTime() + i);
 				int index = r.nextInt(6) + 1;
 				Mesh mesh = AssetManager.getMesh("asteroid_" + index);
 				Material mat = AssetManager.getMaterial("asteroid_" + index);
 				MeshRenderer mr = new MeshRenderer(mat, mesh);
 				PhysicsComponent ast_phys = new PhysicsComponent(100f, 0.5f, true, 0.5f);
-				ast_phys.getAngularVelocity().add(r.nextFloat()*0.001f, r.nextFloat()*0.001f, r.nextFloat()*0.001f);
+				ast_phys.getAngularVelocity().add((r.nextFloat()-0.5f)*0.1f, (r.nextFloat()-0.5f)*0.1f, (r.nextFloat()-0.5f)*0.1f);
 				//ast_phys.getLinearVelocity().add((r.nextFloat()-0.5f)*5f, (r.nextFloat()-0.5f)*5f, (r.nextFloat()-0.5f)*5f);
 				Node node = new Node("asteroid_" + i);
 				root.addChild(node);
@@ -187,5 +191,83 @@ public class TestGame extends Game
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	public Scene createMenuScene()
+	{
+		GUI gui = new GUI() {
+			@Override
+			public void create()
+			{
+			}
+		};
+		// Create a new scene
+		Scene s = new Scene("menu3d");
+		s.addGUI(gui);
+		// Build the 3D scene
+		Node root = s.getRoot();	
+
+		Camera camera = new Camera();
+		camera.setEnabled(true);
+		camera.setFOV(45f);
+		camera.setDepth(0.1f, 10000f);
+		camera.useDisplayBorders(true);
+		camera.setType(Camera.Type.PERSPECTIVE);
+		root.addComponent(camera);
+		
+		// Lights
+		{
+			Light light1 = new Light();
+			Light light2 = new Light();
+			Node light1_node = new Node("light_1");
+			light1.setIntensity(3f);
+			light2.setIntensity(3f);
+			light1_node.addComponent(light1);
+			Node light2_node = new Node("light_2");
+			light2_node.addComponent(light2);
+			root.addChild(light1_node);
+			root.addChild(light2_node);
+			
+			light1.setDiffuseAndSpecularColor(new Color4f("81a79f", 1f));
+			light1.setAmbientColor(new Color4f("122029", 1f));
+			
+			light2.setDiffuseAndSpecularColor(new Color4f("124651", 1f));
+			
+			light1_node.getTransform().translate(500f, 500f, 0f);
+			light2_node.getTransform().translate(-500f, -500f, -500f);
+		}
+		
+		// SETUP SKYBOX
+		{
+			Skybox skybox = AssetManager.getSkybox("space");
+			s.setSkybox(skybox);
+		}
+		
+		// ADD ASTEROIDS!
+		{
+			float posSpread = 200f;
+			int numAsteroids = 200;
+			for(int i = 0; i < numAsteroids; i++)
+			{
+				Random r =  new Random(System.nanoTime() + i);
+				int index = r.nextInt(6) + 1;
+				Mesh mesh = AssetManager.getMesh("asteroid_" + index);
+				Material mat = AssetManager.getMaterial("asteroid_" + index);
+				MeshRenderer mr = new MeshRenderer(mat, mesh);
+				PhysicsComponent ast_phys = new PhysicsComponent(100f, 0.5f, true, 0.5f);
+				ast_phys.getAngularVelocity().add((r.nextFloat()-0.5f)*0.1f, (r.nextFloat()-0.5f)*0.1f, (r.nextFloat()-0.5f)*0.1f);
+				//ast_phys.getLinearVelocity().add((r.nextFloat()-0.5f)*5f, (r.nextFloat()-0.5f)*5f, (r.nextFloat()-0.5f)*5f);
+				Node node = new Node("asteroid_" + i);
+				root.addChild(node);
+				node.addComponent(mr);
+				node.addComponent(ast_phys);
+				node.getTransform().translate((r.nextFloat()-0.5f)*posSpread, (r.nextFloat()-0.5f)*posSpread, (r.nextFloat()-0.5f)*posSpread*2f + 150f);
+				node.getTransform().scale(r.nextFloat()*5f+1f);
+				node.getTransform().rotate(r.nextFloat()*180f, r.nextFloat(), r.nextFloat(), r.nextFloat());
+			}
+		}
+		SoundBuffer music = AssetManager.getSound("menutheme");
+		root.addComponent(new Music(music));
+		return s;
 	}
 }

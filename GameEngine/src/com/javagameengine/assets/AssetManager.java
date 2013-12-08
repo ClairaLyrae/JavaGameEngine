@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.javagameengine.assets.audio.Sound;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Shader;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
+import com.javagameengine.assets.skybox.Skybox;
+import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.scene.Scene;
 
@@ -30,6 +31,7 @@ public class AssetManager
 	public static final String[] textureExtensions = {"bmp", "jpg", "jpeg", "gif", "png"};
 	public static final String[] materialExtensions = {"mtl"};
 	public static final String[] audioExtensions = {"wav"};
+	public static final String[] skyboxExtensions = {"sky"};
 	
 	public static final String dir = "assets";
 	public static final String meshDir = "assets/meshes";
@@ -37,22 +39,25 @@ public class AssetManager
 	public static final String textureDir = "assets/textures";
 	public static final String materialDir = "assets/materials";
 	public static final String audioDir = "assets/audio";
+	public static final String skyboxDir = "assets/skyboxes";
 	
 	private static Map<String, Mesh> meshes;
 	private static Map<String, Texture> textures;
 	private static Map<String, Shader> shaders;
 	private static Map<String, Material> materials;
-	private static Map<String, Sound> sounds;
+	private static Map<String, SoundBuffer> sounds;
 	private static Map<String, Scene> scenes;
 	private static Map<String, GUI> guis;
+	private static Map<String, Skybox> skyboxes;
 	
 	private AssetManager()
 	{
+		skyboxes = new HashMap<String, Skybox>();
 		meshes = new HashMap<String, Mesh>();
 		textures = new HashMap<String, Texture>();
 		shaders = new HashMap<String, Shader>();
 		materials = new HashMap<String, Material>();
-		sounds = new HashMap<String, Sound>();
+		sounds = new HashMap<String, SoundBuffer>();
 		scenes = new HashMap<String, Scene>();
 		guis = new HashMap<String, GUI>();
 	}
@@ -63,6 +68,14 @@ public class AssetManager
 	public static List<String> getGUIList()
 	{
 		return new ArrayList<String>(guis.keySet());
+	}
+
+	/**
+	 * @return List of the names of all loaded Skyboxes
+	 */
+	public static List<String> getSkyboxList()
+	{
+		return new ArrayList<String>(skyboxes.keySet());
 	}
 	
 	/**
@@ -113,6 +126,7 @@ public class AssetManager
 		loadDir(shaderDir);
 		loadDir(audioDir);
 		loadDir(materialDir);
+		loadDir(skyboxDir);
 	}	
 	
 	public static void loadFile(File f) throws IOException
@@ -152,12 +166,18 @@ public class AssetManager
 		}
 		else if(isFileType(ext, audioExtensions))
 		{
-			Sound s = Sound.loadFromFile(f);
+			SoundBuffer s = SoundBuffer.loadFromFile(f);
 			sounds.put(fname, s);
 			s.create();
 			System.out.println("Sound '" + fname + "' loaded: " + s.toString());
 			//materials.put(fname, m);
 			//System.out.println("Material '" + fname + "' loaded: " + m.toString());
+		}
+		else if(isFileType(ext, skyboxExtensions))
+		{
+			Skybox s = Skybox.loadFromFile(f);
+			skyboxes.put(fname, s);
+			System.out.println("Skybox '" + fname + "' loaded: " + s.toString());
 		}
 		else
 			System.out.println("Unknown filetype");
@@ -219,14 +239,14 @@ public class AssetManager
 			addTexture(name, (Texture)o);
 		else if(o instanceof Shader)
 			addShader(name, (Shader)o);
-		else if(o instanceof Sound)
-			addSound(name, (Sound)o);
+		else if(o instanceof SoundBuffer)
+			addSound(name, (SoundBuffer)o);
 		else
 			return false;
 		return true;
 	}
 	
-	public static void addSound(String name, Sound s)
+	public static void addSound(String name, SoundBuffer s)
 	{
 		if(sounds.containsKey(name))
 			throw new IllegalStateException("Cannot add to asset pool. Mesh '" + name + "' already exists.");
@@ -268,6 +288,13 @@ public class AssetManager
 		guis.put(name, gui);
 	}
 	
+	public static void addSkybox(String name, Skybox s)
+	{
+		if(skyboxes.containsKey(name))
+			throw new IllegalStateException("Cannot add to asset pool. Skybox '" + name + "' already exists.");
+		skyboxes.put(name, s);
+	}
+	
 	public static void addScene(Scene s)
 	{
 		if(scenes.containsKey(s.getName()))
@@ -275,7 +302,7 @@ public class AssetManager
 		scenes.put(s.getName(), s);
 	}
 
-	public static Sound removeSound(String s)
+	public static SoundBuffer removeSound(String s)
 	{
 		return sounds.remove(s);
 	}
@@ -309,6 +336,11 @@ public class AssetManager
 	{
 		return scenes.remove(string);
 	}
+	
+	public static Skybox removeSkybox(String string)
+	{
+		return skyboxes.remove(string);
+	}
 
 	public static Mesh getMesh(String s)
 	{
@@ -340,8 +372,29 @@ public class AssetManager
 		return scenes.get(string);
 	}
 	
-	public static Sound getSound(String string)
+	public static SoundBuffer getSound(String string)
 	{
 		return sounds.get(string);
+	}
+	
+	public static Skybox getSkybox(String string)
+	{
+		return skyboxes.get(string);
+	}
+	
+	public static Texture createCubeMap(String name)
+	{
+		Texture tex_top = getTexture(name + "_top");
+		Texture tex_bottom = getTexture(name + "_bottom");
+		Texture tex_left = getTexture(name + "_left");
+		Texture tex_right = getTexture(name + "_right");
+		Texture tex_front = getTexture(name + "_front");
+		Texture tex_back = getTexture(name + "_back");
+		if(tex_front == null || tex_left == null || tex_top == null || tex_bottom == null || tex_back == null || tex_right == null)
+			return null;
+		Texture cubemap = new Texture(tex_top, tex_bottom, tex_left, tex_right, tex_front, tex_back);
+		cubemap.create();
+		textures.put(name, cubemap);
+		return cubemap;
 	}
 }

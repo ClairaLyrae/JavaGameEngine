@@ -64,6 +64,16 @@ public abstract class GUI {
 	public abstract void create();
 
 	
+	public void addComponent(GUIcomponent comp)
+	{
+		rootComponents.add(comp);
+	}
+	
+	public void removeComponent(GUIcomponent comp)
+	{
+		rootComponents.remove(comp);
+	}
+	
 	public void setScene(Scene newScene)
 	{
 		int i;

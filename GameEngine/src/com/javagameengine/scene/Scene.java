@@ -3,7 +3,11 @@ package com.javagameengine.scene;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.lwjgl.input.Mouse;
+
 import com.javagameengine.assets.AssetManager;
+import com.javagameengine.assets.skybox.Skybox;
+import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.gui.GUI;
@@ -25,6 +29,7 @@ public class Scene
 	private Node root;
 	private EventManager eventManager = new EventManager();
 	private Camera camera = null;
+	private Skybox skybox;
 	private GUI gui;
 	
 	public Scene(String name)
@@ -43,6 +48,16 @@ public class Scene
 	{
 		camera = c;
 	}	
+	
+	public Skybox getSkybox()
+	{
+		return skybox;
+	}
+	
+	public void setSkybox(Skybox s)
+	{
+		skybox = s;
+	}
 	
 	public String getName()
 	{
@@ -110,14 +125,15 @@ public class Scene
 		//PhysicsComponent.calculateCollisions();
 	}
 	
-	public void addGUI(GUI newGUI) {
+	public void addGUI(GUI newGUI) 
+	{
 		gui = newGUI;
 		gui.setScene(this);
 		gui.onCreate();
 	}
 
-	public GUI getGui() {
-		
+	public GUI getGui() 
+	{	
 		return gui;
 	}
 }

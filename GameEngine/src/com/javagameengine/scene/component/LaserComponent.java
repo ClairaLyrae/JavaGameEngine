@@ -23,20 +23,14 @@ public class LaserComponent extends Component implements Listener
 	}
 	
 	@Override
-	public void onUpdate(float deltaf)
-	{
-	}
-
-	@Override
-	public void onDestroy()
+	public void onUnlink()
 	{
 		scene.getEventManager().unregisterListener(this);
 	}
 
 	@Override
-	public void onCreate()
+	public void onLink()
 	{
 		scene.getEventManager().registerListener(this);
 	}
-
 }

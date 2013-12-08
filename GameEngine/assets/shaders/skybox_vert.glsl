@@ -1,18 +1,18 @@
 #version 150
 
-uniform mat4 m;
-uniform mat4 v;
-uniform mat4 mv;
 uniform mat4 p;
+uniform mat4 v;
 
 in vec3 in_position;
-in vec2 in_texcoord;
 
-out vec2 texcoord;
+out vec3 texcoords;
 
-void main(void) 
+void main () 
 {
-	texcoord = in_texcoord;
-	
-	gl_Position = vec4(in_position, 1) * mv * p;
+	mat4 v_mod = v;
+	v_mod[0].w = 0;
+	v_mod[1].w = 0;
+	v_mod[2].w = 0;
+	texcoords = in_position;
+	gl_Position = vec4(in_position, 1.0) * v_mod * p;
 }
