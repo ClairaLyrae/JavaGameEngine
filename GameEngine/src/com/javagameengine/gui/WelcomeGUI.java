@@ -22,9 +22,14 @@ public class WelcomeGUI extends GUI {
 				Color4f.white.setTrans(), Color4f.white.setTrans(), null);
 		GLquadGUIcomponent innerBox = new GLquadGUIcomponent(200, 400, centerX-100, centerY-200,
 				Color4f.white.setTrans(), Color4f.red.setTrans(), null);
-		innerBox.addChild(new SettingsButton(100, 100, 50, 50));
+		innerBox.addChild(new Button(100, 100, 50, 50, "SETTINGS", 0));
 		innerBox.addChild(new TextBox(20, 350, "Welcome", Color4f.black));
 		mainBox.addChild(innerBox);
+		
+//		Button b = new button() {
+//			@Override
+//			public void onCLick
+//		}
 
 		
 		Texture t = AssetManager.getTexture("starBackground");

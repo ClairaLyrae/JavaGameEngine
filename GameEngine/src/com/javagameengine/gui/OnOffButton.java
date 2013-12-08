@@ -11,9 +11,9 @@ import com.javagameengine.util.SimpleText;
 import static org.lwjgl.opengl.GL11.glColor4f;
 
 
-public class SettingsButton extends Button{
+public class OnOffButton extends Button{
 	
-    public SettingsButton(int w, int h, int x, int y) {
+    public OnOffButton(int w, int h, int x, int y) {
     	
 		width = w;
 		height = h;
