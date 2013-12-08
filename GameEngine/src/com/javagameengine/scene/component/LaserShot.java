@@ -6,6 +6,7 @@ import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.MouseClickEvent;
+import com.javagameengine.gui.LaserCountText;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.scene.Component;
@@ -53,5 +54,7 @@ public class LaserShot extends Component
 		node.addComponent(phys);
 		node.markAsTransient(4f);
 		SoundManager.play(sound);
+		
+		LaserCountText.increase();
 	}
 }

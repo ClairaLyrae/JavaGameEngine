@@ -70,7 +70,10 @@ public class Scene
 	public void clear()
 	{
 		if(root.getScene() != null)
+		{
 			root.destroy();
+//			gui.destroy();
+		}
 		root = new Node("root");
 		root.scene = this;
 	}

@@ -101,4 +101,13 @@ public abstract class GUI {
 		}
 	}
 	
+	public void destroy()
+	{
+		int i;
+		for(i=0; i<rootComponents.size();i++)
+		{
+			rootComponents.get(i).onDestroy();
+		}
+	}
+	
 }

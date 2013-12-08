@@ -20,12 +20,8 @@ public class testGUIcomponent extends GUIcomponent {
 		yPos = y;
 		borderColor = borC;
 		backgroundColor = bgC;
-		parent = p;
-		if(parent!=null)
-		{
-			absoluteX = parent.xPos + xPos;
-			absoluteY = parent.yPos + yPos;
-		}
+		parent = null;
+		
 		children = new ArrayList<GUIcomponent>();
 	}
 	

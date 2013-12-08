@@ -33,7 +33,7 @@ public class testButton extends Button{
 	@EventMethod
 	public void onMouseClick(MouseClickEvent e)
 	{
-		System.out.println("Mouse Clicked");
+		
 		int x, y;
 		if(e.isCancelled() || e.getButton() != 0)
 			return;
@@ -41,7 +41,7 @@ public class testButton extends Button{
 		y = e.getY();
 		if(x > absoluteX && x < absoluteX + width && y > absoluteY && y < absoluteY + height)
 		{
-			System.out.println("Button Clicked");
+			
 
 			if(e.state())
 			{
@@ -63,7 +63,6 @@ public class testButton extends Button{
 	@Override
 	public void onUpdate(float delta) {
 		int i;
-		System.out.println("Update");
 		for(i=0; i<children.size();i++)
 		{
 			children.get(i).onUpdate(delta);

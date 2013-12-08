@@ -12,8 +12,15 @@ public class HUD extends GUI{
 	public void create() {
 		
 		Crosshairs cursor = new Crosshairs();
+		testGUIcomponent laserCount = new testGUIcomponent(200, 30, 
+				Display.getWidth() - 200, Display.getHeight() - 31,
+				Color4f.white.setTrans(), Color4f.red.setTrans(), null);
+		laserCount.addChild(new TextBox(5, 5, "LASERS SHOT:", Color4f.black));
+		laserCount.addChild(new LaserCountText(100, 5, "0", Color4f.black));
+		
 		
 		rootComponents.add(cursor);
+		rootComponents.add(laserCount);
 	}
 	
 
