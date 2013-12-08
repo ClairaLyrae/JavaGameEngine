@@ -62,13 +62,23 @@ public class testButton extends Button{
 
 	@Override
 	public void onUpdate(int delta) {
-		// TODO Auto-generated method stub
-		
+		int i;
+		System.out.println("Update");
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onUpdate(delta);
+		}
 	}
 
 	@Override
 	public void onDestroy()
 	{
+		int i;
+
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onDestroy();
+		}
 		getScene().getEventManager().unregisterListener(this);
 	}
 

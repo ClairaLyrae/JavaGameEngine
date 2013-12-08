@@ -18,9 +18,8 @@ import com.javagameengine.console.MeshCommand;
 import com.javagameengine.console.SceneCommand;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyPressEvent;
-
+import com.javagameengine.gui.HUD;
 import com.javagameengine.gui.WelcomeGUI;
-
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Vector3f;
@@ -56,7 +55,7 @@ public class TestGame extends Game
 
 		// SETUP GUI
 		s2.addGUI(new WelcomeGUI());
-	
+		s.addGUI(new HUD());
 
 		// Lights
 		{
@@ -129,7 +128,7 @@ public class TestGame extends Game
 		// ADD ASTEROIDS!
 		{
 			float posSpread = 400f;
-			int numAsteroids = 200;
+			int numAsteroids = 2;
 			for(int i = 0; i < numAsteroids; i++)
 			{
 				Random r =  new Random(System.currentTimeMillis());

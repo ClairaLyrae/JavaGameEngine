@@ -33,14 +33,25 @@ public class testGUIcomponent extends GUIcomponent {
 	
 	//@Override
 	public void onUpdate(int delta) {
-		// TODO Auto-generated method stub
-
+		int i;
+		
+		
+		
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onUpdate(delta);
+		}
 	}
 
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
+		
+		int i;
 
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onDestroy();
+		}
 	}
 
 	@Override

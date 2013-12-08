@@ -104,21 +104,21 @@ public abstract class GUIcomponent {
 		if(!visible)
 			return;
 		
-		// draw current component
-		glBegin(GL_QUADS);
-		
 		if(texture == null)
 		{
+			glBegin(GL_QUADS);
 			glColor4f(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
-			
 			glVertex2f(parentX + xPos, parentY + yPos); // bottom left
 			glVertex2f(parentX + xPos, parentY + yPos + height); // top left
 			glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
 			glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+			glEnd();
 		}
 		else
 		{
 			texture.bind();
+			glBegin(GL_QUADS);
+			glColor4f(1f, 1f, 1f, 1f);
 			GL11.glTexCoord2f(0f, 0f);
 			glVertex2f(parentX + xPos, parentY + yPos); // bottom left
 			GL11.glTexCoord2f(0f, 1f);
@@ -127,8 +127,16 @@ public abstract class GUIcomponent {
 			glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
 			GL11.glTexCoord2f(1f, 0f);
 			glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+			glEnd();
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 		}
 
+		glBegin(GL11.GL_LINE_LOOP);
+		glColor4f(borderColor.r, borderColor.g, borderColor.b, borderColor.a);
+		glVertex2f(parentX + xPos, parentY + yPos); // bottom left
+		glVertex2f(parentX + xPos, parentY + yPos + height); // top left
+		glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
+		glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
 		glEnd();
 		
 		if(text != null)

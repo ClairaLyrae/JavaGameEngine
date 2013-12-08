@@ -319,7 +319,6 @@ public class Console implements Listener
 		
 	    // Draw the buffer box and border
 
-		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		
 		glBegin(GL_QUADS);
 	    	glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
@@ -329,7 +328,6 @@ public class Console implements Listener
 	    	
 	    	glVertex3f(width, yBuffer, 0f);
 	    	glVertex3f(0, yBuffer, 0f);
-	    	
 	    glEnd();
 	    
 	    
@@ -360,14 +358,14 @@ public class Console implements Listener
 		    glVertex3f(width, yBuffer, 0f);
 		    glVertex3f(width, yInput, 0f);
 		    glVertex3f(0, yInput, 0f);
-		    glEnd();
-			glBegin(GL_LINES);
+		glEnd();
+		glBegin(GL_LINES);
 		    glColor4f(0.5f, 0.5f, 0.5f, 1f);
 		    glVertex3f(width, yInput, 0f);
 		    glVertex3f(0, yInput, 0f);
-		    glEnd();
-		    glColor4f(1f, 1f, 1f, 1f);
-		    SimpleText.drawString("> " + input.toString() + "_" , 5, yInputText);
+		glEnd();
+		glColor4f(1f, 1f, 1f, 1f);
+		SimpleText.drawString("> " + input.toString() + "_" , 5, yInputText);
 	}
 	
 	public static void executeFromFile(File f)

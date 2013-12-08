@@ -144,13 +144,16 @@ public class Renderer
 	    glUseProgram(0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
-	    
+
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
 	    GL11.glDisable(GL11.GL_CULL_FACE);
 	    GL11.glMatrixMode(GL11.GL_PROJECTION);
 	    GL11.glLoadIdentity();
 		glOrtho(0, Display.getWidth(), 0, Display.getHeight(), 0f, 1f);
 	    GL11.glMatrixMode(GL11.GL_MODELVIEW);   
 	    glLoadIdentity();
+
 
 	    // draw gui
 	    GL11.glPushMatrix();
@@ -162,7 +165,9 @@ public class Renderer
 	    GL11.glPushMatrix();
 	    Console.draw();
 	    GL11.glPopMatrix();
+
 	    
+
 		Display.update();
 	}
 	
