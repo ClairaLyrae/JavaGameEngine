@@ -92,10 +92,9 @@ public abstract class GUI {
 		}
 	}
 	
-	public void onUpdate(int delta)
+	public void update(float delta)
 	{
 		int i;
-		
 		for(i=0; i<rootComponents.size();i++)
 		{
 			rootComponents.get(i).onUpdate(delta);

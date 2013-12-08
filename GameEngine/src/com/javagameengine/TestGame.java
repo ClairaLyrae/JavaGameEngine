@@ -128,7 +128,7 @@ public class TestGame extends Game
 		// ADD ASTEROIDS!
 		{
 			float posSpread = 400f;
-			int numAsteroids = 2;
+			int numAsteroids = 4;
 			for(int i = 0; i < numAsteroids; i++)
 			{
 				Random r =  new Random(System.currentTimeMillis());

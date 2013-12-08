@@ -32,7 +32,7 @@ public class testGUIcomponent extends GUIcomponent {
 
 	
 	//@Override
-	public void onUpdate(int delta) {
+	public void onUpdate(float delta) {
 		int i;
 		
 		

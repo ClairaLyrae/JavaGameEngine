@@ -61,7 +61,7 @@ public class testButton extends Button{
 	}
 
 	@Override
-	public void onUpdate(int delta) {
+	public void onUpdate(float delta) {
 		int i;
 		System.out.println("Update");
 		for(i=0; i<children.size();i++)
