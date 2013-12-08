@@ -22,8 +22,8 @@ import static org.lwjgl.opengl.GL11.glVertex3f;
 
 import org.lwjgl.opengl.GL11;
 
-public abstract class GUIcomponent {
-	
+public abstract class GUIcomponent 
+{
 	protected int width;
 	protected int height;
 	protected int xPos;
@@ -35,7 +35,7 @@ public abstract class GUIcomponent {
 	protected GUIcomponent parent;
 	protected ArrayList<GUIcomponent> children;
 	protected boolean visible = true;
-	protected Scene scene;
+	protected GUI gui;
 	protected String text;
 	protected Color4f textColor;
 	protected Texture texture;
@@ -68,6 +68,15 @@ public abstract class GUIcomponent {
 	}
 	*/
 	
+	public void update(float f)
+	{
+		updateAbsolute();
+		
+		onUpdate(f);
+		for(GUIcomponent c : children)
+			c.update(f);
+	}
+	
 	public void setText(String s)
 	{
 		text = s;
@@ -83,26 +92,39 @@ public abstract class GUIcomponent {
 		texture = t;
 	}
 	
+	public boolean hasChild(GUIcomponent c)
+	{
+		return children.contains(c);
+	}
+	
 	public void addChild(GUIcomponent newChild)
 	{
 		newChild.parent = this;
-		if(newChild.parent!=null)
-		{
-			newChild.absoluteX = xPos + newChild.xPos;
-			newChild.absoluteY = yPos + newChild.yPos;
-		}
-		// add scene to child
+		newChild.absoluteX = xPos + newChild.xPos;
+		newChild.absoluteY = yPos + newChild.yPos;
 		this.children.add(newChild);
-		updateAbsolute(absoluteX, absoluteY);
+		newChild.setGUI(gui);
+	
 	}
 
-	private void updateAbsolute(int x, int y) {
-		for (GUIcomponent c : children)
+	private void updateAbsolute() {
+		
+		if(parent != null)
 		{
-			c.absoluteX = x + c.xPos;
-			c.absoluteY = y + c.yPos;
-			c.updateAbsolute(c.absoluteX, c.absoluteY);
+			absoluteX = parent.absoluteX + xPos;
+			absoluteY = parent.absoluteY + yPos;
 		}
+	}
+	
+	public void removeChild(GUIcomponent oldChild)
+	{
+		if(!children.contains(oldChild))
+			return;
+		oldChild.setGUI(null);
+		oldChild.parent = null;
+		oldChild.absoluteX = oldChild.xPos;
+		oldChild.absoluteY = oldChild.yPos;
+		this.children.remove(oldChild);
 	}
 
 	public void draw()
@@ -148,7 +170,7 @@ public abstract class GUIcomponent {
 			GL11.glTexCoord2f(1f, 0f);
 			glVertex2f(absoluteX + width, absoluteY); // bottom right
 			glEnd();
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			texture.unbind();
 		}
 
 		glBegin(GL11.GL_LINE_LOOP);
@@ -180,25 +202,33 @@ public abstract class GUIcomponent {
 	}
 	
 	
-	public Scene getScene()
+	public GUI getGUI()
 	{
-		return scene;
+		return gui;
 	}
 	
 	public abstract void onUpdate(float delta);
 	public abstract void onDestroy();
 	public abstract void onCreate();
 
-	public void setScene(Scene newScene) {
-		
-		int i;
-		
-		scene = newScene;
-		
-		for(i=0; i<children.size();i++)
+	public void setGUI(GUI newGUI) 
+	{
+		if(gui != null)
+			onDestroy();
+		gui = newGUI;
+		if(newGUI != null)
+			onCreate();
+		for(int i=0; i<children.size();i++)
 		{
-			children.get(i).setScene(scene);
+			children.get(i).setGUI(gui);
 		}
+	}
+	
+	public Scene getScene()
+	{
+		if(gui == null)
+			return null;
+		return gui.getScene();
 	}
 }
 

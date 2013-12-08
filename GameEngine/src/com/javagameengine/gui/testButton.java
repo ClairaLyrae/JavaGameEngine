@@ -61,37 +61,20 @@ public class testButton extends Button{
 	}
 
 	@Override
-	public void onUpdate(float delta) {
-		int i;
-		for(i=0; i<children.size();i++)
-		{
-			children.get(i).onUpdate(delta);
-		}
+	public void onUpdate(float delta) 
+	{
 	}
 
 	@Override
 	public void onDestroy()
 	{
-		int i;
-
-		for(i=0; i<children.size();i++)
-		{
-			children.get(i).onDestroy();
-		}
-		getScene().getEventManager().unregisterListener(this);
+		getGUI().getEventManager().unregisterListener(this);
 	}
 
 	@Override
 	public void onCreate()
 	{
-		int i;
-		
-		getScene().getEventManager().registerListener(this);
-		
-		for(i=0; i<children.size();i++)
-		{
-			children.get(i).onCreate();
-		}
+		getGUI().getEventManager().registerListener(this);
 	}
 
 
