@@ -1,16 +1,6 @@
 package com.javagameengine.assets.material;
 
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
-import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glTexImage2D;
-import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -22,10 +12,7 @@ import java.nio.ByteBuffer;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.*;
 
 import com.javagameengine.assets.NativeObject;
 
@@ -35,7 +22,33 @@ import com.javagameengine.assets.NativeObject;
  */
 public class Texture extends NativeObject
 {	
-	
+	/**
+	 * Texture format
+	 */
+	public enum Type {
+		CUBE_MAP(GL13.GL_TEXTURE_CUBE_MAP),
+		D1(GL11.GL_TEXTURE_1D),
+		D1_DIM_ARRAY(GL30.GL_TEXTURE_1D_ARRAY),
+		D2(GL11.GL_TEXTURE_2D),
+		D2_ARRAY(GL30.GL_TEXTURE_2D_ARRAY),
+		D3(GL12.GL_TEXTURE_3D);
+				
+		private int gl;
+		
+		private Type(int gl)
+		{
+			this.gl = gl;
+		}
+		
+		public int getGLParam()
+		{
+			return gl;
+		}
+	}
+
+	/**
+	 * Data storage mode
+	 */
 	public enum Mode {
 		RGB(3),
 		RGBA(4);
@@ -52,7 +65,10 @@ public class Texture extends NativeObject
 			return components;
 		}
 	}
-	
+
+	/**
+	 * Minification filter
+	 */
 	public enum MinFilter {
 		NEAREST(GL11.GL_NEAREST),
 		LINEAR(GL11.GL_LINEAR),
@@ -74,6 +90,9 @@ public class Texture extends NativeObject
 		}
 	}
 	
+	/**
+	 * Magnification filter
+	 */
 	public enum MagFilter {
 		NEAREST(GL11.GL_NEAREST),
 		LINEAR(GL11.GL_LINEAR);
@@ -91,6 +110,9 @@ public class Texture extends NativeObject
 		}
 	}
 
+    /**
+     * Texture wrapping mode
+     */
     public enum WrapMode {
         REPEAT(GL11.GL_REPEAT),
         REPEAT_MIRRORED(GL14.GL_MIRRORED_REPEAT),
@@ -111,30 +133,93 @@ public class Texture extends NativeObject
 		}
     }
     
-	private Mode mode;
-	private WrapMode wrap = WrapMode.CLAMP_TO_EDGE;
-	private MinFilter minfilter = MinFilter.LINEAR;
-	private MagFilter magfilter = MagFilter.LINEAR;
-	private ByteBuffer data;
-	private int width;
-	private int height;
-	
-	public Texture(int width, int height, Mode mode)
+    protected Type type;
+    protected Mode mode;
+	protected WrapMode wrap = WrapMode.CLAMP_TO_EDGE;
+	protected MinFilter minfilter = MinFilter.LINEAR;
+	protected MagFilter magfilter = MagFilter.LINEAR;
+	protected ByteBuffer[] data;
+	protected int width;
+	protected int height;
+	protected int depth;
+
+	private Texture(int width, int height, int depth, Mode mode, Type type, ByteBuffer data)
 	{
 		super(Texture.class);
+		this.depth = depth;
+		this.type = type;
 		this.mode = mode;
 		this.width = width;
 		this.height = height;
-		BufferUtils.createByteBuffer(width*height);
+		this.data = new ByteBuffer[1];
+		this.data[0] = data;
 	}
 	
-	private Texture(int width, int height, Mode mode, ByteBuffer data)
+	private Texture(int width, int height, int depth, Mode mode, Type type, ByteBuffer[] data)
 	{
 		super(Texture.class);
+		this.depth = depth;
+		this.type = type;
 		this.mode = mode;
 		this.width = width;
 		this.height = height;
 		this.data = data;
+	}
+
+	public Texture(Texture top, Texture bottom, Texture left, Texture right, Texture front, Texture back)
+	{
+		this(top.width, top.height, 0, top.mode, Type.CUBE_MAP, new ByteBuffer[6]);
+		data[0] = bottom.data[0];
+		data[1] = top.data[0];
+		data[2] = left.data[0];
+		data[3] = right.data[0];
+		data[4] = front.data[0];
+		data[5] = back.data[0];
+	}
+
+	public Texture(int width, int height, Mode mode, ByteBuffer buf)
+	{
+		this(width, height, 0, mode, Type.D2, buf);
+	}
+
+	public Texture(int width, int height, Mode mode, ByteBuffer[] buf)
+	{
+		this(width, height, 0, mode, Type.D2, buf);
+	}
+	
+	public Texture(int width, int height, int depth, Mode mode, ByteBuffer buf)
+	{
+		this(width, height, depth, mode, Type.D3, buf);
+	}
+	
+	public Texture(int width, Mode mode, ByteBuffer buf)
+	{
+		this(width, 0, 0, mode, Type.D1, buf);
+	}
+
+	public Texture(int width, Mode mode, ByteBuffer[] buf)
+	{
+		this(width, 0, 0, mode, Type.D1, buf);
+	}
+	
+	public Texture(int width, int height, Mode mode)
+	{
+		this(width, height, mode, BufferUtils.createByteBuffer(width*height));
+	}
+	
+	public Texture(int width, int height, int depth, Mode mode)
+	{
+		this(width, height, depth, mode, BufferUtils.createByteBuffer(width*height*depth));
+	}
+	
+	public Texture(int width, Mode mode)
+	{
+		this(width, 0, 0, mode, BufferUtils.createByteBuffer(width));
+	}
+	
+	public Type getType()
+	{
+		return type;
 	}
 	
 	public Mode getMode()
@@ -151,10 +236,20 @@ public class Texture extends NativeObject
 	{
 		return width;
 	}
-	
+
 	public ByteBuffer getData()
 	{
+		return data[0];
+	}
+	
+	public ByteBuffer[] getDataArray()
+	{
 		return data;
+	}
+	
+	public int getNumDataBuffers()
+	{
+		return data.length;
 	}
 	
 	public int getTextureId()
@@ -181,7 +276,6 @@ public class Texture extends NativeObject
       	long beginTime = System.currentTimeMillis();
          image = ImageIO.read(f);
          image = verticalflip(image);
-         System.out.println("Time to load: " + (System.currentTimeMillis() - beginTime));
          if(image.getWidth() > GL11.GL_MAX_TEXTURE_SIZE || image.getHeight() > GL11.GL_MAX_TEXTURE_SIZE)
         	 throw new IllegalStateException("Texture " + f.getName() + " exceeds the maximum texture size");
          int[] pixels = new int[image.getWidth() * image.getHeight()];
@@ -247,17 +341,48 @@ public class Texture extends NativeObject
 		if(id != -1)
 			throw new UnsupportedOperationException("Texture is already loaded to the GPU");
 		id = glGenTextures(); //Generate texture ID
-	    glBindTexture(GL_TEXTURE_2D, id); //Bind texture ID
+	    glBindTexture(type.getGLParam(), id); //Bind texture ID
 
 	    //Setup wrap mode
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap.getGLParam());
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap.getGLParam());
+	    glTexParameteri(type.getGLParam(), GL_TEXTURE_WRAP_S, wrap.getGLParam());
+	    glTexParameteri(type.getGLParam(), GL_TEXTURE_WRAP_T, wrap.getGLParam());
 
 	    //Setup texture scaling filtering
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minfilter.getGLParam());
-	    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magfilter.getGLParam());
+	    glTexParameteri(type.getGLParam(), GL_TEXTURE_MIN_FILTER, minfilter.getGLParam());
+	    glTexParameteri(type.getGLParam(), GL_TEXTURE_MAG_FILTER, magfilter.getGLParam());
 	    
-	    glTexImage2D(GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data);
+	    switch(type)
+	    {
+		case CUBE_MAP:
+		    glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[0]);
+		    glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[1]);
+		    
+		    glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[2]);
+		    glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[3]);
+		    
+		    glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[4]);
+		    glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[5]);
+			break;
+		case D1:
+		    glTexImage1D(type.getGLParam(), 0, GL11.GL_RGBA8, width, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[0]);
+			break;
+		case D1_DIM_ARRAY:
+			for(int i = 0; i < data.length; i++)
+				glTexImage1D(type.getGLParam(), i, GL11.GL_RGBA8, width, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[i]);
+			break;
+		case D2:
+		    glTexImage2D(type.getGLParam(), 0, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[0]);
+			break;
+		case D2_ARRAY:
+			for(int i = 0; i < data.length; i++)
+				glTexImage2D(type.getGLParam(), i, GL11.GL_RGBA8, width, height, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[i]);
+			break;
+		case D3:
+		    GL12.glTexImage3D(type.getGLParam(), 0, GL11.GL_RGBA8, width, height, depth, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, data[0]);
+			break;
+		default:
+			break;
+	    }
 	    return true;
 	}
 	
@@ -271,9 +396,9 @@ public class Texture extends NativeObject
 	 */
 	public void bind()
 	{
-		glEnable(GL_TEXTURE_2D);
+		glEnable(type.getGLParam());
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, id);
+		glBindTexture(type.getGLParam(), id);
 	}
 	
 	/**
@@ -281,6 +406,6 @@ public class Texture extends NativeObject
 	 */
 	public void unbind()
 	{
-		GL11.glDisable(GL_TEXTURE_2D);
+		GL11.glDisable(type.getGLParam());
 	}
 }

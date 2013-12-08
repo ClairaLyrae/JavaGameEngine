@@ -161,14 +161,24 @@ public class Camera extends Component
 	}
 
 	@Override
-	public void onDestroy()
+	public void onUnlink()
 	{
 		getScene().setCamera(null);
 	}
 
 	@Override
-	public void onCreate()
+	public void onLink()
 	{
 		getScene().setCamera(this);
+	}
+
+	@Override
+	public void onActivate()
+	{
+	}
+
+	@Override
+	public void onDeactivate()
+	{
 	}
 }

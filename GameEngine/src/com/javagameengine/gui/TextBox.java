@@ -6,9 +6,14 @@ import com.javagameengine.math.Color4f;
 
 public class TextBox extends GUIcomponent {
 	
+	public TextBox()
+	{
+		
+	}
+	
 	public TextBox(int x, int y, String t, Color4f color)
 	{
-		backgroundColor = new Color4f(1f, 0f, 0f, .5f);
+		backgroundColor = new Color4f(0f, 0f, 0f, 0f);
 		borderColor = new Color4f(0f, 0f, 0f, 0f);
 		width = t.length()*8;
 		height = 10;
@@ -21,7 +26,7 @@ public class TextBox extends GUIcomponent {
 	}
 
 	@Override
-	public void onUpdate(int delta) {
+	public void onUpdate(float delta) {
 		// TODO Auto-generated method stub
 		
 	}

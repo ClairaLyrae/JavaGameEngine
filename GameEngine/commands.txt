@@ -1,1 +1,1 @@
-/scene setactive menu3d
+/scene setactive 3d

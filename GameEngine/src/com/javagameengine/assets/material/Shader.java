@@ -57,7 +57,7 @@ public class Shader extends NativeObject
     private Type type;
     private String source = null;
     
-    private Shader(Type type, String data)
+    public Shader(Type type, String data)
     {
     	super(Shader.class);
     	this.type = type;
@@ -86,9 +86,6 @@ public class Shader extends NativeObject
     				vars.add(var);
     		}
     	}
-    	System.out.println("Version #: " + version);
-    	for(ShaderVariable v : vars)
-    		System.out.println(v);
     }
     
     public static Shader loadFromFile(File f) throws IOException
@@ -152,6 +149,6 @@ public class Shader extends NativeObject
 	
 	public String toString()
 	{
-		return "type=" + type.toString();
+		return "shader=[type=" + type.toString() + "], id[" + id + "]]";
 	}
 }

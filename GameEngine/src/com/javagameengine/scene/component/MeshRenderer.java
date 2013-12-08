@@ -12,20 +12,6 @@ public class MeshRenderer extends RenderableComponent
 	private Mesh mesh = null;
 	private Material material = null;
 	
-	public MeshRenderer()
-	{
-	}
-	
-	public MeshRenderer(Mesh m)
-	{
-		mesh = m;
-	}
-
-	public MeshRenderer(Material mat)
-	{
-		material = mat;
-	}
-
 	public MeshRenderer(Material mat, Mesh m)
 	{
 		mesh = m;
@@ -60,19 +46,6 @@ public class MeshRenderer extends RenderableComponent
 		return mesh.getBounds();
 	}
 	
-	public void onDestroy()
-	{
-		
-	}
-
-	public void onCreate()
-	{
-		if(mesh != null)
-			mesh.create();
-		if(material != null)
-			material.create();
-	}
-
 	public void onUpdate(float delta)
 	{
 		// Update mesh bounds and vertex buffers... if needed!

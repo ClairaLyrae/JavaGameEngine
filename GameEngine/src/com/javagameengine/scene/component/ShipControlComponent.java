@@ -9,6 +9,7 @@ import com.javagameengine.events.KeyHeldEvent;
 import com.javagameengine.events.KeyPressEvent;
 import com.javagameengine.events.Listener;
 import com.javagameengine.events.MouseMoveEvent;
+import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Matrix3f;
 import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
@@ -73,7 +74,8 @@ public class ShipControlComponent extends Component implements Listener
 	
 
 	Vector3f targetHeading = new Vector3f(0f, 0f, 1f);
-	
+	float forwardThrustAccum = 0f;
+	float forwardThrustLimit = 5f;
 	@Override
 	public void onUpdate(float delta)
 	{
@@ -97,7 +99,23 @@ public class ShipControlComponent extends Component implements Listener
 			deltav.y = incTrans;
 		if(Keyboard.isKeyDown(Keyboard.KEY_A))
 			deltav.y = -incTrans;
-		float forwardThrust = deltav.z;
+		
+		
+		if(deltav.z == 0f)
+		{
+			float scaling = 1f-delta;
+			if(scaling < 0f)
+				scaling = 0f;
+			forwardThrustAccum *= scaling;
+		}
+		else
+			forwardThrustAccum += (forwardThrustLimit - FastMath.abs(forwardThrustAccum))*deltav.z/10f;
+		if(forwardThrustAccum > forwardThrustLimit)
+			forwardThrustAccum = forwardThrustLimit;
+		if(forwardThrustAccum < -forwardThrustLimit)
+			forwardThrustAccum = -forwardThrustLimit;
+		
+		
 		Matrix3f world_rot = phys.getNode().getWorldTransform().getRotation().toRotationMatrix3f();
 		// Rotate the velocity vector to face the ship direction
 		deltav = world_rot.multiplyInto(deltav, deltav);
@@ -124,19 +142,19 @@ public class ShipControlComponent extends Component implements Listener
 			targetHeading.z = 1.5f;
 		
 		Transform camerat = camera.getNode().getTransform();
-		camerat.getPosition().set(targetHeading.y, 0.5f - 0.5f*targetHeading.x, -4f + 0.1f*forwardThrust);
+		camerat.getPosition().set(targetHeading.y, 0.5f - 0.5f*targetHeading.x, -4f + 0.1f*forwardThrustAccum);
 		
 		world_rot.multiplyInto(targetHeading, phys.getAngularVelocity());	
 	}
 
 	@Override
-	public void onDestroy()
+	public void onUnlink()
 	{
 		getScene().getEventManager().unregisterListener(this);
 	}
 
 	@Override
-	public void onCreate()
+	public void onLink()
 	{
 		getScene().getEventManager().registerListener(this);
 	}

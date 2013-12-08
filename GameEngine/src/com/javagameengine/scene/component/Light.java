@@ -156,16 +156,6 @@ public class Light extends Component
 	public void onUpdate(float delta)
 	{
 	}
-
-	@Override
-	public void onDestroy()
-	{
-	}
-
-	@Override
-	public void onCreate()
-	{
-	}
 	
 	public static void bindInvalid(int progID, int lightIndex)
 	{
@@ -208,5 +198,25 @@ public class Light extends Component
 	public Matrix4f getWorldMatrix()
 	{
 		return node.getTransform().getTransformMatrix();
+	}
+
+	@Override
+	public void onUnlink()
+	{
+	}
+
+	@Override
+	public void onLink()
+	{
+	}
+	
+	@Override
+	public void onActivate()
+	{
+	}
+
+	@Override
+	public void onDeactivate()
+	{
 	}
 }

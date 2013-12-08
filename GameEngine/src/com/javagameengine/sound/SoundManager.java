@@ -2,19 +2,22 @@ package com.javagameengine.sound;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 
-import com.javagameengine.assets.audio.SoundBuffer;
+import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.math.Vector3f;
+import com.javagameengine.scene.Scene;
 
 public class SoundManager
 {
-	private static SoundManager global = new SoundManager();
 	private static int MAX_SOURCES = 16;
 
 	/** Position of the listener. */
@@ -49,8 +52,10 @@ public class SoundManager
 		listenerOri.rewind();
 		AL10.alListener(AL10.AL_POSITION, listenerPos);
 	}
-	
-	private static Map<String, Sound> sourcemap = new HashMap<String, Sound>();
+
+
+	private static SoundManager global = new SoundManager();
+	private static HashMap<Scene, List<Sound>> registeredSounds = new HashMap<Scene, List<Sound>>();
 	
 	private static Sound[] sources;
 	

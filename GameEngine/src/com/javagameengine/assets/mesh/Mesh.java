@@ -259,12 +259,6 @@ public class Mesh extends NativeObject implements Drawable
         m.setBuffer(Attribute.TEXCOORDS, AttributeUsage.DYNAMIC, texcoordBuffer);
         m.setIndexBuffer(AttributeUsage.DYNAMIC, indexBuffer);
         m.calculateTangents();
-        
-        System.out.println("Vertices=" + vertexList.size() + 
-        		" Tex Coords=" + texcoordList.size() + 
-        		" Normals=" + normalList.size() + 
-        		" Vert Groups=" + vertexGroup.size());
-        System.out.println(m.toString());
         reader.close();
         return m;
     }
@@ -333,7 +327,6 @@ public class Mesh extends NativeObject implements Drawable
 	        tan2[i3].add(tdir);
 	    }
 	    indexes.rewind();
-	    System.out.println(dupeVertCount);
 	    for(int i = 0; i < dupeVertCount; i++)
 	    {
 	        Vector3f n = normals[i];

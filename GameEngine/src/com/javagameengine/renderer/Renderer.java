@@ -25,6 +25,7 @@ import com.javagameengine.math.Transform;
 import com.javagameengine.math.Vector3f;
 import com.javagameengine.math.Vector4f;
 import com.javagameengine.math.Color4f;
+import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.CoordinateGrid;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.gui.WelcomeGUI;
@@ -98,7 +99,8 @@ public class Renderer
 		// First off, we need to set up the render target & viewport & buffers
 		int width = Display.getWidth();
 		int height = Display.getHeight();
-		GUI gui = Game.getHandle().getActiveScene().getGui();
+		Scene scene = Game.getHandle().getActiveScene();
+		GUI gui = scene.getGui();
 		
 		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
 
@@ -108,9 +110,15 @@ public class Renderer
 	    GL11.glEnable(GL11.GL_NORMALIZE);
 	    
 		glClear(GL_DEPTH_BUFFER_BIT);
-		glDepthMask(true);
 		GL11.glClearDepth(1.0f); // Depth Buffer Setup
+
+		if(scene.getSkybox() != null)
+		{
+			glDepthMask(false);
+			scene.getSkybox().draw();
+		}
 		
+		glDepthMask(true);
 		if(camera != null)
 		{
 		    GL11.glMatrixMode(GL11.GL_PROJECTION);
@@ -140,34 +148,35 @@ public class Renderer
 	    glUseProgram(0);
 		glDisable(GL_TEXTURE_2D);
 		glDisable(GL_LIGHTING);
+
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	    // DRAW CONSOLE
+
 	    GL11.glDisable(GL11.GL_CULL_FACE);
 	    GL11.glMatrixMode(GL11.GL_PROJECTION);
 	    GL11.glLoadIdentity();
 		glOrtho(0, Display.getWidth(), 0, Display.getHeight(), 0f, 1f);
 	    GL11.glMatrixMode(GL11.GL_MODELVIEW);   
 	    glLoadIdentity();
-	    
-	    GL11.glPushMatrix();
+
+
 	    // draw gui
 	    //  Scene s = Game.getHandle().getActiveScene();
 	    if(gui != null || Console.isVisible())
 	    	Mouse.setGrabbed(false);
 	    else
 	    	Mouse.setGrabbed(true);
+	    GL11.glPushMatrix();
 	    if(gui != null)
 	    	gui.draw();
-
-	    
-	    // GLMenuWindow.draw();
 	    GL11.glPopMatrix();
 	    
+	    // draw console
 	    GL11.glPushMatrix();
 	    Console.draw();
 	    GL11.glPopMatrix();
+
 	    
-	    
+
 		Display.update();
 	}
 	

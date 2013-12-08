@@ -7,7 +7,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
 
 import com.javagameengine.assets.NativeObject;
-import com.javagameengine.assets.audio.SoundBuffer;
+import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.math.Vector3f;
 
 public class Sound extends NativeObject

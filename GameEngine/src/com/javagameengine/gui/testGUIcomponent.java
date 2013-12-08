@@ -20,27 +20,34 @@ public class testGUIcomponent extends GUIcomponent {
 		yPos = y;
 		borderColor = borC;
 		backgroundColor = bgC;
-		parent = p;
-		if(parent!=null)
-		{
-			absoluteX = parent.xPos + xPos;
-			absoluteY = parent.yPos + yPos;
-		}
+		parent = null;
+		
 		children = new ArrayList<GUIcomponent>();
 	}
 	
 
 	
 	//@Override
-	public void onUpdate(int delta) {
-		// TODO Auto-generated method stub
-
+	public void onUpdate(float delta) {
+		int i;
+		
+		
+		
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onUpdate(delta);
+		}
 	}
 
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
+		
+		int i;
 
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onDestroy();
+		}
 	}
 
 	@Override

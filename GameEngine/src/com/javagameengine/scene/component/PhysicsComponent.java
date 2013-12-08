@@ -214,19 +214,6 @@ public class PhysicsComponent extends Component
 	}
 	
 	@Override
-	public void onCreate()
-	{
-		
-	}
-	
-	@Override
-	public void onDestroy()
-	{
-		if(isCollidable)
-			collidable.remove(this);
-	}
-	
-	@Override
 	public void onUpdate(float delta)
 	{
 		Transform t = getNode().getTransform();
@@ -268,5 +255,28 @@ public class PhysicsComponent extends Component
 	public void setRadius(float radius)
 	{
 		this.radius = radius;
+	}
+	
+	@Override
+	public void onLink()
+	{
+		
+	}
+	
+	@Override
+	public void onUnlink()
+	{
+		if(isCollidable)
+			collidable.remove(this);
+	}
+	
+	@Override
+	public void onActivate()
+	{
+	}
+
+	@Override
+	public void onDeactivate()
+	{
 	}
 }

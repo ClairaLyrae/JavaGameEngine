@@ -6,7 +6,8 @@ import java.util.Set;
 import org.lwjgl.input.Mouse;
 
 import com.javagameengine.assets.AssetManager;
-import com.javagameengine.assets.audio.SoundBuffer;
+import com.javagameengine.assets.skybox.Skybox;
+import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.gui.GUI;
@@ -28,6 +29,7 @@ public class Scene
 	private Node root;
 	private EventManager eventManager = new EventManager();
 	private Camera camera = null;
+	private Skybox skybox;
 	private GUI gui;
 	
 	public Scene(String name)
@@ -46,6 +48,16 @@ public class Scene
 	{
 		camera = c;
 	}	
+	
+	public Skybox getSkybox()
+	{
+		return skybox;
+	}
+	
+	public void setSkybox(Skybox s)
+	{
+		skybox = s;
+	}
 	
 	public String getName()
 	{
@@ -73,7 +85,10 @@ public class Scene
 	public void clear()
 	{
 		if(root.getScene() != null)
+		{
 			root.destroy();
+//			gui.destroy();
+		}
 		root = new Node("root");
 		root.scene = this;
 	}
@@ -99,6 +114,7 @@ public class Scene
 		if(root == null)
 			return;
 		root.update(deltaf);
+		gui.update(deltaf);
 		//PhysicsComponent.calculateCollisions();
 	}
 	

@@ -290,14 +290,18 @@ public abstract class Game
 	 */
 	public boolean setActiveScene(String s)
 	{
-		Scene scene = AssetManager.getScene(s);
-		if(scene == null)
+		Scene newScene = AssetManager.getScene(s);
+		if(newScene == null)
 			return false;
-		if(scene == activeScene)
+		if(newScene == activeScene)
 			return false;
 		EventManager.global.callEvent(new SceneChangeEvent(activeScene, false));
-		EventManager.global.callEvent(new SceneChangeEvent(scene, true));
-		this.activeScene = scene;
+		EventManager.global.callEvent(new SceneChangeEvent(newScene, true));
+		Scene oldScene = activeScene;
+		this.activeScene = newScene;
+		if(oldScene != null)
+			oldScene.getRoot().relink();
+		newScene.getRoot().relink();
 		return true;
 	}
 	

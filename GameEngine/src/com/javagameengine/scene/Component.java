@@ -1,5 +1,7 @@
 package com.javagameengine.scene;
 
+import com.javagameengine.Game;
+
 /**
  * Generic object used to define anything that affects the scene. All 'objects' in a scene extend Component 
  * and use the framework of component to define how they are rendered, updated, manipulated, or manipulate
@@ -14,32 +16,57 @@ public abstract class Component
 	protected boolean isEnabled = true;
 	protected Node node;
 	protected Scene scene;
-		
-	public Component()
-	{
-		
-	}
 	
 	private boolean isDestroyed = false;
 	
+	/**
+	 * @return True if component was destroyed
+	 */
 	public boolean isDestroyed()
 	{
 		return isDestroyed;
 	}
 	
+	/**
+	 * Removes this component from the parent node, if attached. If the component has
+	 * no parent node and is unlinked, this method does nothing.
+	 */
 	public void destroy()
 	{
-		onDestroy();
 		if(node != null)
 			node.removeComponent(this);
-		node = null;
-		scene = null;
 		isDestroyed = true;
 	}
 	
-	public abstract void onUpdate(float deltaf);
-	public abstract void onDestroy();
-	public abstract void onCreate();
+	/**
+	 * Update this component for the current frame
+	 * @param deltaf Time since last frame (seconds)
+	 */
+	public void onUpdate(float deltaf) {}
+	
+	/**
+	 * Called when this component is unlinked from its parent node, and that parent node
+	 * is linked to a scene
+	 */
+	public void onUnlink() {}
+	
+	/**
+	 * Called when this component is linked to a parent node, and that parent node
+	 * is linked to a scene
+	 */
+	public void onLink() {}
+	
+	/**
+	 * Called when this component is either added to a node which is part of an active
+	 * scene, or when the scene this node is part of is loaded
+	 */
+	public void onActivate() {}
+
+	/**
+	 * Called when this component is either removed from a node which is part of an active
+	 * scene, or when the scene this node is part of is unloaded
+	 */
+	public void onDeactivate() {}
 	
 	/**
 	 * Enables or disables updating of this component.
@@ -65,9 +92,18 @@ public abstract class Component
 	 */
 	public boolean isLinked()
 	{
-		if(node == null)
+		return scene != null;
+	}
+	
+	/**
+	 * Determines if this component is connected to a scene graph.
+	 * @return True if component is linked to a scene graph.
+	 */
+	public boolean isActive()
+	{
+		if(scene == null)
 			return false;
-		return node.scene != null;
+		return scene == Game.getHandle().getActiveScene();
 	}
 
 	/**

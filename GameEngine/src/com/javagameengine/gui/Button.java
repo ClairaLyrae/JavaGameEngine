@@ -70,7 +70,7 @@ public abstract class Button extends GUIcomponent implements Listener {
 		}
 	}
 
-	public abstract void onUpdate(int delta);
+	public abstract void onUpdate(float delta);
 	public abstract void onDestroy();
 	public abstract void onCreate();
 
