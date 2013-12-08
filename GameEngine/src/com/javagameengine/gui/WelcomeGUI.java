@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.Display;
 
+import com.javagameengine.Game;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.material.Texture;
 import com.javagameengine.gui.GUIcomponent;
@@ -20,16 +21,34 @@ public class WelcomeGUI extends GUI {
 		
 		GLquadGUIcomponent mainBox = new GLquadGUIcomponent(Display.getWidth(), Display.getHeight(), 0, 0,
 				Color4f.white.setTrans(), Color4f.white.setTrans(), null);
-		GLquadGUIcomponent innerBox = new GLquadGUIcomponent(200, 400, centerX-100, centerY-200,
+		GLquadGUIcomponent innerBox = new GLquadGUIcomponent(340, 300, centerX-170, centerY-150,
 				Color4f.white.setTrans(), Color4f.red.setTrans(), null);
-		innerBox.addChild(new Button(100, 100, 50, 50, "SETTINGS", 0));
-		innerBox.addChild(new TextBox(20, 350, "Welcome", Color4f.black));
-		mainBox.addChild(innerBox);
+		Button startButt = new Button(80, 20, 25, 20, "START", 0){
+			@Override
+			public void onClick(){
+				Game.getHandle().setActiveScene("3d");
+			}
+		};
+		Button settingsButt = new Button(80, 20, 130, 20, "SETTINGS", 0){
+			@Override
+			public void onClick(){
+				
+			}
+		};
+		Button quitButt = new Button(80, 20, 235, 20, "QUIT", 0){
+			public void onClick(){
+				Game.getHandle().exit();
+			}
+		};
 		
-//		Button b = new button() {
-//			@Override
-//			public void onCLick
-//		}
+		innerBox.addChild(startButt);
+		innerBox.addChild(settingsButt);
+		innerBox.addChild(quitButt);
+
+		innerBox.addChild(new TextBox(20, 350, "Welcome", Color4f.black));
+		
+		mainBox.addChild(innerBox);
+	
 
 		
 		Texture t = AssetManager.getTexture("starBackground");

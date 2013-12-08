@@ -230,6 +230,8 @@ public abstract class GUIcomponent
 			return null;
 		return gui.getScene();
 	}
+	
+
 }
 
 

@@ -37,15 +37,10 @@ public class Button extends GUIcomponent implements Listener {
 	
 	public Button()
 	{	
-	//	width = w;
-	//	height = h;
-	//	xPos = x;
-	//	yPos = y;
 		borderColor = Color4f.red.setTrans();
 		backgroundColor = Color4f.red.setTrans();
 		parent = null;
 		children = new ArrayList<GUIcomponent>();
-	//	text = "SETTINGS";
 		textColor = Color4f.black;
 		clicked = false;
 	}
@@ -58,11 +53,11 @@ public class Button extends GUIcomponent implements Listener {
 		xPos = x;
 		yPos = y;
 		mode = m;
+		clicked = false;
 		borderColor = Color4f.red.setTrans();
 		backgroundColor = Color4f.red.setTrans();
 		parent = null;
 		children = new ArrayList<GUIcomponent>();
-	//	text = "SETTINGS";
 		textColor = Color4f.black;
 		text = t;
 		
@@ -74,7 +69,7 @@ public class Button extends GUIcomponent implements Listener {
 	private void addText() {
 		int x = (width/2) - (text.length()/2)*8;
 		int y = (height/2) - 4;
-		this.addChild(new TextBox(x, y, text, Color4f.black));
+		this.addChild(new TextBox(x, y, text, textColor));
 	}
 	
 	@EventMethod
@@ -103,7 +98,14 @@ public class Button extends GUIcomponent implements Listener {
 					this.backgroundColor = this.backgroundColor.inverse().setTrans();
 					this.textColor = this.textColor.inverse();
 					clicked = false;
+					onClick();
 				}
+			}
+			else if(clicked)
+			{
+				this.backgroundColor = this.backgroundColor.inverse().setTrans();
+				this.textColor = this.textColor.inverse();
+				clicked = false;
 			}
 		}
 			
@@ -128,22 +130,15 @@ public class Button extends GUIcomponent implements Listener {
 		}
 	}
 	
+	public void onClick()
+	{
+		
+	}
+	
 	@Override
 	public void draw()
 	{
-		int parentX; 
-		int parentY;
-		
-		if(parent == null)
-		{
-			parentX = 0;
-			parentY = 0;
-		}
-		else
-		{
-			parentX = parent.xPos;
-			parentY = parent.yPos;
-		}
+
 		
 		if(!visible)
 			return;
