@@ -20,13 +20,12 @@ import com.javagameengine.console.MeshCommand;
 import com.javagameengine.console.SceneCommand;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyPressEvent;
-
+import com.javagameengine.events.Listener;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.HUD;
 import com.javagameengine.gui.WelcomeGUI;
 import com.javagameengine.gui.GLquadGUIcomponent;
-
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Vector3f;
@@ -201,6 +200,10 @@ public class TestGame extends Game
 			{
 			}
 		};
+		
+		
+	
+		
 		// Create a new scene
 		Scene s = new Scene("menu3d");
 		s.addGUI(gui);

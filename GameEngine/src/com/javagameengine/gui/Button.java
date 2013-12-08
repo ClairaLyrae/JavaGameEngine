@@ -32,7 +32,17 @@ public abstract class Button extends GUIcomponent implements Listener {
 	boolean clicked;
 	
 	public Button()
-	{
+	{	
+	//	width = w;
+	//	height = h;
+	//	xPos = x;
+	//	yPos = y;
+		borderColor = Color4f.red.setTrans();
+		backgroundColor = Color4f.red.setTrans();
+		parent = null;
+		children = new ArrayList<GUIcomponent>();
+	//	text = "SETTINGS";
+		textColor = Color4f.black;
 		clicked = false;
 	}
 	
@@ -43,16 +53,14 @@ public abstract class Button extends GUIcomponent implements Listener {
 		height = h;
 		xPos = x;
 		yPos = y;
-		borderColor = borC;
-		backgroundColor = bgC;
-		parent = p;
-		if(parent!=null)
-		{
-			absoluteX = parent.xPos + xPos;
-			absoluteY = parent.yPos + yPos;
-		}
+	//	borderColor = Color4f.red.setTrans();
+	//	backgroundColor = Color4f.red.setTrans();
+		parent = null;
 		children = new ArrayList<GUIcomponent>();
-    	
+	//	text = "SETTINGS";
+		textColor = Color4f.black;
+		
+		
 		
     }
     
