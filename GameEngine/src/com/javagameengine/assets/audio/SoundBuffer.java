@@ -10,27 +10,27 @@ import org.lwjgl.util.WaveData;
 
 import com.javagameengine.assets.NativeObject;
 
-public class Sound extends NativeObject
+public class SoundBuffer extends NativeObject
 {
 	private WaveData data;
 	
-	public Sound()
+	public SoundBuffer()
 	{
-		super(Sound.class);
+		super(SoundBuffer.class);
 	}
 	
-	public Sound(WaveData data)
+	public SoundBuffer(WaveData data)
 	{
-		super(Sound.class);
+		super(SoundBuffer.class);
 		this.data = data;
 	}
 
-	public static Sound loadFromFile(File f) throws FileNotFoundException 
+	public static SoundBuffer loadFromFile(File f) throws FileNotFoundException 
 	{
 		WaveData wav = WaveData.create(new BufferedInputStream(new FileInputStream(f)));
 		if(wav == null)
 			throw new IllegalStateException("Could not load wav data from file '" + f.getName() + "'");
-		return new Sound(wav);
+		return new SoundBuffer(wav);
 	}
 
 	@Override
@@ -38,7 +38,6 @@ public class Sound extends NativeObject
 	{
 		if(data == null)
 			throw new IllegalStateException("Could not load sound to audio card");
-			
 		id = AL10.alGenBuffers();
 		if (AL10.alGetError() != AL10.AL_NO_ERROR)
 			throw new IllegalStateException("Could not load sound to audio card");

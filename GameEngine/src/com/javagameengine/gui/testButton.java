@@ -83,8 +83,6 @@ public class testButton extends Button{
 		{
 			children.get(i).onCreate();
 		}
-	
-		getScene().getEventManager().registerListener(this);
 	}
 
 

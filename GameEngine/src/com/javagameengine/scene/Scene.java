@@ -3,7 +3,10 @@ package com.javagameengine.scene;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.lwjgl.input.Mouse;
+
 import com.javagameengine.assets.AssetManager;
+import com.javagameengine.assets.audio.SoundBuffer;
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.gui.GUI;
@@ -99,14 +102,15 @@ public class Scene
 		//PhysicsComponent.calculateCollisions();
 	}
 	
-	public void addGUI(GUI newGUI) {
+	public void addGUI(GUI newGUI) 
+	{
 		gui = newGUI;
 		gui.setScene(this);
 		gui.onCreate();
 	}
 
-	public GUI getGui() {
-		
+	public GUI getGui() 
+	{	
 		return gui;
 	}
 }

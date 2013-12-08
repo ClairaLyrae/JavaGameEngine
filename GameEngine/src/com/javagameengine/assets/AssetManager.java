@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.javagameengine.assets.audio.Sound;
+import com.javagameengine.assets.audio.SoundBuffer;
 import com.javagameengine.assets.material.Material;
 import com.javagameengine.assets.material.Shader;
 import com.javagameengine.assets.material.Texture;
@@ -42,7 +42,7 @@ public class AssetManager
 	private static Map<String, Texture> textures;
 	private static Map<String, Shader> shaders;
 	private static Map<String, Material> materials;
-	private static Map<String, Sound> sounds;
+	private static Map<String, SoundBuffer> sounds;
 	private static Map<String, Scene> scenes;
 	private static Map<String, GUI> guis;
 	
@@ -52,7 +52,7 @@ public class AssetManager
 		textures = new HashMap<String, Texture>();
 		shaders = new HashMap<String, Shader>();
 		materials = new HashMap<String, Material>();
-		sounds = new HashMap<String, Sound>();
+		sounds = new HashMap<String, SoundBuffer>();
 		scenes = new HashMap<String, Scene>();
 		guis = new HashMap<String, GUI>();
 	}
@@ -152,7 +152,7 @@ public class AssetManager
 		}
 		else if(isFileType(ext, audioExtensions))
 		{
-			Sound s = Sound.loadFromFile(f);
+			SoundBuffer s = SoundBuffer.loadFromFile(f);
 			sounds.put(fname, s);
 			s.create();
 			System.out.println("Sound '" + fname + "' loaded: " + s.toString());
@@ -219,14 +219,14 @@ public class AssetManager
 			addTexture(name, (Texture)o);
 		else if(o instanceof Shader)
 			addShader(name, (Shader)o);
-		else if(o instanceof Sound)
-			addSound(name, (Sound)o);
+		else if(o instanceof SoundBuffer)
+			addSound(name, (SoundBuffer)o);
 		else
 			return false;
 		return true;
 	}
 	
-	public static void addSound(String name, Sound s)
+	public static void addSound(String name, SoundBuffer s)
 	{
 		if(sounds.containsKey(name))
 			throw new IllegalStateException("Cannot add to asset pool. Mesh '" + name + "' already exists.");
@@ -275,7 +275,7 @@ public class AssetManager
 		scenes.put(s.getName(), s);
 	}
 
-	public static Sound removeSound(String s)
+	public static SoundBuffer removeSound(String s)
 	{
 		return sounds.remove(s);
 	}
@@ -340,7 +340,7 @@ public class AssetManager
 		return scenes.get(string);
 	}
 	
-	public static Sound getSound(String string)
+	public static SoundBuffer getSound(String string)
 	{
 		return sounds.get(string);
 	}

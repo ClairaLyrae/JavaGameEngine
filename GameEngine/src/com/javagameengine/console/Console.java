@@ -86,6 +86,13 @@ public class Console implements Listener
 				return null;
 			}
 		});
+		registerCommand(new Command("exit", 0) {
+			public String execute(String[] args)
+			{
+				Game.getHandle().exit();
+				return null;
+			}
+		});
 		registerCommand(new Command("console", 1) {
 			public String execute(String[] args)
 			{

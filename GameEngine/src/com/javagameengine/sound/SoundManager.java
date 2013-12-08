@@ -9,7 +9,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
 
-import com.javagameengine.assets.audio.Sound;
+import com.javagameengine.assets.audio.SoundBuffer;
 import com.javagameengine.math.Vector3f;
 
 public class SoundManager
@@ -50,18 +50,29 @@ public class SoundManager
 		AL10.alListener(AL10.AL_POSITION, listenerPos);
 	}
 	
-	private static Map<String, SoundSource> sourcemap = new HashMap<String, SoundSource>();
+	private static Map<String, Sound> sourcemap = new HashMap<String, Sound>();
 	
-	private static SoundSource[] sources;
+	private static Sound[] sources;
 	
-	public static void play(Sound s)
+	public static void play(SoundBuffer s)
 	{
-		SoundSource source = getNewSource();
+		Sound source = getSource();
 		source.setSound(s);
 		source.play();
 	}
 	
-	public static SoundSource getNewSource()
+	public static void play(SoundBuffer s, Vector3f position, Vector3f velocity)
+	{
+		Sound source = getSource();
+		if(source == null)
+			return;
+		source.setPosition(position);
+		source.setVelocity(velocity);
+		source.setSound(s);
+		source.play();
+	}
+	
+	public static Sound getSource()
 	{
 		for(int i = 0; i < sources.length; i++)
 		{
@@ -81,11 +92,12 @@ public class SoundManager
 			le.printStackTrace();
 			return;
 		}
-		AL10.alGetError();
-		sources = new SoundSource[MAX_SOURCES];
+		if(AL10.alGetError() != AL10.AL_NO_ERROR)
+			throw new IllegalStateException("Failed to create OpenAL environment.");
+		sources = new Sound[MAX_SOURCES];
 		for(int i = 0; i < sources.length; i++)
 		{
-			sources[i] = new SoundSource();
+			sources[i] = new Sound();
 			sources[i].create();
 		}
 		setListenerOrientation(Vector3f.zero, Vector3f.zero);

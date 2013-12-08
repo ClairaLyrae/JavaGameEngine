@@ -46,7 +46,7 @@ public abstract class GUIcomponent {
 		absoluteX = 0;
 		absoluteY = 0;
 		text = null;
-		textColor = null;
+		textColor = Color4f.white;
 		children = new ArrayList<GUIcomponent>();
 	}
 	
@@ -67,6 +67,16 @@ public abstract class GUIcomponent {
 
 	}
 	*/
+	
+	public void setText(String s)
+	{
+		text = s;
+	}
+
+	public void setTextColor(Color4f color)
+	{
+		textColor = color;
+	}
 	
 	public void setBackground(Texture t)
 	{
@@ -131,7 +141,7 @@ public abstract class GUIcomponent {
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 		}
 
-		glBegin(GL11.GL_LINES);
+		glBegin(GL11.GL_LINE_LOOP);
 		glColor4f(borderColor.r, borderColor.g, borderColor.b, borderColor.a);
 		glVertex2f(parentX + xPos, parentY + yPos); // bottom left
 		glVertex2f(parentX + xPos, parentY + yPos + height); // top left
@@ -142,7 +152,7 @@ public abstract class GUIcomponent {
 		if(text != null)
 		{
 			glColor4f(textColor.r, textColor.g, textColor.b, textColor.a);
-			SimpleText.drawString(text, absoluteX, absoluteY);
+			SimpleText.drawString(text, parentX + xPos, parentY + yPos);
 		}
 		
 		// draw children of current component

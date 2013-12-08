@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
@@ -101,22 +102,17 @@ public class Renderer
 		
 		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
 
-
+		GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
+		GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
+	    GL11.glEnable(GL11.GL_CULL_FACE);
+	    GL11.glEnable(GL11.GL_NORMALIZE);
+	    
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glDepthMask(true);
+		GL11.glClearDepth(1.0f); // Depth Buffer Setup
+		
 		if(camera != null)
 		{
-
-			GL11.glEnable(GL11.GL_DEPTH_TEST); // Enables Depth Testing
-			GL11.glDepthFunc(GL11.GL_LEQUAL); // The Type Of Depth Test To Do
-		    GL11.glEnable(GL11.GL_CULL_FACE);
-		    GL11.glEnable(GL11.GL_NORMALIZE);
-		    
-			glClear(GL_DEPTH_BUFFER_BIT);
-			glDepthMask(true);
-			GL11.glClearDepth(1.0f); // Depth Buffer Setup
-			
-			
-			
-			
 		    GL11.glMatrixMode(GL11.GL_PROJECTION);
 		    GL11.glLoadIdentity();
 		    //GLU.gluPerspective(45.0f, ((float) width / (float) height), 0.1f, 100.0f);
@@ -156,7 +152,10 @@ public class Renderer
 	    GL11.glPushMatrix();
 	    // draw gui
 	    //  Scene s = Game.getHandle().getActiveScene();
-	    
+	    if(gui != null || Console.isVisible())
+	    	Mouse.setGrabbed(false);
+	    else
+	    	Mouse.setGrabbed(true);
 	    if(gui != null)
 	    	gui.draw();
 

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
+import org.lwjgl.input.Cursor;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
@@ -113,6 +114,11 @@ public abstract class Game
 	public long getTime()
 	{
 		return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+	}
+	
+	public void exit()
+	{
+		closeRequested = true;
 	}
 	
 	/**
@@ -239,10 +245,12 @@ public abstract class Game
 			throw new LWJGLException("Another instance of a game is already running.");
 		handle = this;
 		Renderer.initialize();
-		Console.initialize();
 		SoundManager.initialize();
+		Console.initialize();
 		AssetManager.loadAll();
 		onCreate();
+		updateDelta();
+		updateFPS();
 		while (!closeRequested)	// Main game loop
 		{
 			// Update timing information
