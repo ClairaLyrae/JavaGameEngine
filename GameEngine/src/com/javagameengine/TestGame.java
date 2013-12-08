@@ -25,7 +25,7 @@ import com.javagameengine.gui.GUI;
 import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.HUD;
 import com.javagameengine.gui.WelcomeGUI;
-import com.javagameengine.gui.testGUIcomponent;
+import com.javagameengine.gui.GLquadGUIcomponent;
 
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.FastMath;
