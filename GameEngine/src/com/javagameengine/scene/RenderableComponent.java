@@ -53,4 +53,10 @@ public abstract class RenderableComponent extends Component implements Renderabl
 	{
 		return layer;
 	}
+
+	@Override
+	public boolean onRender()
+	{
+		return true;
+	}
 }

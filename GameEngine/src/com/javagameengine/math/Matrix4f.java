@@ -389,15 +389,20 @@ public class Matrix4f extends Matrix<Matrix4f>
 				f32, f03, f13, f23, f33);
 	}
 
-	public FloatBuffer toBuffer()
+	public FloatBuffer toBuffer(FloatBuffer fb)
 	{
-		FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+		fb.clear();
 		fb.put(f00).put(f01).put(f02).put(f03)
 			.put(f10).put(f11).put(f12).put(f13)
 			.put(f20).put(f21).put(f22).put(f23)
 			.put(f30).put(f31).put(f32).put(f33);
 		fb.flip();
 		return fb;
+	}
+	
+	public FloatBuffer toBuffer()
+	{
+		return toBuffer(BufferUtils.createFloatBuffer(16));
 	}
 	
 	public Matrix4f fromBuffer(FloatBuffer fb)

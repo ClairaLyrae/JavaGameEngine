@@ -3,17 +3,23 @@ package com.javagameengine.renderer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 
@@ -55,18 +61,29 @@ public class Renderer
 	public static Matrix4f model_matrix = new Matrix4f();
 	public static Matrix4f view_matrix = new Matrix4f();
 	public static Matrix4f projection_matrix = new Matrix4f();
+	public static FloatBuffer view_matrix_buffer = BufferUtils.createFloatBuffer(16);
+	public static FloatBuffer projection_matrix_buffer = BufferUtils.createFloatBuffer(16);
+	private static int numSamples = 4;
+	
+	
+	public static int getNumSamples()
+	{
+		return numSamples;
+	}
 	
 	public static void initialize()
 	{
 		PixelFormat pixelf;
 		try
 		{
-			pixelf = new PixelFormat().withSamples(4).withDepthBits(24).withSRGB(true);
+			numSamples = 4;
+			pixelf = new PixelFormat().withSamples(numSamples).withDepthBits(24).withSRGB(true);
 			Display.setDisplayMode(new DisplayMode(1280, 768));
 			Display.create(pixelf); // BLAH
 		} 
 		catch (LWJGLException e)
 		{
+			numSamples = 1;
 			pixelf = new PixelFormat().withDepthBits(24).withSRGB(true);
 			try
 			{
@@ -96,6 +113,8 @@ public class Renderer
 	
 	public static void render()
 	{		
+		OcclusionQuery.updateQueries();
+		
 		// First off, we need to set up the render target & viewport & buffers
 		int width = Display.getWidth();
 		int height = Display.getHeight();
@@ -123,15 +142,18 @@ public class Renderer
 		{
 		    GL11.glMatrixMode(GL11.GL_PROJECTION);
 		    GL11.glLoadIdentity();
-		    //GLU.gluPerspective(45.0f, ((float) width / (float) height), 0.1f, 100.0f);
+		    
 		    GLU.gluPerspective(camera.getFOV(), camera.getAspect(), camera.getDepthNear(), camera.getDepthFar());
-		    //projection_matrix = Matrix4f.perspectiveMatrix(45.0f, ((float) width / (float) height), 0.1f, 100.0f);
+		    
 		    projection_matrix = camera.getProjectionMatrix();
 			view_matrix = camera.getViewMatrix();
+			
+			view_matrix.toBuffer(view_matrix_buffer);
+			projection_matrix.toBuffer(projection_matrix_buffer);
+			
 		    GL11.glMatrixMode(GL11.GL_MODELVIEW);
 		    GL11.glLoadIdentity();
-		    GL11.glMultMatrix(view_matrix.transposeInto(null).toBuffer());
-
+		    
 			glDisable(GL_BLEND);
 			for(RenderQueue q : layers)
 				q.render();
@@ -241,4 +263,6 @@ public class Renderer
 		light = new Light();
 		light.setDiffuseColor(Color4f.red);
 	}
+
+
 }

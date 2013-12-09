@@ -32,35 +32,34 @@ public class RenderQueue
 			List<Renderable> list = queue.get(b);
 			if(list == null)
 				continue;
-			for(Renderable r : list)
+			for(final Renderable r : list)
 			{
 				Matrix4f transform = r.getMatrix();
+				Matrix4f modelviewtemp = Renderer.view_matrix.multiplyInto(transform, null);
+				FloatBuffer MV_buffer2 = modelviewtemp.toBuffer();
+				FloatBuffer M_buffer = transform.toBuffer();
+				
+				GL11.glPushMatrix();
+				GL11.glMultMatrix(modelviewtemp.transposeInto(null).toBuffer());
+				
 				if(progID < 0)
 				{
 					GL20.glUseProgram(0);
-					GL11.glMatrixMode(GL11.GL_MODELVIEW);
-					GL11.glPushMatrix();
-					GL11.glMultMatrix(transform.toBuffer());
-					r.getDrawable().draw();
-					GL11.glPopMatrix();
 				} else {
-					Matrix4f modelviewtemp = Renderer.view_matrix.multiplyInto(transform, null);
 
-					FloatBuffer MV_buffer2 = modelviewtemp.toBuffer();
 					int loc = glGetUniformLocation(progID, "mv");
 					glUniformMatrix4(loc, false, MV_buffer2);
 
-					FloatBuffer M_buffer = transform.toBuffer();
 					loc = glGetUniformLocation(progID, "m");
 					glUniformMatrix4(loc, false, M_buffer);
 
-					FloatBuffer V_buffer = Renderer.view_matrix.toBuffer();
 					loc = glGetUniformLocation(progID, "v");
-					glUniformMatrix4(loc, false, V_buffer);
+					glUniformMatrix4(loc, false, Renderer.view_matrix_buffer);
+					Renderer.view_matrix_buffer.rewind();
 					
-					FloatBuffer P_buffer = Renderer.projection_matrix.toBuffer();
 					loc = glGetUniformLocation(progID, "p");
-					glUniformMatrix4(loc, false, P_buffer);
+					glUniformMatrix4(loc, false, Renderer.projection_matrix_buffer);
+					Renderer.projection_matrix_buffer.rewind();
 					
 					for(int i = 0; i < Renderer.MAX_LIGHTS; i++)
 					{
@@ -69,9 +68,10 @@ public class RenderQueue
 						else
 							Renderer.lights[i].bind(progID,i);
 					}
-					
-					r.getDrawable().draw();
 				}
+				if(r.onRender());
+					r.getDrawable().draw();
+				GL11.glPopMatrix();
 			}
 		}
 	}

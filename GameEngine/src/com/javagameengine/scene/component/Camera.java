@@ -10,12 +10,12 @@ import com.javagameengine.scene.Component;
 
 public class Camera extends Component
 {
-	public enum Type{
+	public enum Type {
 		PERSPECTIVE,
 		ORTHOGONAL;
 	}
 	
-	private Type type;
+	private Type type = Type.PERSPECTIVE;
 	
 	private float aspect;
 	private float fovy;
@@ -38,6 +38,16 @@ public class Camera extends Component
 		this.fovy = fov;
 	}
 	
+	public void setType(Type type)
+	{
+		this.type = type;
+	}
+	
+	public Type getType()
+	{
+		return type;
+	}
+	
 	public void setOrthoBounds(float top, float bottom, float left, float right)
 	{
 		this.top = top;
@@ -50,11 +60,6 @@ public class Camera extends Component
 	{
 		this.zFar = zFar;
 		this.zNear = zNear;
-	}
-	
-	public void setType(Type type)
-	{
-		this.type = type;
 	}
 	
 	private int[] ignoreLayers = new int[Renderer.MAX_LAYERS];
@@ -146,13 +151,17 @@ public class Camera extends Component
 		return cinv;
 	}
 	
+	public Matrix4f getPerspectiveMatrix()
+	{
+		return Matrix4f.perspectiveMatrix(getFOV(), getAspect(), getDepthNear(), getDepthFar());
+	}
+	
 	public Matrix4f getProjectionMatrix()
 	{
 		if(type == Type.PERSPECTIVE)
-			return Matrix4f.perspectiveMatrix(getFOV(), getAspect(), getDepthNear(), getDepthFar());
-		if(type == Type.ORTHOGONAL)
-			return Matrix4f.orthoMatrix(getOrthoLeft(), getOrthoRight(), getOrthoTop(), getOrthoBottom(), getDepthNear(), getDepthFar());
-		return new Matrix4f();
+			return getPerspectiveMatrix();
+		else
+			return getOrthoMatrix();
 	}
 	
 	@Override
@@ -180,5 +189,10 @@ public class Camera extends Component
 	@Override
 	public void onDeactivate()
 	{
+	}
+
+	public Matrix4f getOrthoMatrix()
+	{
+		return Matrix4f.orthoMatrix(getOrthoLeft(), getOrthoRight(), getOrthoTop(), getOrthoBottom(), getDepthNear(), getDepthFar());
 	}
 }

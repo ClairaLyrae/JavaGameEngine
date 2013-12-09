@@ -13,4 +13,5 @@ public interface Renderable
 	public Matrix4f getMatrix();
 	public int getLayer();
 	public boolean isTransparent();
+	public boolean onRender();
 }

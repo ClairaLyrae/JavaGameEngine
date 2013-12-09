@@ -1,6 +1,7 @@
 package com.javagameengine.assets.material;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
@@ -41,6 +42,18 @@ import com.javagameengine.renderer.Bindable;
  */
 public class Material extends NativeObject implements Bindable
 {
+	private boolean blendEnable;
+	
+	public boolean isTransparent()
+	{
+		return blendEnable;
+	}
+	
+	public void setTransparency(boolean state)
+	{
+		blendEnable = state;
+	}
+	
 	public enum TextureType 
 	{
 		DIFFUSE("tex_diffuse"),
@@ -107,18 +120,6 @@ public class Material extends NativeObject implements Bindable
 	public Texture[] getTextures()
 	{
 		return textures;
-	}
-	
-	private boolean transparent = false;
-	
-	public boolean isTransparent()
-	{
-		return transparent;
-	}
-	
-	public void setTransparency(boolean state)
-	{
-		transparent = state;
 	}
 	
 	public static Material loadFromFile(File f) throws IOException
@@ -240,7 +241,7 @@ public class Material extends NativeObject implements Bindable
 			if(getShader(type) != null)
 			sb.append(type.toString() + ", ");
 		}
-		sb.append("], transparent=[" + transparent + "]");
+		sb.append("], transparent=[" + blendEnable + "]");
 		return sb.toString();
 	}
 
@@ -262,5 +263,7 @@ public class Material extends NativeObject implements Bindable
 		}
 		return id;
 	}
+
+
 }
 

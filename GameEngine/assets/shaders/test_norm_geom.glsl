@@ -26,21 +26,21 @@ void main()
     	color = vec4(1, 0, 0, 1);
 		gl_Position = P * p;
 		EmitVertex();
-		gl_Position = (P + N) * p;
+		gl_Position = (P + N/5) * p;
 		EmitVertex();
 		EndPrimitive();  
 		  
     	color = vec4(0, 1, 0, 1);
 		gl_Position = P * p;
 		EmitVertex();
-		gl_Position = (P + T) * p;
+		gl_Position = (P + T/5) * p;
 		EmitVertex();
 		EndPrimitive();
 		
     	color = vec4(0, 0, 1, 1);
 		gl_Position = P * p;
 		EmitVertex();
-		gl_Position = (P + B) * p;
+		gl_Position = (P + B/5) * p;
 		EmitVertex();
 		EndPrimitive();
 	}

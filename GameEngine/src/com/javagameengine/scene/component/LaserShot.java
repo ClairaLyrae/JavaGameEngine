@@ -46,8 +46,8 @@ public class LaserShot extends Component
 		node.addComponent(light);
 		node.addComponent(phys);
 		node.markAsTransient(4f);
-		
-		SoundManager.play(sound);
+
+		SoundManager.play(sound, 0.05f);
 		LaserCountText.increase();
 	}
 

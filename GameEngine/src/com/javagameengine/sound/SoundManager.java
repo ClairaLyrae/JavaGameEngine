@@ -77,12 +77,31 @@ public class SoundManager
 		source.play();
 	}
 	
+	public static void play(SoundBuffer s, float vol)
+	{
+		Sound source = getSource();
+		if(source == null)
+			return;
+		source.setSound(s);
+		source.setGain(vol);
+		source.play();
+	}
+	
+	
+	private static int pointer = 0;
+	
 	public static Sound getSource()
 	{
-		for(int i = 0; i < sources.length; i++)
+		for(int i = pointer; i < sources.length; i++)
 		{
 			if(!sources[i].isUsed())
+			{
+				pointer = i+1;
+				if(pointer >= sources.length)
+					pointer = 0;
 				return sources[i];
+			}
+			
 		}
 		return null;
 	}
