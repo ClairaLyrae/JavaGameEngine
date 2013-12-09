@@ -5,7 +5,9 @@ import java.util.ArrayList;
 
 
 
+
 import com.javagameengine.assets.material.Texture;
+import com.javagameengine.events.Listener;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.Scene;
 
@@ -24,6 +26,8 @@ public class GLquadGUIcomponent extends GUIcomponent {
 		
 		children = new ArrayList<GUIcomponent>();
 	}
+	
+	//public void 
 	
 	public void onUpdate(float delta) 
 	{

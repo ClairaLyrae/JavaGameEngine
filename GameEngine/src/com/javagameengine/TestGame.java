@@ -50,10 +50,11 @@ public class TestGame extends Game
 		// Create a new scene
 		Scene s = new Scene("3d");
 		Scene s2 = new Scene("menu");
+		Scene menu3d = createMenuScene();
 		// Load the scene into the game
 		AssetManager.addScene(s);
 		AssetManager.addScene(s2);
-		AssetManager.addScene(createMenuScene());
+		AssetManager.addScene(menu3d);
 		
 		// Build the 3D scene
 		Node root = s.getRoot();
@@ -64,8 +65,8 @@ public class TestGame extends Game
 		hud.setCursor(false);
 		
 		// SETUP GUI
-		s2.addGUI(welcomegui);
-		s.addGUI(hud);
+		menu3d.setGUI(welcomegui);
+		s.setGUI(hud);
 		
 		
 
@@ -161,7 +162,7 @@ public class TestGame extends Game
 		Console.registerCommand(new MeshCommand());
 		Console.registerCommand(new SceneCommand());
 		
-		setActiveScene(s2.getName());
+		setActiveScene(menu3d.getName());
 		
 		// Auto load commands to console from file! 
 		Console.executeFromFile(new File("commands.txt"));
@@ -211,7 +212,7 @@ public class TestGame extends Game
 		
 		// Create a new scene
 		Scene s = new Scene("menu3d");
-		s.addGUI(gui);
+		s.setGUI(gui);
 		// Build the 3D scene
 		Node root = s.getRoot();	
 

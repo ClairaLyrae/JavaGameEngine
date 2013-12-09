@@ -22,6 +22,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 import com.javagameengine.events.EventMethod;
+import com.javagameengine.events.KeyPressEvent;
 import com.javagameengine.events.Listener;
 import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.math.Color4f;
@@ -30,7 +31,7 @@ import com.javagameengine.scene.component.LaserShot;
 import com.javagameengine.util.SimpleText;
 
 
-public class Button extends GUIcomponent implements Listener {
+public class Button extends GUIcomponent implements Listener{
 	
 	boolean clicked;
 	int mode;
@@ -66,7 +67,7 @@ public class Button extends GUIcomponent implements Listener {
 
     }
 	
-	private void addText() {
+	protected void addText() {
 		int x = (width/2) - (text.length()/2)*8;
 		int y = (height/2) - 4;
 		this.addChild(new TextBox(x, y, text, textColor));
@@ -85,8 +86,6 @@ public class Button extends GUIcomponent implements Listener {
 		{
 			if(x > absoluteX && x < absoluteX + width && y > absoluteY && y < absoluteY + height)
 			{
-				System.out.println("Button click");
-
 				if(e.state())
 				{
 					this.backgroundColor = this.backgroundColor.inverse();
@@ -124,6 +123,7 @@ public class Button extends GUIcomponent implements Listener {
 				this.backgroundColor = this.backgroundColor.inverse();
 				this.textColor = this.textColor.inverse();
 				clicked = !clicked;
+				onClick();
 			}
 
 			
@@ -133,6 +133,12 @@ public class Button extends GUIcomponent implements Listener {
 	public void onClick()
 	{
 		
+	}
+	
+	// Allow key press actions
+	@EventMethod
+	public void onKey(KeyPressEvent e)
+	{
 	}
 	
 	@Override
@@ -189,6 +195,8 @@ public class Button extends GUIcomponent implements Listener {
 		{
 			children.get(i).onUpdate(delta);
 		}
+		if(text!=null)
+			addText();
 	}
 
 	@Override
@@ -200,7 +208,7 @@ public class Button extends GUIcomponent implements Listener {
 		{
 			children.get(i).onDestroy();
 		}
-		getScene().getEventManager().unregisterListener(this);
+		getGUI().getEventManager().unregisterListener(this);
 	}
 
 	@Override
@@ -208,7 +216,7 @@ public class Button extends GUIcomponent implements Listener {
 	{
 		int i;
 		
-		getScene().getEventManager().registerListener(this);
+		getGUI().getEventManager().registerListener(this);
 		
 		for(i=0; i<children.size();i++)
 		{

@@ -23,12 +23,14 @@ public class Crosshairs extends GUIcomponent implements Listener{
 
 	public void draw()
 	{
+		if(!gui.crosshairs_visible)
+			return;
+		
 		float theta;
 		float angle_increment = (float) Math.PI / 500;	
 		width = 40;
 		height = 40;
-		if(!visible)
-			return;
+
 		
 	
 	//	glBegin(GL_QUADS);
