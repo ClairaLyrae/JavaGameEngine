@@ -50,26 +50,12 @@ public abstract class GUIcomponent
 		children = new ArrayList<GUIcomponent>();
 	}
 	
-	/*
-	public GUIcomponent(int w, int h, int x, int y, 
-			Color4f borC, Color4f bgC, GUIcomponent p)
-	{
-		width = w;
-		height = h;
-		xPos = x;
-		yPos = y;
-		borderColor = borC;
-		backgroundColor = bgC;
-		parent = p;
-		children = new ArrayList<GUIcomponent>();
-		
-		
 
-	}
-	*/
 	
 	public void update(float f)
 	{
+		updateAbsolute();
+		
 		onUpdate(f);
 		for(GUIcomponent c : children)
 			c.update(f);
@@ -102,6 +88,16 @@ public abstract class GUIcomponent
 		newChild.absoluteY = yPos + newChild.yPos;
 		this.children.add(newChild);
 		newChild.setGUI(gui);
+	
+	}
+
+	private void updateAbsolute() {
+		
+		if(parent != null)
+		{
+			absoluteX = parent.absoluteX + xPos;
+			absoluteY = parent.absoluteY + yPos;
+		}
 	}
 	
 	public void removeChild(GUIcomponent oldChild)
@@ -138,10 +134,10 @@ public abstract class GUIcomponent
 		{
 			glBegin(GL_QUADS);
 			glColor4f(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
-			glVertex2f(parentX + xPos, parentY + yPos); // bottom left
-			glVertex2f(parentX + xPos, parentY + yPos + height); // top left
-			glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
-			glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+			glVertex2f(absoluteX, absoluteY); // bottom left
+			glVertex2f(absoluteX, absoluteY + height); // top left
+			glVertex2f(absoluteX + width, absoluteY + height); // top right
+			glVertex2f(absoluteX + width, absoluteY); // bottom right
 			glEnd();
 		}
 		else
@@ -150,29 +146,29 @@ public abstract class GUIcomponent
 			glBegin(GL_QUADS);
 			glColor4f(1f, 1f, 1f, 1f);
 			GL11.glTexCoord2f(0f, 0f);
-			glVertex2f(parentX + xPos, parentY + yPos); // bottom left
+			glVertex2f(absoluteX, absoluteY); // bottom left
 			GL11.glTexCoord2f(0f, 1f);
-			glVertex2f(parentX + xPos, parentY + yPos + height); // top left
+			glVertex2f(absoluteX, absoluteY + height); // top left
 			GL11.glTexCoord2f(1f, 1f);
-			glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
+			glVertex2f(absoluteX + width, absoluteY + height); // top right
 			GL11.glTexCoord2f(1f, 0f);
-			glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+			glVertex2f(absoluteX + width, absoluteY); // bottom right
 			glEnd();
 			texture.unbind();
 		}
 
 		glBegin(GL11.GL_LINE_LOOP);
 		glColor4f(borderColor.r, borderColor.g, borderColor.b, borderColor.a);
-		glVertex2f(parentX + xPos, parentY + yPos); // bottom left
-		glVertex2f(parentX + xPos, parentY + yPos + height); // top left
-		glVertex2f(parentX + xPos + width, parentY + yPos + height); // top right
-		glVertex2f(parentX + xPos + width, parentY + yPos); // bottom right
+		glVertex2f(absoluteX, absoluteY); // bottom left
+		glVertex2f(absoluteX, absoluteY + height); // top left
+		glVertex2f(absoluteX + width, absoluteY + height); // top right
+		glVertex2f(absoluteX + width, absoluteY); // bottom right
 		glEnd();
 		
 		if(text != null)
 		{
 			glColor4f(textColor.r, textColor.g, textColor.b, textColor.a);
-			SimpleText.drawString(text, parentX + xPos, parentY + yPos);
+			SimpleText.drawString(text, absoluteX, absoluteY);
 		}
 		
 		// draw children of current component
@@ -218,6 +214,8 @@ public abstract class GUIcomponent
 			return null;
 		return gui.getScene();
 	}
+	
+
 }
 
 

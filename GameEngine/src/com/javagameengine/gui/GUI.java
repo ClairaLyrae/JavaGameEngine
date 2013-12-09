@@ -14,6 +14,10 @@ import org.lwjgl.opengl.Display;
 
 import com.javagameengine.console.Console;
 import com.javagameengine.events.EventManager;
+import com.javagameengine.events.EventMethod;
+import com.javagameengine.events.KeyEvent;
+import com.javagameengine.events.KeyPressEvent;
+import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.scene.Scene;
 
 public abstract class GUI {
@@ -28,6 +32,7 @@ public abstract class GUI {
 	protected int centerY;
 	protected Scene scene;
 	ArrayList<GUIcomponent> rootComponents; 
+	static protected boolean crosshairs_visible = true;
 	
 	public EventManager getEventManager()
 	{
@@ -106,4 +111,6 @@ public abstract class GUI {
 		for(GUIcomponent c : rootComponents)
 			c.update(delta);
 	}
+	
+
 }

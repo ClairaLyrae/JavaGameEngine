@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glColor3d;
 import static org.lwjgl.opengl.GL11.glColor3ub;
+import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
@@ -16,62 +17,220 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 import java.util.ArrayList;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 
+import com.javagameengine.Game;
 import com.javagameengine.events.EventMethod;
+import com.javagameengine.events.KeyPressEvent;
 import com.javagameengine.events.Listener;
 import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.component.LaserShot;
+import com.javagameengine.util.SimpleText;
 
 
-public abstract class Button extends GUIcomponent implements Listener {
+public class Button extends GUIcomponent implements Listener{
 	
 	boolean clicked;
+	int mode;
 	
 	public Button()
-	{
+	{	
+		borderColor = Color4f.red.setTrans();
+		backgroundColor = Color4f.red.setTrans();
+		parent = null;
+		children = new ArrayList<GUIcomponent>();
+		textColor = Color4f.black;
 		clicked = false;
 	}
 	
     public Button(int w, int h, int x, int y, 
-			Color4f borC, Color4f bgC, GUIcomponent p, String[] args) {
+			String t, int m) {
     	
 		width = w;
 		height = h;
 		xPos = x;
 		yPos = y;
-		borderColor = borC;
-		backgroundColor = bgC;
-		parent = p;
-		if(parent!=null)
-		{
-			absoluteX = parent.xPos + xPos;
-			absoluteY = parent.yPos + yPos;
-		}
+		mode = m;
+		clicked = false;
+		borderColor = Color4f.red.setTrans();
+		backgroundColor = Color4f.red.setTrans();
+		parent = null;
 		children = new ArrayList<GUIcomponent>();
-    	
+		textColor = Color4f.black;
+		text = t;
 		
+		if(text!=null)
+			addText();
+
     }
-    
+	
+	protected void addText() {
+		int x = (width/2) - (text.length()/2)*8;
+		int y = (height/2) - 4;
+		this.addChild(new TextBox(x, y, text, textColor));
+	}
+	
 	@EventMethod
 	public void onMouseClick(MouseClickEvent e)
 	{
 		int x, y;
-		if(e.isCancelled() || e.getButton() != 0 || !e.state())
-			return;
 		x = e.getX();
 		y = e.getY();
-		if(x > this.xPos && x < this.xPos && y > this.yPos && y < this.yPos)
+		
+		
+		// For momentary button
+		if(mode == 0)
 		{
+			if(x > absoluteX && x < absoluteX + width && y > absoluteY && y < absoluteY + height)
+			{
+				if(e.state())
+				{
+					this.backgroundColor = this.backgroundColor.inverse();
+					this.textColor = this.textColor.inverse();
+					clicked = true;
+				}
+				else
+				{
+					this.backgroundColor = this.backgroundColor.inverse().setTrans();
+					this.textColor = this.textColor.inverse();
+					clicked = false;
+				onClick();
+				}
+			}
+			else if(clicked)
+			{
+				this.backgroundColor = this.backgroundColor.inverse().setTrans();
+				this.textColor = this.textColor.inverse();
+				clicked = false;
+			}
+		}
+			
+		
+		// For On/Off button
+		else if(mode == 1)	
+		{
+
+
+			if(e.isCancelled() || e.getButton() != 0 || !e.state())
+				return;
+	
+			if(x > absoluteX && x < absoluteX + width && y > absoluteY && y < absoluteY + height)
+			{
+		
+				this.backgroundColor = this.backgroundColor.inverse();
+				this.textColor = this.textColor.inverse();
+				clicked = !clicked;
+				onClick();
+			}
+
 			
 		}
 	}
+	
+	public void onClick()
+	{
+		
+	}
+	
+	// Allow key press actions
+	@EventMethod
+	public void onKey(KeyPressEvent e)
+	{
+		keyPressed(e);
+	}
+	
+	public void keyPressed(KeyPressEvent e) {
+	
+	}
 
-	public abstract void onUpdate(float delta);
-	public abstract void onDestroy();
-	public abstract void onCreate();
+	@Override
+	public void draw()
+	{
+
+		
+		if(!visible)
+			return;
+		
+		if(texture == null)
+		{
+			glBegin(GL_QUADS);
+			glColor4f(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+			glVertex2f(absoluteX, absoluteY); // bottom left
+			glVertex2f(absoluteX, absoluteY + height); // top left
+			glVertex2f(absoluteX + width, absoluteY + height); // top right
+			glVertex2f(absoluteX + width, absoluteY); // bottom right
+			glEnd();
+		}
+		else
+		{
+			texture.bind();
+			glBegin(GL_QUADS);
+			glColor4f(1f, 1f, 1f, 1f);
+			GL11.glTexCoord2f(0f, 0f);
+			glVertex2f(absoluteX, absoluteY); // bottom left
+			GL11.glTexCoord2f(0f, 1f);
+			glVertex2f(absoluteX, absoluteY + height); // top left
+			GL11.glTexCoord2f(1f, 1f);
+			glVertex2f(absoluteX + width, absoluteY + height); // top right
+			GL11.glTexCoord2f(1f, 0f);
+			glVertex2f(absoluteX + width, absoluteY); // bottom right
+			glEnd();
+			texture.unbind();
+		}
+
+		glBegin(GL11.GL_LINE_LOOP);
+		glColor4f(borderColor.r, borderColor.g, borderColor.b, borderColor.a);
+		glVertex2f(absoluteX, absoluteY); // bottom left
+		glVertex2f(absoluteX, absoluteY + height); // top left
+		glVertex2f(absoluteX + width, absoluteY + height); // top right
+		glVertex2f(absoluteX + width, absoluteY); // bottom right
+		glEnd();
+		
+		// draw children of current component
+		drawChildren();
+	}
+
+	@Override
+	public void onUpdate(float delta) {
+		int i;
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onUpdate(delta);
+		}
+		if(text!=null)
+			addText();
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		int i;
+
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onDestroy();
+		}
+		getGUI().getEventManager().unregisterListener(this);
+	}
+
+	@Override
+	public void onCreate()
+	{
+		int i;
+		
+		getGUI().getEventManager().registerListener(this);
+		
+		for(i=0; i<children.size();i++)
+		{
+			children.get(i).onCreate();
+		}
+	}
+
+
 
 }

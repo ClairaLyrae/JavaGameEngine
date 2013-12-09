@@ -20,13 +20,12 @@ import com.javagameengine.console.MeshCommand;
 import com.javagameengine.console.SceneCommand;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyPressEvent;
-
+import com.javagameengine.events.Listener;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.HUD;
 import com.javagameengine.gui.WelcomeGUI;
 import com.javagameengine.gui.GLquadGUIcomponent;
-
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.FastMath;
 import com.javagameengine.math.Vector3f;
@@ -54,7 +53,7 @@ public class TestGame extends Game
 		{
 			GUI hud = new GUI() { public void create() {} };
 			hud.setCursor(false);
-			menu3d.addGUI(hud);
+			menu3d.setGUI(hud);
 			addEnvironmentToScene(menu3d);
 			menu3d.getRoot().addChild(createRotatingCamera(0.1f, 0.1f, 0.1f));
 			//menu3d.getRoot().addChild(createShip());
@@ -68,7 +67,7 @@ public class TestGame extends Game
 		{
 			GUI welcomegui = new WelcomeGUI();
 			welcomegui.setCursor(true);
-			menu.addGUI(welcomegui);
+			menu.setGUI(welcomegui);
 		}
 		
 		// Setup 3d scene
@@ -76,7 +75,7 @@ public class TestGame extends Game
 		{
 			GUI hud = new HUD();
 			hud.setCursor(false);
-			game3d.addGUI(hud);
+			game3d.setGUI(hud);
 			addEnvironmentToScene(game3d);
 			game3d.getRoot().addChild(createShip());
 			addAsteroidsToScene(game3d, 400, 400f, 400f, 400f, 0f, 0f, 0f);
@@ -97,6 +96,10 @@ public class TestGame extends Game
 		// Do initial console stuff
 		Console.registerCommand(new MeshCommand());
 		Console.registerCommand(new SceneCommand());
+		
+		setActiveScene(menu3d.getName());
+		
+		// Auto load commands to console from file! 
 		Console.executeFromFile(new File("commands.txt"));
 	}
 	

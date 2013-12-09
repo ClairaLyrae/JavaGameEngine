@@ -119,7 +119,7 @@ public class Scene
 		//PhysicsComponent.calculateCollisions();
 	}
 	
-	public void addGUI(GUI newGUI) 
+	public void setGUI(GUI newGUI) 
 	{
 		if(gui != null)
 		{
@@ -131,6 +131,7 @@ public class Scene
 		{
 			eventManager.addEventManager(gui.getEventManager());
 			gui.setScene(this);
+
 		}
 	}
 
