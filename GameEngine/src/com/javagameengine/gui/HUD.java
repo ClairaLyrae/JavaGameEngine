@@ -80,7 +80,11 @@ public class HUD extends GUI implements Listener{
 				if(!e.state())
 					return;
 				if(e.getKey() == Keyboard.KEY_ESCAPE)
+				{
+					
 					Game.getHandle().getActiveScene().setGUI(new PauseGUI());
+					Game.getHandle().pause(true);
+				}
 			}
 		};
 		

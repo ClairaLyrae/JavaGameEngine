@@ -27,7 +27,7 @@ public class WelcomeGUI extends GUI {
 		// Start Button
 		Button startButt = new Button(80, 20, 25, 20, "START", 0){
 			@Override
-			public void onClick(){
+			public void unClick(){
 				Game.getHandle().setActiveScene("3d");
 			}
 		};
@@ -36,7 +36,7 @@ public class WelcomeGUI extends GUI {
 		// Settings Button
 		Button settingsButt = new Button(80, 20, 130, 20, "SETTINGS", 0){
 			@Override
-			public void onClick(){
+			public void unClick(){
 				System.out.println("Settings onClick called.");
 				Game.getHandle().getActiveScene().setGUI(new SettingsGUI());
 			}
@@ -45,7 +45,7 @@ public class WelcomeGUI extends GUI {
 		
 		// Quit Button
 		Button quitButt = new Button(80, 20, 235, 20, "QUIT", 0){
-			public void onClick(){
+			public void unClick(){
 				Game.getHandle().exit();
 			}
 		};

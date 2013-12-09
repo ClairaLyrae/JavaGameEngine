@@ -45,8 +45,23 @@ public class SettingsGUI extends GUI {
 		//Sound on/off
 		Button sound_onoff = new Button(50, 20, 250, 405, "On", 1)
 		{
+			
 			@Override
-			public void onClick(){
+			public void unClick(){
+				if(this.clicked)
+				{
+
+					this.text = "OFF";
+					if(text!=null)
+						updateText(0);
+				}
+				else
+				{
+
+					this.text = "ON";
+					if(text!=null)
+						updateText(0);
+				}
 			}
 		};
 		innerBox.addChild(sound_onoff);
@@ -66,28 +81,53 @@ public class SettingsGUI extends GUI {
 		Button music_onoff = new Button(50, 20, 250, 325, "On", 1)
 		{
 			@Override
-			public void onClick(){
+			public void unClick(){
+				if(this.clicked)
+				{
+
+					this.text = "OFF";
+					if(text!=null)
+						updateText(0);
+				}
+				else
+				{
+
+					this.text = "ON";
+					if(text!=null)
+						updateText(0);
+				}
 			}
 		};
 		innerBox.addChild(music_onoff);
 		
 		
 		//Crosshair
-		Button crosshair_onoff = new Button(50, 20, 250, 245, "ON", 1)
+		Button crosshair_onoff = new Button(50, 20, 250, 245, null, 1)
 		{
 			@Override
-			public void onClick(){
+			public void getText() {
+				if(GUI.crosshairs_visible)
+					text = "ON";
+				else
+					text = "OFF";
+			}
+			@Override
+			public void unClick(){
 				if(this.clicked)
 				{
 					System.out.println("Crosshairs off");
 					GUI.crosshairs_visible = false;
 					this.text = "OFF";
+					if(text!=null)
+						updateText(0);
 				}
 				else
 				{
 					System.out.println("Crosshairs on");
 					GUI.crosshairs_visible = true;
 					this.text = "ON";
+					if(text!=null)
+						updateText(0);
 				}
 			}
 			
@@ -113,7 +153,21 @@ public class SettingsGUI extends GUI {
 		Button fullscreen_onoff = new Button(50, 20, 250, 165, "On", 1)
 		{
 			@Override
-			public void onClick(){
+			public void unClick(){
+				if(this.clicked)
+				{
+
+					this.text = "OFF";
+					if(text!=null)
+						updateText(0);
+				}
+				else
+				{
+
+					this.text = "ON";
+					if(text!=null)
+						updateText(0);
+				}
 			}
 		};
 		innerBox.addChild(fullscreen_onoff);
@@ -123,20 +177,45 @@ public class SettingsGUI extends GUI {
 		Button vsync_onoff = new Button(50, 20, 250, 125, "On", 1)
 		{
 			@Override
-			public void onClick(){
+			public void unClick(){
+				if(this.clicked)
+				{
+					Display.setVSyncEnabled(!clicked);
+					this.text = "OFF";
+					if(text!=null)
+						updateText(0);
+				}
+				else
+				{
+					Display.setVSyncEnabled(clicked);
+					this.text = "ON";
+					if(text!=null)
+						updateText(0);
+				}
 			}
 		};
 		innerBox.addChild(vsync_onoff);
 		
 		
 		//Multisamp
-		Button mult_onoff = new Button(50, 20, 250, 85, "On", 1)
+		Button mult_moment = new Button(50, 20, 250, 85, "1", 0)
 		{
+			private int multisampleNum = 1;;
+			
 			@Override
-			public void onClick(){
+			public void unClick(){
+				if(multisampleNum == 8)
+					multisampleNum = 1;
+				else
+					multisampleNum *= 2;
+				
+				this.text = Integer.toString(multisampleNum);
+				if(text!=null)
+					updateText(0);
 			}
+			
 		};
-		innerBox.addChild(mult_onoff);
+		innerBox.addChild(mult_moment);
 		
 		//Back
 		Button backButton = new Button(200, 20, 100, 35, "RETURN TO MAIN MENU", 0)

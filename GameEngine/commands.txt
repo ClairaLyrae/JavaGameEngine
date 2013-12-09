@@ -1,1 +1,0 @@
-/scene setactive menu3d

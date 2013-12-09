@@ -63,16 +63,28 @@ public class Button extends GUIcomponent implements Listener{
 		children = new ArrayList<GUIcomponent>();
 		textColor = Color4f.black;
 		text = t;
+		if(text==null)
+			getText();
 		
 		if(text!=null)
 			addText();
 
+			
+	
+
     }
 	
+
+
 	protected void addText() {
 		int x = (width/2) - (text.length()/2)*8;
 		int y = (height/2) - 4;
 		this.addChild(new TextBox(x, y, text, textColor));
+	}
+	
+	protected void updateText(int index)
+	{
+		this.children.get(index).text = text;
 	}
 	
 	@EventMethod
@@ -93,13 +105,14 @@ public class Button extends GUIcomponent implements Listener{
 					this.backgroundColor = this.backgroundColor.inverse();
 					this.textColor = this.textColor.inverse();
 					clicked = true;
+					onClick();
 				}
 				else
 				{
 					this.backgroundColor = this.backgroundColor.inverse().setTrans();
 					this.textColor = this.textColor.inverse();
 					clicked = false;
-				onClick();
+					unClick();
 				}
 			}
 			else if(clicked)
@@ -125,7 +138,7 @@ public class Button extends GUIcomponent implements Listener{
 				this.backgroundColor = this.backgroundColor.inverse();
 				this.textColor = this.textColor.inverse();
 				clicked = !clicked;
-				onClick();
+				unClick();
 			}
 
 			
@@ -134,6 +147,15 @@ public class Button extends GUIcomponent implements Listener{
 	
 	public void onClick()
 	{
+		
+	}
+	
+	public void unClick()
+	{
+		
+	}
+	
+	public void getText() {
 		
 	}
 	
@@ -202,8 +224,6 @@ public class Button extends GUIcomponent implements Listener{
 		{
 			children.get(i).onUpdate(delta);
 		}
-		if(text!=null)
-			addText();
 	}
 
 	@Override
