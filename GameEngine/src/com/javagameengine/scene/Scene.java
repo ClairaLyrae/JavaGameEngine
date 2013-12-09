@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.lwjgl.input.Mouse;
 
+import com.javagameengine.Game;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.skybox.Skybox;
 import com.javagameengine.assets.sounds.SoundBuffer;
@@ -109,13 +110,11 @@ public class Scene
 	
 	public void update(float deltaf)
 	{
-		if(root == null)
-			return;
-		root.update(deltaf);
+		if(root != null && !Game.getHandle().isPaused())
+			root.update(deltaf);
 		
-		if(gui == null)
-			return;
-		gui.update(deltaf);
+		if(gui != null)
+			gui.update(deltaf);
 		//PhysicsComponent.calculateCollisions();
 	}
 	

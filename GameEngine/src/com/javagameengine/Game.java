@@ -262,11 +262,8 @@ public abstract class Game
 			if (activeScene != null)
 			{
 				float deltaf = (float)delta/1000f;	// Find seconds since last frame
-				if(!isPaused)
-				{
-					activeScene.update(deltaf);
-					onUpdate(deltaf);
-				}
+				activeScene.update(deltaf);
+				onUpdate(deltaf);
 				Renderer.reset();
 				activeScene.queueRender();	
 				Renderer.render();

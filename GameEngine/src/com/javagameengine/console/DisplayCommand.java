@@ -1,8 +1,10 @@
 package com.javagameengine.console;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.PixelFormat;
 
 /**
  * Allows for switching of display modes from inside the console enviroment. 

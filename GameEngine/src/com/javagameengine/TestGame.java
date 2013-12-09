@@ -51,9 +51,9 @@ public class TestGame extends Game
 		// Setup 3d menu scene
 		Scene menu3d = new Scene("menu3d");
 		{
-			GUI hud = new GUI() { public void create() {} };
-			hud.setCursor(false);
-			menu3d.setGUI(hud);
+			GUI menuGUI = new WelcomeGUI();
+			menuGUI.setCursor(true);
+			menu3d.setGUI(menuGUI);
 			addEnvironmentToScene(menu3d);
 			menu3d.getRoot().addChild(createRotatingCamera(0.1f, 0.1f, 0.1f));
 			//menu3d.getRoot().addChild(createShip());
