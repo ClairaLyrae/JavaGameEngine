@@ -32,7 +32,7 @@ public abstract class GUI {
 	protected int centerY;
 	protected Scene scene;
 	ArrayList<GUIcomponent> rootComponents; 
-	static public boolean crosshairs_visible = true;
+	static protected boolean crosshairs_visible = true;
 	
 	public EventManager getEventManager()
 	{

@@ -6,6 +6,7 @@ import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.MouseClickEvent;
+import com.javagameengine.gui.HUD;
 import com.javagameengine.gui.LaserCountText;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.math.Vector3f;
@@ -48,7 +49,7 @@ public class LaserShot extends Component
 		node.markAsTransient(4f);
 		
 		SoundManager.play(sound);
-		LaserCountText.increase();
+		HUD.decreaseLaserPower();
 	}
 
 	@Override
