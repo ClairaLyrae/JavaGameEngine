@@ -105,11 +105,17 @@ public class SettingsGUI extends GUI {
 		Button crosshair_onoff = new Button(50, 20, 250, 245, null, 1)
 		{
 			@Override
-			public void getText() {
+			public void getState() {
 				if(GUI.crosshairs_visible)
 					text = "ON";
 				else
+				{
+					this.backgroundColor = this.backgroundColor.inverse().setTrans();
+					this.textColor = this.textColor.inverse();
 					text = "OFF";
+					clicked = true;
+				}
+					
 			}
 			@Override
 			public void unClick(){
@@ -174,13 +180,28 @@ public class SettingsGUI extends GUI {
 		
 		
 		//VSync
-		Button vsync_onoff = new Button(50, 20, 250, 125, "On", 1)
+		Button vsync_onoff = new Button(50, 20, 250, 125, null, 1)
 		{
+			@Override
+			public void getState() {
+				if(GUI.VSyncEnabled)
+					text = "ON";
+				else
+				{
+					this.backgroundColor = this.backgroundColor.inverse().setTrans();
+					this.textColor = this.textColor.inverse();
+					text = "OFF";
+					clicked = true;
+				}
+					
+			}
+			
 			@Override
 			public void unClick(){
 				if(this.clicked)
 				{
 					Display.setVSyncEnabled(!clicked);
+					GUI.VSyncEnabled = !clicked;
 					this.text = "OFF";
 					if(text!=null)
 						updateText(0);
@@ -188,6 +209,7 @@ public class SettingsGUI extends GUI {
 				else
 				{
 					Display.setVSyncEnabled(clicked);
+					GUI.VSyncEnabled = clicked;
 					this.text = "ON";
 					if(text!=null)
 						updateText(0);
@@ -198,18 +220,23 @@ public class SettingsGUI extends GUI {
 		
 		
 		//Multisamp
-		Button mult_moment = new Button(50, 20, 250, 85, "1", 0)
+		Button mult_moment = new Button(50, 20, 250, 85, null, 0)
 		{
-			private int multisampleNum = 1;;
+			
+			
+			@Override
+			public void getState() {
+				this.text = Integer.toString(GUI.multisampleNum);
+			}
 			
 			@Override
 			public void unClick(){
-				if(multisampleNum == 8)
-					multisampleNum = 1;
+				if(GUI.multisampleNum == 8)
+					GUI.multisampleNum = 1;
 				else
-					multisampleNum *= 2;
+					GUI.multisampleNum *= 2;
 				
-				this.text = Integer.toString(multisampleNum);
+				this.text = Integer.toString(GUI.multisampleNum);
 				if(text!=null)
 					updateText(0);
 			}
@@ -221,7 +248,7 @@ public class SettingsGUI extends GUI {
 		Button backButton = new Button(200, 20, 100, 35, "RETURN TO MAIN MENU", 0)
 		{
 			@Override
-			public void onClick(){
+			public void unClick(){
 				Game.getHandle().getActiveScene().setGUI(new WelcomeGUI());
 			}
 		};
