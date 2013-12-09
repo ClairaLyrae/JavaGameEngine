@@ -76,7 +76,7 @@ public class SettingsGUI extends GUI {
 		Button crosshair_onoff = new Button(50, 20, 250, 245, "ON", 1)
 		{
 			@Override
-			public void onClick(){
+			public void unClick(){
 				if(this.clicked)
 				{
 					System.out.println("Crosshairs off");

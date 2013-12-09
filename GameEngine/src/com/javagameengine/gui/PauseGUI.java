@@ -27,8 +27,10 @@ public class PauseGUI extends GUI {
 		// Return Button
 		Button returnButt = new Button(100, 20, 25, 20, "RETURN", 0){
 			@Override
-			public void onClick(){
+			public void unClick(){
+			
 				Game.getHandle().getActiveScene().setGUI(new HUD());
+				Game.getHandle().pause(false);
 			}
 		};
 		
@@ -36,16 +38,18 @@ public class PauseGUI extends GUI {
 		// MAIN MENU BUTTON
 		Button menuButt = new Button(100, 20, 150, 20, "MAIN MENU", 0){
 			@Override
-			public void onClick(){
+			public void unClick(){
+				
 				Game.getHandle().getActiveScene().setGUI(new HUD());
 				Game.getHandle().setActiveScene("menu3d");
+				Game.getHandle().pause(false);
 			}
 		};
 		
 		
 		// Quit Button
 		Button quitButt = new Button(100, 20, 275, 20, "QUIT", 0){
-			public void onClick(){
+			public void unClick(){
 				Game.getHandle().exit();
 			}
 		};

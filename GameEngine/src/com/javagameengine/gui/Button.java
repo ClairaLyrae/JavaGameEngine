@@ -93,13 +93,14 @@ public class Button extends GUIcomponent implements Listener{
 					this.backgroundColor = this.backgroundColor.inverse();
 					this.textColor = this.textColor.inverse();
 					clicked = true;
+					onClick();
 				}
 				else
 				{
 					this.backgroundColor = this.backgroundColor.inverse().setTrans();
 					this.textColor = this.textColor.inverse();
 					clicked = false;
-				onClick();
+					unClick();
 				}
 			}
 			else if(clicked)
@@ -125,7 +126,7 @@ public class Button extends GUIcomponent implements Listener{
 				this.backgroundColor = this.backgroundColor.inverse();
 				this.textColor = this.textColor.inverse();
 				clicked = !clicked;
-				onClick();
+				unClick();
 			}
 
 			
@@ -133,6 +134,11 @@ public class Button extends GUIcomponent implements Listener{
 	}
 	
 	public void onClick()
+	{
+		
+	}
+	
+	public void unClick()
 	{
 		
 	}
