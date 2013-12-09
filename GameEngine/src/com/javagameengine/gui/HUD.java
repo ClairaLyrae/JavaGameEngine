@@ -19,17 +19,26 @@ public class HUD extends GUI implements Listener{
 		Crosshairs cursor = new Crosshairs();
 		GLquadGUIcomponent mainBox = new GLquadGUIcomponent(0, 0, 0, 0,
 				Color4f.white.setTrans(0f), Color4f.white.setTrans(0f), null);
+		
+		// add hint for pause command
+		mainBox.addChild(new TextBox(10, Display.getHeight() - 15,
+				"PRESS ESC TO PAUSE", Color4f.white.setTrans()));
+		
+		
+		// ADD LASER SHOT COUNTER
 		GLquadGUIcomponent laserCount = new GLquadGUIcomponent(200, 30, 
 				Display.getWidth() - 200, Display.getHeight() - 31,
 				Color4f.white.setTrans(), Color4f.red.setTrans(), null);
-		mainBox.addChild(laserCount);
 		laserCount.addChild(new TextBox(5, 5, "LASERS SHOT:", Color4f.black));
 		laserCount.addChild(new LaserCountText(100, 5, "0", Color4f.black));
-		
-		Button PauseListener = new Button(0, 0, 0, 0, null, 0){
+		mainBox.addChild(laserCount);
+
+
+		// ADD SOMETHING TO LISTEN FOR PAUSE COMMAND (ESC)
+		Button PauseListener = new Button(0, 0, 0, 0, null, 0)	
+		{
 			@Override
-			@EventMethod
-			public void onKey(KeyPressEvent e)
+			public void keyPressed(KeyPressEvent e)
 			{
 				System.out.println("Key Event");
 				if(!e.state())
@@ -46,15 +55,7 @@ public class HUD extends GUI implements Listener{
 	}
 	
 	
-	@EventMethod
-	public void onKey(KeyPressEvent e)
-	{
-		System.out.println("Key Event");
-		if(!e.state())
-			return;
-		if(e.getKey() == Keyboard.KEY_ESCAPE)
-			Game.getHandle().getActiveScene().setGUI(new PauseGUI());
-	}
+
 	
 
 }

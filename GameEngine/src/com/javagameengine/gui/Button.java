@@ -17,10 +17,12 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 import java.util.ArrayList;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import com.javagameengine.Game;
 import com.javagameengine.events.EventMethod;
 import com.javagameengine.events.KeyPressEvent;
 import com.javagameengine.events.Listener;
@@ -97,7 +99,7 @@ public class Button extends GUIcomponent implements Listener{
 					this.backgroundColor = this.backgroundColor.inverse().setTrans();
 					this.textColor = this.textColor.inverse();
 					clicked = false;
-					onClick();
+				onClick();
 				}
 			}
 			else if(clicked)
@@ -139,8 +141,13 @@ public class Button extends GUIcomponent implements Listener{
 	@EventMethod
 	public void onKey(KeyPressEvent e)
 	{
+		keyPressed(e);
 	}
 	
+	public void keyPressed(KeyPressEvent e) {
+	
+	}
+
 	@Override
 	public void draw()
 	{
