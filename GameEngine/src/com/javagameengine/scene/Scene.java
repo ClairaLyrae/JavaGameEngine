@@ -115,7 +115,7 @@ public class Scene
 		
 		if(gui != null)
 			gui.update(deltaf);
-		//PhysicsComponent.calculateCollisions();
+		PhysicsComponent.calculateCollisions();
 	}
 	
 	public void setGUI(GUI newGUI) 

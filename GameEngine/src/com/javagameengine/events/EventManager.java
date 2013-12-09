@@ -18,6 +18,7 @@ import com.javagameengine.scene.Scene;
  */
 public class EventManager
 {
+	private boolean ignoreEvents = false;
 	public static final EventManager global = new EventManager();
 	
 	private List<EventManager> subManagers = new ArrayList<EventManager>();
@@ -26,6 +27,16 @@ public class EventManager
 	
 	public EventManager()
 	{
+	}
+
+	public boolean isIgnoringEvents()
+	{
+		return ignoreEvents;
+	}
+	
+	public void ignoreEvents(boolean state)
+	{
+		ignoreEvents = state;
 	}
 	
 	public List<EventManager> getEventManagers()
@@ -128,18 +139,21 @@ public class EventManager
 	 */
 	public void callEvent(Event e)
 	{
-		Map<Listener, Method> methods = methodCalls.get(e.getClass());
-		if(methods != null)
+		if(!ignoreEvents)
 		{
-			Map<Listener, Method> methodsCopy = new HashMap<Listener, Method>();
-			for(Listener l : methods.keySet())
-				methodsCopy.put(l, methods.get(l));
-			for(Listener l : methodsCopy.keySet())
+			Map<Listener, Method> methods = methodCalls.get(e.getClass());
+			if(methods != null)
 			{
-				try {
-					methodsCopy.get(l).invoke(l, e);
-				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-					ex.printStackTrace();
+				Map<Listener, Method> methodsCopy = new HashMap<Listener, Method>();
+				for(Listener l : methods.keySet())
+					methodsCopy.put(l, methods.get(l));
+				for(Listener l : methodsCopy.keySet())
+				{
+					try {
+						methodsCopy.get(l).invoke(l, e);
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+						ex.printStackTrace();
+					}
 				}
 			}
 		}

@@ -27,6 +27,7 @@ import com.javagameengine.events.MouseEvent;
 import com.javagameengine.events.MouseMoveEvent;
 import com.javagameengine.events.MouseScrollEvent;
 import com.javagameengine.events.SceneChangeEvent;
+import com.javagameengine.gui.GUI;
 import com.javagameengine.renderer.Renderer;
 import com.javagameengine.scene.Scene;
 import com.javagameengine.sound.SoundManager;
@@ -231,6 +232,11 @@ public abstract class Game
 	public void pause(boolean state)
 	{
 		isPaused = state;
+		Scene s = getActiveScene();
+		if(s != null)
+		{
+			s.getEventManager().ignoreEvents(isPaused);
+		}
 	}
 
 	/**
@@ -286,6 +292,7 @@ public abstract class Game
 	 */
 	public boolean setActiveScene(String s)
 	{
+		pause(false);
 		Scene newScene = AssetManager.getScene(s);
 		if(newScene == null)
 			return false;
