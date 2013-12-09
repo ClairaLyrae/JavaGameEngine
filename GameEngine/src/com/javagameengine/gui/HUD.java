@@ -83,7 +83,7 @@ public class HUD extends GUI implements Listener{
 				{
 					
 					Game.getHandle().getActiveScene().setGUI(new PauseGUI());
-					Game.getHandle().pause(true);
+	//				Game.getHandle().pause(true);
 				}
 			}
 		};

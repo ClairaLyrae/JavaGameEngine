@@ -82,12 +82,16 @@ public class SettingsGUI extends GUI {
 					System.out.println("Crosshairs off");
 					GUI.crosshairs_visible = false;
 					this.text = "OFF";
+					if(text!=null)
+						update(0);
 				}
 				else
 				{
 					System.out.println("Crosshairs on");
 					GUI.crosshairs_visible = true;
 					this.text = "ON";
+					if(text!=null)
+						updateText(0);
 				}
 			}
 			
