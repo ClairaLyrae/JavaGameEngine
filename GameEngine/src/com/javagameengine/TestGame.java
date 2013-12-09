@@ -24,6 +24,7 @@ import com.javagameengine.events.Listener;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.HUD;
+import com.javagameengine.gui.SettingsGUI;
 import com.javagameengine.gui.WelcomeGUI;
 import com.javagameengine.gui.GLquadGUIcomponent;
 import com.javagameengine.math.Color4f;
@@ -52,6 +53,7 @@ public class TestGame extends Game
 		Scene menu3d = new Scene("menu3d");
 		{
 			GUI menugui = new WelcomeGUI();
+			AssetManager.addGUI("menugui", menugui);
 			menugui.setCursor(true);
 			menu3d.setGUI(menugui);
 			addEnvironmentToScene(menu3d);
@@ -66,6 +68,7 @@ public class TestGame extends Game
 		Scene menu = new Scene("menu");
 		{
 			GUI welcomegui = new WelcomeGUI();
+			AssetManager.addGUI("welcomegui", welcomegui);
 			welcomegui.setCursor(true);
 			menu.setGUI(welcomegui);
 		}
@@ -74,6 +77,7 @@ public class TestGame extends Game
 		Scene game3d = new Scene("3d");
 		{
 			GUI hud = new HUD();
+			AssetManager.addGUI("hud", hud);
 			hud.setCursor(false);
 			game3d.setGUI(hud);
 			addEnvironmentToScene(game3d);
@@ -86,6 +90,11 @@ public class TestGame extends Game
 //			testn.getTransform().translate(50f, 50f, 50f);
 			//game3d.getRoot().addComponent(Flare.createFlare(AssetManager.getTexture("sunflare")));
 		}
+		
+		// setup settings gui
+		GUI settingsgui = new SettingsGUI();
+		AssetManager.addGUI("settingsgui", settingsgui);
+		
 		
 		// Add scenes to asset manager so we can keep track of them
 		AssetManager.addScene(game3d);

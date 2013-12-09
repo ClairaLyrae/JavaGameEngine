@@ -29,7 +29,7 @@ public class PauseGUI extends GUI {
 			@Override
 			public void unClick(){
 			
-				Game.getHandle().getActiveScene().setGUI(new HUD());
+				Game.getHandle().getActiveScene().setGUI(AssetManager.getGUI("hud"));
 				Game.getHandle().pause(false);
 			}
 		};
@@ -40,7 +40,7 @@ public class PauseGUI extends GUI {
 			@Override
 			public void unClick(){
 				
-				Game.getHandle().getActiveScene().setGUI(new HUD());
+				Game.getHandle().getActiveScene().setGUI(AssetManager.getGUI("hud"));
 				Game.getHandle().setActiveScene("menu3d");
 				Game.getHandle().pause(false);
 			}
