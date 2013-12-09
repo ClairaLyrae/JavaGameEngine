@@ -64,7 +64,7 @@ public class Button extends GUIcomponent implements Listener{
 		textColor = Color4f.black;
 		text = t;
 		if(text==null)
-			getText();
+			getState();
 		
 		if(text!=null)
 			addText();
@@ -85,6 +85,7 @@ public class Button extends GUIcomponent implements Listener{
 	protected void updateText(int index)
 	{
 		this.children.get(index).text = text;
+		this.children.get(index).textColor = textColor;
 	}
 	
 	@EventMethod
@@ -155,7 +156,7 @@ public class Button extends GUIcomponent implements Listener{
 		
 	}
 	
-	public void getText() {
+	public void getState() {
 		
 	}
 	

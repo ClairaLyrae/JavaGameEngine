@@ -76,7 +76,6 @@ public class HUD extends GUI implements Listener{
 			@Override
 			public void keyPressed(KeyPressEvent e)
 			{
-				System.out.println("Key Event");
 				if(!e.state())
 					return;
 				if(e.getKey() == Keyboard.KEY_ESCAPE)

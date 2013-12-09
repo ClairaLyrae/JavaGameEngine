@@ -33,6 +33,8 @@ public abstract class GUI {
 	protected Scene scene;
 	ArrayList<GUIcomponent> rootComponents; 
 	static protected boolean crosshairs_visible = true;
+	static protected int multisampleNum = 1;
+	static protected boolean VSyncEnabled = false;
 	
 	public EventManager getEventManager()
 	{
