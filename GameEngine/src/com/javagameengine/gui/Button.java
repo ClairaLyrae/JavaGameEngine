@@ -63,11 +63,19 @@ public class Button extends GUIcomponent implements Listener{
 		children = new ArrayList<GUIcomponent>();
 		textColor = Color4f.black;
 		text = t;
+		if(text==null)
+			getText();
+		
 		if(text!=null)
 			addText();
 
+			
+	
+
     }
 	
+
+
 	protected void addText() {
 		int x = (width/2) - (text.length()/2)*8;
 		int y = (height/2) - 4;
@@ -144,6 +152,10 @@ public class Button extends GUIcomponent implements Listener{
 	
 	public void unClick()
 	{
+		
+	}
+	
+	public void getText() {
 		
 	}
 	
