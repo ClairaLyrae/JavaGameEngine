@@ -27,9 +27,9 @@ public class SoundManager
 	
 	public static void setGlobalVolume(float f)
 	{
-		for(Sound s : sources)
-			s.setGain(s.gain * global_volume);
 		global_volume = f;
+		//for(Sound s : sources)
+		//	AL10.alSourcef(s.getID(), AL10.AL_GAIN, s.gain *= global_volume);
 	}
 	
 	private static int MAX_SOURCES = 16;

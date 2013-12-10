@@ -38,7 +38,7 @@ public class WelcomeGUI extends GUI {
 			@Override
 			public void unClick(){
 				System.out.println("Settings onClick called.");
-				Game.getHandle().getActiveScene().setGUI(new SettingsGUI());
+				Game.getHandle().getActiveScene().setGUI(AssetManager.getGUI("settingsgui"));
 			}
 		};
 		

@@ -2,6 +2,7 @@ package com.javagameengine.gui;
 
 import java.util.ArrayList;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 import com.javagameengine.Game;
@@ -11,6 +12,7 @@ import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.GLquadGUIcomponent;
 import com.javagameengine.gui.GUI;
 import com.javagameengine.math.Color4f;
+import com.javagameengine.sound.SoundManager;
 
 
 public class SettingsGUI extends GUI {
@@ -68,12 +70,33 @@ public class SettingsGUI extends GUI {
 		
 		
 		//Volume Slider
-		Button volume_slider = new Button(10, 25, 270, 365, null, 0)
+		Button volume_slider = new Button(10, 25, 270, 365, null, 2)
 		{
 			@Override
-			public void onClick(){
+			public void unClick()
+			{
+				int distance = Mouse.getX() - 445;
+				double gainValue = 0.0;
+				if(distance > 315)
+				{
+					this.xPos = 315;
+					gainValue = 1;
+				}
+				else if(distance < 225)
+				{
+					this.xPos = 225;
+					gainValue = 0;
+				}
+				else
+				{
+					this.xPos = distance;
+					gainValue = ((double)distance - 225)/(315-225);
+				}
+				SoundManager.setGlobalVolume((float)gainValue);
+				System.out.println(SoundManager.getGlobalVolume());
 			}
 		};
+		volume_slider.xPos = (int)SoundManager.getGlobalVolume()*(315-225) + 225;
 		innerBox.addChild(volume_slider);
 		
 		
@@ -182,10 +205,15 @@ public class SettingsGUI extends GUI {
 		//VSync
 		Button vsync_onoff = new Button(50, 20, 250, 125, null, 1)
 		{
+			private boolean VSyncDisabled = false;
+
 			@Override
 			public void getState() {
-				if(GUI.VSyncEnabled)
+				if(!VSyncDisabled)
+				{
 					text = "ON";
+					clicked = false;
+				}
 				else
 				{
 					this.backgroundColor = this.backgroundColor.inverse().setTrans();
@@ -198,18 +226,20 @@ public class SettingsGUI extends GUI {
 			
 			@Override
 			public void unClick(){
+				// VSync off
 				if(this.clicked)
 				{
-					Display.setVSyncEnabled(!clicked);
-					GUI.VSyncEnabled = !clicked;
+	//				Display.setVSyncEnabled(!clicked);
+					VSyncDisabled = clicked;
 					this.text = "OFF";
 					if(text!=null)
 						updateText(0);
 				}
+				// VSync on 
 				else
 				{
-					Display.setVSyncEnabled(clicked);
-					GUI.VSyncEnabled = clicked;
+	//				Display.setVSyncEnabled(clicked);
+					VSyncDisabled = !clicked;
 					this.text = "ON";
 					if(text!=null)
 						updateText(0);
@@ -222,21 +252,24 @@ public class SettingsGUI extends GUI {
 		//Multisamp
 		Button mult_moment = new Button(50, 20, 250, 85, null, 0)
 		{
-			
+			private int multisampleNum = 1;
+
 			
 			@Override
 			public void getState() {
-				this.text = Integer.toString(GUI.multisampleNum);
+				if(multisampleNum == 0)
+					multisampleNum = 1;
+				this.text = Integer.toString(multisampleNum);
 			}
 			
 			@Override
 			public void unClick(){
-				if(GUI.multisampleNum == 8)
-					GUI.multisampleNum = 1;
+				if(multisampleNum == 8)
+					multisampleNum = 1;
 				else
-					GUI.multisampleNum *= 2;
+					multisampleNum *= 2;
 				
-				this.text = Integer.toString(GUI.multisampleNum);
+				this.text = Integer.toString(multisampleNum);
 				if(text!=null)
 					updateText(0);
 			}
@@ -249,7 +282,7 @@ public class SettingsGUI extends GUI {
 		{
 			@Override
 			public void unClick(){
-				Game.getHandle().getActiveScene().setGUI(new WelcomeGUI());
+				Game.getHandle().getActiveScene().setGUI(AssetManager.getGUI("welcomegui"));
 			}
 		};
 		innerBox.addChild(backButton);

@@ -73,7 +73,7 @@ public class Flare extends RenderableComponent
 	private static Shader fragShader;
 
 	public BlendMode srcBlend = BlendMode.SRC_ALPHA;
-	public BlendMode destBlend = BlendMode.ONE_MINUS_SRC_ALPHA;
+	public BlendMode destBlend = BlendMode.ONE;
 	
 	private boolean drawAtInfinity = false;	// Draw this flare at effective infinity (extend position vector)
 	private boolean scaleByDistance = false;	// Allow flare to be affected by perspective

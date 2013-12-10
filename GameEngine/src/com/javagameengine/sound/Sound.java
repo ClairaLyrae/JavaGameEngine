@@ -58,11 +58,22 @@ public class Sound extends NativeObject
 		pitch = f;
 		AL10.alSourcef(id, AL10.AL_PITCH, pitch);
 	}
+
+	public void setAbsoluteGain(float f)
+	{
+		gain = f;
+		AL10.alSourcef(id, AL10.AL_GAIN, SoundManager.getGlobalVolume());
+	}
 	
 	public void setGain(float f)
 	{
-		gain = f * SoundManager.getGlobalVolume();
-		AL10.alSourcef(id, AL10.AL_GAIN, gain);
+		gain = f;
+		AL10.alSourcef(id, AL10.AL_GAIN, SoundManager.getGlobalVolume());
+	}
+	
+	public float getGain()
+	{
+		return gain;
 	}
 	
 	public boolean isPlaying()

@@ -47,19 +47,20 @@ public class Music extends Component
 	@Override
 	public void onUpdate(float deltaf)
 	{
-		if(fadeTime > 0f)
-		{
-			fadeTimeCounter += deltaf;
-			if(fadeDir)
-				source.setGain((fadeTimeCounter/fadeTime));
-			else
-				source.setGain((1f - (fadeTimeCounter/fadeTime)));
-			if(fadeTimeCounter >= fadeTime)
-			{
-				fadeTimeCounter = 0f;
-				fadeTime = 0f;
-			}
-		}
+//		if(fadeTime > 0f)
+//		{
+//			fadeTimeCounter += deltaf;
+//			if(fadeDir)
+//				source.setGain((fadeTimeCounter/fadeTime));
+//			else
+//				source.setGain((1f - (fadeTimeCounter/fadeTime)));
+//			if(fadeTimeCounter >= fadeTime)
+//			{
+//				fadeTimeCounter = 0f;
+//				fadeTime = 0f;
+//			}
+//		}
+		source.setGain(1f);
 	}
 	
 	@Override
