@@ -2,6 +2,7 @@ package com.javagameengine.gui;
 
 import java.util.ArrayList;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
 import com.javagameengine.Game;
@@ -68,10 +69,29 @@ public class SettingsGUI extends GUI {
 		
 		
 		//Volume Slider
-		Button volume_slider = new Button(10, 25, 270, 365, null, 0)
+		Button volume_slider = new Button(10, 25, 270, 365, null, 2)
 		{
 			@Override
-			public void onClick(){
+			public void unClick(){
+				int distance = Mouse.getX() - 445;
+				double gainValue = 0.0;
+				
+				if(distance > 315)
+				{
+					this.xPos = 315;
+					gainValue = 1;
+				}
+				else if(distance < 225)
+				{
+					this.xPos = 225;
+					gainValue = 0;
+				}
+				else
+				{
+					this.xPos = distance;
+					gainValue = ((double)distance - 225)/(315-225);
+				}
+				System.out.println(gainValue);
 			}
 		};
 		innerBox.addChild(volume_slider);

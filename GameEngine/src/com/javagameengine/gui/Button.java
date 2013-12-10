@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
@@ -136,13 +137,37 @@ public class Button extends GUIcomponent implements Listener{
 			if(x > absoluteX && x < absoluteX + width && y > absoluteY && y < absoluteY + height)
 			{
 		
-				this.backgroundColor = this.backgroundColor.inverse();
-				this.textColor = this.textColor.inverse();
-				clicked = !clicked;
-				unClick();
+				if((x > absoluteX && x < absoluteX + width && y > absoluteY && y < absoluteY + height) ||
+						!(x > absoluteX && x < absoluteX + width && y > absoluteY && y < absoluteY + height))
+				{
+					this.backgroundColor = this.backgroundColor.inverse();
+					this.textColor = this.textColor.inverse();
+					clicked = !clicked;
+					unClick();
+				}
 			}
-
-			
+		}
+		
+		// Slider
+		if(mode == 2)
+		{
+			// On the line?
+			if(x > absoluteX-50 && x < absoluteX + width + 50 && y > absoluteY && y < absoluteY + height)
+			{
+				// In the button?
+				if(e.state() && (x > absoluteX && x < absoluteX + width && y > absoluteY && y < absoluteY + height))
+				{
+					this.textColor = this.textColor.inverse();
+					clicked = true;
+					onClick();
+				}
+				else
+				{
+					this.textColor = this.textColor.inverse();
+					clicked = false;
+					unClick();
+				}	
+			}	
 		}
 	}
 	
