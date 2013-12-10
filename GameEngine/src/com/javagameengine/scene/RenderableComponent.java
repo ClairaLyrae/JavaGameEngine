@@ -2,6 +2,7 @@ package com.javagameengine.scene;
 
 import com.javagameengine.math.Matrix4f;
 import com.javagameengine.renderer.Renderable;
+import com.javagameengine.renderer.RendererState;
 
 public abstract class RenderableComponent extends Component implements Renderable, Bounded
 {
@@ -58,5 +59,11 @@ public abstract class RenderableComponent extends Component implements Renderabl
 	public boolean onRender()
 	{
 		return true;
+	}
+	
+	@Override
+	public RendererState getRendererState()
+	{
+		return null;
 	}
 }

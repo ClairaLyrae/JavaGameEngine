@@ -13,7 +13,6 @@ package com.javagameengine.events;
  * The object implementing Listener must then be registered in a suitable EventManager 
  * class. When the EventManager receives an event, it will call the methods in the
  * Listener that satisfy the cases above with the appropriate Event object.
- * @author ClairaLyrae
  */ 
 public interface Listener
 {

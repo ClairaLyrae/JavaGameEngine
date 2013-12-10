@@ -17,8 +17,8 @@ import org.lwjgl.opengl.*;
 import com.javagameengine.assets.NativeObject;
 
 /**
- * @author ClairaLyrae
- * A Texture object represents a 2D image.
+ * A Texture object is a wrapper for a NIO buffer or array of NIO buffers containing data that
+ * can be sampled by the GPU. Is a NativeObject which can be loaded into a texture buffer on the GPU
  */
 public class Texture extends NativeObject
 {	

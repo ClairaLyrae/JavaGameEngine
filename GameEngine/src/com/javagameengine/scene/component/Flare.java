@@ -1,6 +1,9 @@
 package com.javagameengine.scene.component;
 
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_POINTS;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4;
 
@@ -19,10 +22,13 @@ import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Attribute;
 import com.javagameengine.assets.mesh.AttributeUsage;
 import com.javagameengine.assets.mesh.Mesh;
+import com.javagameengine.math.FastMath;
 import com.javagameengine.renderer.Bindable;
 import com.javagameengine.renderer.Drawable;
 import com.javagameengine.renderer.OcclusionQuery;
 import com.javagameengine.renderer.Renderer;
+import com.javagameengine.renderer.RendererState;
+import com.javagameengine.renderer.RendererState.BlendMode;
 import com.javagameengine.scene.RenderableComponent;
 
 public class Flare extends RenderableComponent
@@ -35,50 +41,60 @@ public class Flare extends RenderableComponent
 		"{\n" +
 		"fragColor = texture2D(tex_diffuse, texcoords);\n" +
 		"}\n";
-	
-	private static final String vertShaderSource = "#version 150\n" +
-		"uniform mat4 p;\n" +
-		"uniform mat4 v;\n" +
-		"uniform mat4 mv;\n" +
-		"uniform float flare_size;\n" +
-		"uniform int flare_depth_test;\n" +
-		"uniform int flare_scale;\n" +
-		"uniform int flare_rotate;\n" +
-		"in vec3 in_position;\n" +
-		"out vec2 texcoords;\n" +
-		"void main()\n" +
-		"{\n" +
-		"	texcoords = in_position.xy;\n" +
-		"	gl_Position = (vec4(0.0, 0.0, 0.0, 5.0)*mv + vec4(in_position.x, in_position.y, 0.0, 0.0))*p;\n" +
-		"	gl_Position = (vec4(0.0, 0.0, 0.0, (5 + (1/flare_size))/gl_Position.z)*mv + vec4(in_position.x, in_position.y, 0.0, 0.0))*p;\n" +
-		"	gl_Position.x -= 0.75;\n" +
-		"	gl_Position.y -= 1.25;\n" +
-		"	gl_Position.z = -0.99;\n" +
-		"}\n";
+
+    private static final String vertShaderSource = "#version 150\n" +
+            "uniform mat4 p;\n" +
+            "uniform mat4 v;\n" +
+            "uniform mat4 mv;\n" +
+    		"uniform float flare_size;\n" +
+    		"uniform int flare_always_on_top;\n" +
+    		"uniform int flare_allow_perspective;\n" +
+    		"uniform int flare_draw_at_infinity;\n" +
+    		"uniform int flare_rotate_to_up;\n" +
+            "in vec3 in_position;\n" +
+            "out vec2 texcoords;\n" +
+            "void main()\n" +
+            "{\n" +
+            "    texcoords = in_position.xy;\n" +
+            "    gl_Position = (vec4(0.0, 0.0, 0.0, 1.0)*mv + vec4(in_position.x, in_position.y, 0.0, 0.0))*p;\n" +
+            "    gl_Position = (vec4(0.0, 0.0, 0.0, ((1/flare_size))/gl_Position.z)*mv + vec4(in_position.x-0.5, in_position.y-0.5, 0.0, 0.0))*p;\n" +
+            "    //gl_Position.x -= 0.5*flare_size;\n" +
+            "    //gl_Position.y -= 0.5*flare_size;\n" +
+    		"	 if(flare_always_on_top == 1)\n" +
+    		"	 {\n" +
+    		"	 	gl_Position.z = -0.99;\n" +
+    		"	 }\n" +
+            "}\n";
 
 	private static Mesh billboard = new Mesh();
 	private static boolean isInitialized = false;
 	
 	private static Shader vertShader;
 	private static Shader fragShader;
+
+	public BlendMode srcBlend = BlendMode.SRC_ALPHA;
+	public BlendMode destBlend = BlendMode.ONE_MINUS_SRC_ALPHA;
 	
-	private boolean enableDistScaling = false;	// Allow dist scaling
-	private boolean enableRotateToUp = true;	// Always align flare up
-	private boolean enableOcclusion = true;	// Scale flare when occlusion size is hidden
-	private boolean enableDepthTest = false;	// Allow openGL to draw over this flare (not always on top)
+	private boolean drawAtInfinity = false;	// Draw this flare at effective infinity (extend position vector)
+	private boolean scaleByDistance = false;	// Allow flare to be affected by perspective
+	private boolean rotateToUp = true;	// Always align flare up
+	private boolean fadeOut = true;	// Scale flare when occlusion size is hidden
+	private boolean isAlwaysOnTop = true;	// Draw flare over all other objects
 	
 	private float size = 10f;	// Flare size at full view
 	private float sizePercent = 1f;	// Read only, holds current occlusion percentage
-	private float depthTestSize = 100f;	// Controls speed of fade out
+	private float fadeTestSize = 100f;	// Controls speed of fade out
+	private float fadeTestSizeMax = 100f;	// Controls speed of fade out
 	
-	public float getOcclusionSize()
+	public float getFadeTestSize()
 	{
-		return this.depthTestSize;
+		return this.fadeTestSize;
 	}
 	
-	public void setOcclusionSize(float s)
+	public void setFadeTestSize(float s)
 	{
-		depthTestSize = s;
+		fadeTestSize = s;
+		fadeTestSizeMax = FastMath.PI*fadeTestSize*fadeTestSize*0.25f;
 	}
 	
 	public float getSize()
@@ -90,45 +106,55 @@ public class Flare extends RenderableComponent
 	{
 		size = f;
 	}
-	
-	public boolean hasScaling()
-	{
-		return enableDistScaling;
-	}
-	
-	public void setScaling(boolean b)
-	{
-		enableDistScaling = b;
-	}
 
-	public boolean hasRotation()
+	public boolean isAtInfinity()
 	{
-		return enableRotateToUp;
+		return scaleByDistance;
 	}
 	
-	public void setRotation(boolean b)
+	public void setAtInfinity(boolean b)
 	{
-		enableRotateToUp = b;
+		scaleByDistance = b;
+	}
+	
+	public boolean isPerspectiveEnabled()
+	{
+		return scaleByDistance;
+	}
+	
+	public void setPerspectiveEnabled(boolean b)
+	{
+		scaleByDistance = b;
 	}
 
-	public boolean isOcclusionEnabled()
+	public boolean isRotateEnabled()
 	{
-		return enableOcclusion;
+		return rotateToUp;
+	}
+	
+	public void setRotateEnabled(boolean b)
+	{
+		rotateToUp = b;
 	}
 
-	public void setOcclusionEnabled(boolean enableOcclusion)
+	public boolean isFadeEnabled()
 	{
-		this.enableOcclusion = enableOcclusion;
+		return fadeOut;
 	}
 
-	public boolean isDepthTestEnabled()
+	public void setFadeEnabled(boolean state)
 	{
-		return enableDepthTest;
+		this.fadeOut = state;
 	}
 
-	public void setDepthTestEnabled(boolean enableDepthTest)
+	public boolean isAlwaysOnTop()
 	{
-		this.enableDepthTest = enableDepthTest;
+		return isAlwaysOnTop;
+	}
+
+	public void setAlwaysOnTop(boolean s)
+	{
+		this.isAlwaysOnTop = s;
 	}
 	
 	private Material mat = new Material();
@@ -162,7 +188,9 @@ public class Flare extends RenderableComponent
 	@Override
 	public boolean onRender()
 	{
-		if(enableOcclusion)
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(srcBlend.getGLParam(), destBlend.getGLParam());
+		if(fadeOut)
 		{
 			new OcclusionQuery() {
 				@Override
@@ -171,7 +199,7 @@ public class Flare extends RenderableComponent
 					GL11.glDepthMask(false);
 					GL11.glColorMask(false, false, false, false);
 					GL20.glUseProgram(0);
-					GL11.glPointSize(7f);
+					GL11.glPointSize(fadeTestSize);
 					GL11.glBegin(GL_POINTS);
 					GL11.glColor4f(1f, 0f, 0f, 1f);
 					GL11.glVertex3f(0f, 0f, 0f);
@@ -184,7 +212,7 @@ public class Flare extends RenderableComponent
 				@Override
 				public void onComplete(int samplesPassed) 
 				{ 
-					sizePercent = samplesPassed/40f;
+					sizePercent = (float)samplesPassed/fadeTestSizeMax;
 				}
 			};
 		}
@@ -193,17 +221,34 @@ public class Flare extends RenderableComponent
 		
 		int loc;
 
-		loc = glGetUniformLocation(mat.getID(), "flare_depth_test");
-		GL20.glUniform1i(loc, enableDepthTest ? 1 : 0);
+		//this.setSize(5f);
+		this.setFadeTestSize(8f);
+		//this.fadeOut = true;
+		//this.isAlwaysOnTop = false;
+		//this.scaleByDistance = false;
+		//this.drawAtInfinity = false;
+		//this.rotateToUp = false;
 		
-		loc = glGetUniformLocation(mat.getID(), "flare_scale");
-		GL20.glUniform1i(loc, enableDistScaling ? 1 : 0);
+		// If flare is drawn over everything
+		loc = glGetUniformLocation(mat.getID(), "flare_always_on_top");
+		GL20.glUniform1i(loc, isAlwaysOnTop ? 1 : 0);
 		
-		loc = glGetUniformLocation(mat.getID(), "flare_rotate");
-		GL20.glUniform1i(loc, enableRotateToUp ? 1 : 0);
+		// Scale flare by distance. If 0, const size relative to screen.
+		loc = glGetUniformLocation(mat.getID(), "flare_allow_perspective");
+		GL20.glUniform1i(loc, scaleByDistance ? 1 : 0);
 		
+		// Rotate flare to aling to screen
+		loc = glGetUniformLocation(mat.getID(), "flare_rotate_to_up");
+		GL20.glUniform1i(loc, rotateToUp ? 1 : 0);
+		
+		// Draw flare at infinite dist
+		loc = glGetUniformLocation(mat.getID(), "flare_draw_at_infinity");
+		GL20.glUniform1i(loc, drawAtInfinity ? 1 : 0);
+		
+		// Size of flare
 		loc = glGetUniformLocation(mat.getID(), "flare_size");
 		GL20.glUniform1f(loc, size*sizePercent);
+		
 		return true;
 	}
 

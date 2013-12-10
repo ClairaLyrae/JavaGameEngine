@@ -45,8 +45,7 @@ import com.javagameengine.util.SimpleText;
  * EventManager at runtime. The Console listens to KeyEvents and processes the keystrokes into Commands upon an enter key press.
  * <p>
  * Commands are registered to the Console by the registerCommand method. Registering a command to the console will allow the console
- * to execute the given command if entered by the user. 
- * @author ClairaLyrae
+ * to execute the given command if entered by the user.
  */
 public class Console implements Listener
 {

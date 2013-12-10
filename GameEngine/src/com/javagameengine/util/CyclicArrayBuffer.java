@@ -13,7 +13,6 @@ import java.util.Arrays;
  * In addition to the iterative read methods, there is also get, getHead, and getTail which do not modify the
  * read index.
  * 
- * @author ClairaLyrae
  * @param <T> Object type to store in buffer
  */
 public class CyclicArrayBuffer<T>

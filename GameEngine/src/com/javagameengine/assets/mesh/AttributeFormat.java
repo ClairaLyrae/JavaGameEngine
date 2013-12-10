@@ -3,7 +3,9 @@ package com.javagameengine.assets.mesh;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
-// Format of the data that is stored in the buffer.
+/**
+ * AttributeFormat is an enum which describes all the different types of data that can be handled by the graphics card.
+ */
 public enum AttributeFormat 
 {
     HALF_FLOAT(2, GL30.GL_HALF_FLOAT),

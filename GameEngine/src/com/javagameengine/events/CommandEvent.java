@@ -4,7 +4,6 @@ import com.javagameengine.console.Command;
 
 /**
  * Called when a command is executed by the console. 
- * @author ClairaLyrae
  */
 public class CommandEvent extends Event
 {

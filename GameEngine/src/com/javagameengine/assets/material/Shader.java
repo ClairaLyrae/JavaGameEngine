@@ -23,21 +23,12 @@ import org.lwjgl.opengl.GL20;
 import com.javagameengine.assets.NativeObject;
 
 /**
- * Compiles GLSL shader files into a representative object.
- * @author ClairaLyrae
+ * Compiles GLSL shader files into a representative object. Shader files loaded with this class must contain either
+ * "frag", "geom", or "vert" in the filename to designate the type of shader. Is a NativeObject, as the compiled shaders
+ * are stored on the GPU.
  */
 public class Shader extends NativeObject
-{
-	public class Variable{
-		String type, name;
-		
-		public Variable(String type, String name)
-		{
-			this.type = type;
-			this.name = name;
-		}
-	}
-	
+{	
 	public enum Type 
 	{
 		VERTEX(GL_VERTEX_SHADER),

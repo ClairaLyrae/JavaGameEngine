@@ -82,7 +82,7 @@ public class ShipControlComponent extends Component implements Listener
 		
 		Vector3f deltav = new Vector3f();
 //		Vector3f deltaw = new Vector3f(0f, 0f, 0f); 
-		float incTrans = 30f*delta;
+		float incTrans = 60f*delta;
 //		float incRot = 2f;
 
 		Vector3f v_lin = phys.getLinearVelocity();

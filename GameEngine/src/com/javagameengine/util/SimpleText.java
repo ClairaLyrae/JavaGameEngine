@@ -4,13 +4,12 @@ import org.lwjgl.opengl.GL11;
 
 /**
  * Temporary class for drawing text in openGL. Extremely brute force! Actually draws the characters as a series of points one by one. 
- * Will need to create a proper TextRenderer or something later on... Most likely drawing quads for each letter with textures taken from 
- * a font image..
- * @author ClairaLyrae
+ * Will need to create a proper TextRenderer or something later on. 
  */
 public class SimpleText 
 {
-	public static void drawString(String s, int x, int y){
+	public static void drawString(String s, int x, int y)
+	{
 		int startX = x;
 		GL11.glPointSize(1.5f);
 		GL11.glBegin(GL11.GL_POINTS);

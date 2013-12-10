@@ -4,6 +4,9 @@ import java.util.List;
 
 import com.javagameengine.assets.AssetManager;
 
+/**
+ * Console command which allows the state of the AssetManager to be queried
+ */
 public class AssetCommand extends Command
 {
 	public AssetCommand()

@@ -14,4 +14,5 @@ public interface Renderable
 	public int getLayer();
 	public boolean isTransparent();
 	public boolean onRender();
+	public RendererState getRendererState();
 }

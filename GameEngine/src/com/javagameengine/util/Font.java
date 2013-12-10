@@ -4,8 +4,6 @@ import com.javagameengine.assets.material.Texture;
 
 public class Font
 {
-	
-	
 	public static Font createFont(Texture t)
 	{
 		return null;

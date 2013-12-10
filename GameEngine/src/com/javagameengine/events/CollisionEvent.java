@@ -3,25 +3,24 @@ package com.javagameengine.events;
 import com.javagameengine.scene.component.PhysicsComponent;
 
 /**
- * Event describing a mouse button being clicked.
- * @author ClairaLyrae
+ * Event describing two colliding objects.
  */
 public class CollisionEvent extends Event
 {
 	private PhysicsComponent a;
 	private PhysicsComponent b;
-	private float force;
+	private float inertia;
 	
-	public CollisionEvent(PhysicsComponent a, PhysicsComponent b, float force)
+	public CollisionEvent(PhysicsComponent a, PhysicsComponent b, float inertia)
 	{
 		this.a = a;
 		this.b = b;
-		this.force = force;
+		this.inertia = inertia;
 	}
 	
-	public float getForce()
+	public float getInertia()
 	{
-		return force;
+		return inertia;
 	}
 	
 	public PhysicsComponent getColliderA()

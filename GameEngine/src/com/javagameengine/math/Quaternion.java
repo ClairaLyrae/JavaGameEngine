@@ -2,13 +2,9 @@ package com.javagameengine.math;
 
 import java.nio.FloatBuffer;
 
-//TODO This class is far from complete and totally untested. Someone needs to get a handle on 
-//how the quaternions work, finish the class, and test it to make sure it makes sense
-
 /**
  * Quaternion vector utilizing floats. Replicates the capabilities of Vector4f in quaternion space. Provides a number of
  * quaternion-specific methods for rotational operations.
- * @author ClairaLyrae
  */
 public class Quaternion extends Vector<Quaternion>
 {

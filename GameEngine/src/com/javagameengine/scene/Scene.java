@@ -115,20 +115,20 @@ public class Scene
 		
 		if(gui != null)
 			gui.update(deltaf);
-		PhysicsComponent.calculateCollisions();
+		//PhysicsComponent.calculateCollisions();
 	}
 	
 	public void setGUI(GUI newGUI) 
 	{
 		if(gui != null)
 		{
-			eventManager.removeEventManager(gui.getEventManager());
+			eventManager.unregisterEventManager(gui.getEventManager());
 			gui.setScene(null);
 		}
 		gui = newGUI;
 		if(newGUI != null)
 		{
-			eventManager.addEventManager(gui.getEventManager());
+			eventManager.registerEventManager(gui.getEventManager());
 			gui.setScene(this);
 
 		}

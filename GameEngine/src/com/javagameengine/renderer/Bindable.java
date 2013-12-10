@@ -3,7 +3,6 @@ package com.javagameengine.renderer;
 /**
  * Interface describing an object that contains a bind() method used for setting up the openGL
  * context. Influences drawing order of objects.
- * @author ClairaLyrae
  */
 public interface Bindable
 {

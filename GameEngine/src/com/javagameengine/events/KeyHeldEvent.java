@@ -2,6 +2,9 @@ package com.javagameengine.events;
 
 import org.lwjgl.input.Keyboard;
 
+/**
+ * Event describing a key being held down. Called once per frame.
+ */
 public class KeyHeldEvent extends KeyEvent
 {	
 	long ms_held;

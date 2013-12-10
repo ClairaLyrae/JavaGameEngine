@@ -4,7 +4,6 @@ import org.lwjgl.input.Keyboard;
 
 /**
  * Describes a keyboard event relating to a key on the keyboard
- * @author ClairaLyrae
  */
 public abstract class KeyEvent extends InputEvent
 {

@@ -12,6 +12,9 @@ import org.lwjgl.opengl.GL20;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.renderer.Renderer;
 
+/**
+ * Describes a variable inside a GLSL shader.
+ */
 public class ShaderVariable
 {
 	public enum Type {

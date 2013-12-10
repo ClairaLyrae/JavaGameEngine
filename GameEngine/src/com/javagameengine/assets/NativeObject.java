@@ -11,7 +11,7 @@ import java.util.Set;
 public abstract class NativeObject
 {
 	/**
-	 * References to all instantiated objects.
+	 * References to all instantiated objects. Used for clearing the native memory on program exit.
 	 */
 	private static Set<NativeObject> handles = new HashSet<NativeObject>();
 	

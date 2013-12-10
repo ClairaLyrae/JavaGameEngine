@@ -12,7 +12,7 @@ import com.javagameengine.math.Vector3f;
 
 public class Sound extends NativeObject
 {
-	protected float gain = 1.0f;
+	protected float gain;
 	protected float pitch = 1.0f;
 	protected boolean used = false;
 	protected SoundBuffer sound = null;
@@ -44,6 +44,7 @@ public class Sound extends NativeObject
 	{
 		this();
 		sound = s;
+		gain = 1f*SoundManager.getGlobalVolume();
 	}
 	
 	public void setSound(SoundBuffer s)
@@ -60,7 +61,7 @@ public class Sound extends NativeObject
 	
 	public void setGain(float f)
 	{
-		gain = f;
+		gain = f * SoundManager.getGlobalVolume();
 		AL10.alSourcef(id, AL10.AL_GAIN, gain);
 	}
 	

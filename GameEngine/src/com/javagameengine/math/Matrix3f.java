@@ -5,7 +5,6 @@ import java.nio.FloatBuffer;
 
 /**
  * 3x3 square matrix class implemented using floats.
- * @author ClairaLyrae
  */
 public class Matrix3f extends Matrix<Matrix3f>
 {

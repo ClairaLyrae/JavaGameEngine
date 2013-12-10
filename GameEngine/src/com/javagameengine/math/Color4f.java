@@ -1,5 +1,8 @@
 package com.javagameengine.math;
 
+/**
+ * Color4f is an object describing a color that consists of four float values: r, g, b and an alpha.
+ */
 public class Color4f
 {
 	public static final Color4f white = new Color4f(1f, 1f, 1f, 1f);

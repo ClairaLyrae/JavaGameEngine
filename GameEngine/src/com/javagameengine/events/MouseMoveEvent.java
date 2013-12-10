@@ -3,7 +3,6 @@ package com.javagameengine.events;
 /**
  * Event describing a mouse moving across the screen. Gives the mouse's X and Y positions after movement in addition to the
  * change in X and Y since the last MouseMoveEvent. 
- * @author ClairaLyrae
  */
 public class MouseMoveEvent extends MouseEvent
 {

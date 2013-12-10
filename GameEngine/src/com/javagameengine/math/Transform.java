@@ -2,16 +2,10 @@ package com.javagameengine.math;
 
 import java.nio.FloatBuffer;
 
-// TODO Not fully featured yet. A lot of methods this class might need are
-// somewhat dependent on what we actually end up using it for, so it may
-// be subject to change over time. ALSO, note that the vector/quat classes
-// are not complete, so by extension this may have errors!
-
 /**
  * Transform encapsulates two Vector3f objects and a single Quaternion object, representing translation, scale, and rotation 
  * respectively. The class provides methods for modifying the transform in useful ways and applying the transform to other
  * transforms to create total transforms.
- * @author ClairaLyrae
  */
 public class Transform
 {

@@ -6,7 +6,6 @@ import org.lwjgl.BufferUtils;
 
 /**
  * 4x4 square matrix class implemented using floats.
- * @author ClairaLyrae
  */
 public class Matrix4f extends Matrix<Matrix4f>
 {
@@ -367,13 +366,13 @@ public class Matrix4f extends Matrix<Matrix4f>
 	public String toString()
 	{
 		return String.format(
-				"matrix=\n" +
-				"%.4f %.4f %.4f %.4f;\n" +
-				"%.4f %.4f %.4f %.4f;\n" +
-				"%.4f %.4f %.4f %.4f;\n" +
-				"%.4f %.4f %.4f %.4f;\n", f00, f01,
-				f02, f03, f10, f11, f12, f13, f20, f21, f22, f23, f30, f31,
-				f32, f33);
+			"matrix=\n" +
+			"%.4f %.4f %.4f %.4f;\n" +
+			"%.4f %.4f %.4f %.4f;\n" +
+			"%.4f %.4f %.4f %.4f;\n" +
+			"%.4f %.4f %.4f %.4f;\n", f00, f01,
+			f02, f03, f10, f11, f12, f13, f20, f21, f22, f23, f30, f31,
+			f32, f33);
 	}
 
 	public Matrix4f transpose()
@@ -526,14 +525,14 @@ public class Matrix4f extends Matrix<Matrix4f>
 
 	public static Matrix4f orthoMatrix(float left, float right, float top, float bottom, float znear, float zfar)
 	{
-		  Matrix4f m = new Matrix4f();
-		  m.f00 = 2f/(right-left); 
-		  m.f11 = 2f/(top-bottom); 
-		  m.f22 = -2f/(zfar-znear); 
-		  m.f03 = -1*((right+left)/(right-left));
-		  m.f13 = -1*((top+bottom)/(top-bottom));
-		  m.f23 = -1*((zfar+znear)/(zfar-znear));
-		  return m;
+		Matrix4f m = new Matrix4f();
+		m.f00 = 2f/(right-left); 
+		m.f11 = 2f/(top-bottom); 
+		m.f22 = -2f/(zfar-znear); 
+		m.f03 = -1*((right+left)/(right-left));
+		m.f13 = -1*((top+bottom)/(top-bottom));
+		m.f23 = -1*((zfar+znear)/(zfar-znear));
+		return m;
 	}
 	
 	public static Matrix4f perspectiveMatrix(float fovy, float aspect, float zNear, float zFar)
@@ -544,113 +543,50 @@ public class Matrix4f extends Matrix<Matrix4f>
 		deltaZ = zFar - zNear;
 
 		float tan = FastMath.tan(radians);
-		if ((deltaZ == 0) || (tan == 0) || (aspect == 0)) {
+		if ((deltaZ == 0) || (tan == 0) || (aspect == 0))
 			return null;
-		}
 
 		cotangent = 1.0f/tan;
 
 		Matrix4f m = new Matrix4f();
-		
 		m.f00 = cotangent / aspect;
 		m.f11 = cotangent;
 		m.f22 =  - (zFar + zNear) / deltaZ;
 		m.f23 =  -1;
 		m.f32 =  -2 * zNear * zFar / deltaZ;
 		m.f33 =  0;
-
 		return m.transpose();
 	}
 	
-	public static Matrix4f lookAt(
-		float eyex,
-		float eyey,
-		float eyez,
-		float centerx,
-		float centery,
-		float centerz,
-		float upx,
-		float upy,
-		float upz) 
-	{
-		Vector3f forward = new Vector3f();
-		Vector3f side = new Vector3f();
-		Vector3f up = new Vector3f();
-
-		forward.x = centerx - eyex;
-		forward.y = centery - eyey;
-		forward.z = centerz - eyez;
-
-		up.x = upx;
-		up.y = upy;
-		up.z = upz;
-
-		forward.normalize();
-
-		/* Side = forward x up */
-		forward.crossInto(up, side);
-		side.normalize();
-
-		/* Recompute up as: up = side x forward */
-		side.crossInto(forward, up);
-
-		Matrix4f matrix = new Matrix4f();
-		matrix.f00 = side.x;
-		matrix.f10 = side.y;
-		matrix.f20 = side.z;
-
-		matrix.f01 = up.x;
-		matrix.f11 = up.y;
-		matrix.f21 = up.z;
-
-		matrix.f02 = -forward.x;
-		matrix.f12 = -forward.y;
-		matrix.f22 = -forward.z;
-		
-		matrix.f03 = -eyex;
-		matrix.f13 = -eyey;
-		matrix.f23 = -eyez;
-		return matrix;
-	}
-	
-	public static Matrix4f lookAtMatrix(
-			float eyex,
-			float eyey,
-			float eyez,
-			float centerx,
-			float centery,
-			float centerz,
-			float upx,
-			float upy,
-			float upz)
+	public static Matrix4f lookAtMatrix(float eyex, float eyey, float eyez, float centerx, float centery, float centerz, float upx, float upy, float upz)
 	{
 		Vector3f position = new Vector3f(eyex, eyey, eyez);
 		Vector3f target = new Vector3f(centerx, centery, centerz);
 		Vector3f upVector = new Vector3f(upx, upy, upz);
-	  Vector3f forward = target.subtractInto(position, null);
-	  forward.normalize();
-	  Vector3f right = forward.crossInto(upVector, null);
-	  right.normalize();
-	  Vector3f up = right.crossInto(forward, null);
-	  up.normalize();  
-	  Matrix4f mat = new Matrix4f();
-	 
-	  mat.f00 = right.x;
-	  mat.f01 = right.y;
-	  mat.f02 = right.z;
+		Vector3f forward = target.subtractInto(position, null);
+		forward.normalize();
+		Vector3f right = forward.crossInto(upVector, null);
+		right.normalize();
+		Vector3f up = right.crossInto(forward, null);
+		up.normalize();
+		
+		Matrix4f mat = new Matrix4f();
+		mat.f00 = right.x;
+		mat.f01 = right.y;
+		mat.f02 = right.z;
 
-	  mat.f10 = up.x;
-	  mat.f11 = up.y;
-	  mat.f12 = up.z;
+		mat.f10 = up.x;
+		mat.f11 = up.y;
+		mat.f12 = up.z;
 
-	  mat.f20 = -forward.x;
-	  mat.f21 = -forward.y;
-	  mat.f22 = -forward.z;
+		mat.f20 = -forward.x;
+		mat.f21 = -forward.y;
+		mat.f22 = -forward.z;
 
-	  mat.f03 = -right.dot(position);
-	  mat.f13 = -up.dot(position);
-	  mat.f23 = forward.dot(position);
-	  return mat;
+		mat.f03 = -right.dot(position);
+		mat.f13 = -up.dot(position);
+		mat.f23 = forward.dot(position);
+		return mat;
 	}
 	
 	public static Matrix4f rotationMatrix(float angle, float x, float y, float z) 

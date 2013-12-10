@@ -19,6 +19,13 @@ import org.lwjgl.opengl.GL15;
 import com.javagameengine.assets.NativeObject;
 import com.javagameengine.math.FastMath;
 
+/**
+ * AttributeBuffer is a wrapper class for Java NIO buffers which extends NativeObject. It is meant to
+ * provide easy access to buffers stored on the graphics card. It also provides values to set the stride,
+ * offset, and usage of the data.
+ * 
+ * @param <T> Java NIO buffer type this class serves as a wrapper for
+ */
 public class AttributeBuffer<T extends Buffer> extends NativeObject
 {
 	// Describes attribute

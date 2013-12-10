@@ -6,7 +6,6 @@ import org.lwjgl.BufferUtils;
 
 /**
  * 2 dimensional vector class implemented using floats.
- * @author ClairaLyrae
  */
 public class Vector2f extends Vector<Vector2f>
 {

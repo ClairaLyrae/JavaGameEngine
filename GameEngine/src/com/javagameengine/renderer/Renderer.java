@@ -6,7 +6,10 @@ import static org.lwjgl.opengl.GL20.glUseProgram;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.SortedSet;
+import java.util.TreeMap;
 
 
 
@@ -101,12 +104,97 @@ public class Renderer
 		}
 	}
 	
+	public static final RendererState defaultState = new RendererState();
+	public static RendererState currentState = new RendererState();
+	
 	public static final int MAX_PASSES = 10;
 	public static final int MAX_LAYERS = 10;
 	public static final int MAX_LIGHTS = 10;
 	protected static RenderPass[] passes = new RenderPass[MAX_PASSES];	// These are the different render views we can use. 
 	protected static RenderQueue[] layers = new RenderQueue[MAX_LAYERS];	// These are the different layers we can draw in. Each layer handles drawing inside itself
 	protected static RenderQueue[] transparentLayers = new RenderQueue[MAX_LAYERS]; 
+	
+	private static TreeMap<RendererState, List<Renderable>> queue = new TreeMap<RendererState, List<Renderable>>();
+	
+	public static void renderTree()
+	{
+		int width = Display.getWidth();
+		int height = Display.getHeight();
+		OcclusionQuery.updateQueries();
+		
+		// First off, we need to set up the render target & viewport & buffers
+		Scene scene = Game.getHandle().getActiveScene();
+		GUI gui = scene.getGui();
+		
+		GL11.glViewport(0, 0, width, height); // Reset The Current Viewport
+		glClear(GL_DEPTH_BUFFER_BIT);
+		GL11.glClearDepth(1.0f); // Depth Buffer Setup
+		
+		defaultState.enableState();
+
+		if(scene.getSkybox() != null)
+		{
+			glDepthMask(false);
+			scene.getSkybox().draw();
+			glDepthMask(defaultState.isDepthWriteEnabled);
+		}
+		
+		if(camera != null)
+		{
+		    GL11.glMatrixMode(GL11.GL_PROJECTION);
+		    GL11.glLoadIdentity();
+		    
+		    GLU.gluPerspective(camera.getFOV(), camera.getAspect(), camera.getDepthNear(), camera.getDepthFar());
+		    
+		    projection_matrix = camera.getProjectionMatrix();
+			view_matrix = camera.getViewMatrix();
+			
+			view_matrix.toBuffer(view_matrix_buffer);
+			projection_matrix.toBuffer(projection_matrix_buffer);
+			
+		    GL11.glMatrixMode(GL11.GL_MODELVIEW);
+		    GL11.glLoadIdentity();
+
+			for(Entry<RendererState, List<Renderable>> statekey : queue.entrySet())
+			{
+				RendererState state = statekey.getKey();
+				state.switchState(currentState);
+				currentState = state;
+				List<Renderable> drawList = statekey.getValue();
+				for(Renderable d : drawList)
+				{
+					d.onRender();
+					d.getDrawable().draw();
+				}
+			}
+		}
+		
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	    glUseProgram(0);
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_LIGHTING);
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	    GL11.glDisable(GL11.GL_CULL_FACE);
+	    GL11.glMatrixMode(GL11.GL_PROJECTION);
+	    GL11.glLoadIdentity();
+		glOrtho(0, Display.getWidth(), 0, Display.getHeight(), 0f, 1f);
+	    GL11.glMatrixMode(GL11.GL_MODELVIEW);   
+	    glLoadIdentity();
+
+	    if((gui != null && gui.hasCursor()) || Console.isVisible())
+	    	Mouse.setGrabbed(false);
+	    else
+	    	Mouse.setGrabbed(true);
+	    
+	    if(gui != null)
+	    	gui.draw();
+	    Console.draw();
+
+		Display.update();
+		
+		
+	}
 	
 	protected static Light[] lights = new Light[MAX_LIGHTS];
 	protected static int light_index = 0;

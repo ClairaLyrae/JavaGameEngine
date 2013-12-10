@@ -9,7 +9,6 @@ import java.nio.FloatBuffer;
  * denotes that the method has another parameter which is a reference to the object the operation will save the
  * result into. For example, obj1.normalizeInto(obj2) will normalize obj1 and store the result in obj2, without
  * modifying the contents of obj1. 
- * @author ClairaLyrae
  */
 public abstract class Vector<T extends Vector<T>>
 {

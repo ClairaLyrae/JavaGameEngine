@@ -4,7 +4,10 @@ import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.GL_STREAM_DRAW;
 
-// Hints to GPU what the mesh is used for (guides GPU to place it in the optimal spot)
+/**
+ * AttributeUsage is an enum which has an equivalent set in OpenGL. It provides a hint to the graphics card
+ * which describes how the data should be stored, in order to achieve optimal performance.
+ */
 public enum AttributeUsage 
 {
     STATIC(GL_STATIC_DRAW),	// Mesh data is rarely changed

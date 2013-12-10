@@ -10,6 +10,10 @@ import org.lwjgl.util.WaveData;
 
 import com.javagameengine.assets.NativeObject;
 
+/**
+ * SoundBuffer is a native buffer stored on the audio hardware through OpenAL. It contains the sound data in a Java NIO buffer
+ * and a pointer to the location on the audio hardware. Additionally, it provides static methods to load .wav files.
+ */
 public class SoundBuffer extends NativeObject
 {
 	private WaveData data;

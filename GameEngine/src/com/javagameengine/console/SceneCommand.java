@@ -6,6 +6,9 @@ import com.javagameengine.scene.Component;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
 
+/**
+ * Console command allowing scene switching in the console environment
+ */
 public class SceneCommand extends Command
 {
 	public SceneCommand()

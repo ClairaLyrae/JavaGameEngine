@@ -8,7 +8,6 @@ package com.javagameengine.console;
  * integer corresponding to the minimum number of arguments the command requires. Whether or not the Console
  * calls the execute method depends on if the command string sent to the Console matches the format "/<name>"
  * with the required number of arguments following, where arguments are divided by spaces.
- * @author ClairaLyrae
  */
 public abstract class Command
 {

@@ -8,6 +8,10 @@ import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.MeshRenderer;
 
+/**
+ * Console command for loading in meshes from the AssetManager into the current scene. Creates
+ * a MeshRenderer component with the given Material and Mesh.
+ */
 public class MeshCommand extends Command
 {
 	public MeshCommand()

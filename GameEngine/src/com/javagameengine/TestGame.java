@@ -1,38 +1,25 @@
 package com.javagameengine;
 
-import java.awt.Color;
 import java.io.File;
 import java.util.Random;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.material.Material;
-import com.javagameengine.assets.material.Texture;
 import com.javagameengine.assets.mesh.Mesh;
 import com.javagameengine.assets.skybox.Skybox;
 import com.javagameengine.assets.sounds.SoundBuffer;
 import com.javagameengine.console.Console;
 import com.javagameengine.console.MeshCommand;
 import com.javagameengine.console.SceneCommand;
-import com.javagameengine.events.EventManager;
-import com.javagameengine.events.KeyPressEvent;
-import com.javagameengine.events.Listener;
 import com.javagameengine.gui.GUI;
-import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.HUD;
 import com.javagameengine.gui.WelcomeGUI;
-import com.javagameengine.gui.GLquadGUIcomponent;
 import com.javagameengine.math.Color4f;
-import com.javagameengine.math.FastMath;
-import com.javagameengine.math.Vector3f;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.Camera;
-import com.javagameengine.scene.component.CoordinateGrid;
 import com.javagameengine.scene.component.Flare;
 import com.javagameengine.scene.component.LaserComponent;
 import com.javagameengine.scene.component.Light;
@@ -40,9 +27,10 @@ import com.javagameengine.scene.component.MeshRenderer;
 import com.javagameengine.scene.component.Music;
 import com.javagameengine.scene.component.PhysicsComponent;
 import com.javagameengine.scene.component.ShipControlComponent;
-import com.javagameengine.sound.SoundManager;
-import com.javagameengine.sound.Sound;
 
+/**
+ * TestGame is a demo extension of the Game class for a simple space shooter.
+ */
 public class TestGame extends Game
 {
 	// We want to manually put stuff in our game, so here we make a scene and load it in during startup
@@ -127,8 +115,16 @@ public class TestGame extends Game
 		sunLightNode.getTransform().translate(50000f, 50000f, 0f);
 		backLightNode.getTransform().translate(-50000f, -50000f, -50000f);
 			
-		Flare flare = Flare.createFlare(AssetManager.getTexture("sunflare"));
-		sunLightNode.addComponent(flare);
+		Flare sunflare = Flare.createFlare(AssetManager.getTexture("sunflare"));
+		sunLightNode.addComponent(sunflare);
+		Flare glowflare = Flare.createFlare(AssetManager.getTexture("sunglow"));
+		sunLightNode.addComponent(glowflare);
+		sunflare.setAlwaysOnTop(true);
+		sunflare.setSize(0.5f);
+		sunflare.setLayer(1);
+		glowflare.setAlwaysOnTop(false);
+		glowflare.setFadeEnabled(false);
+		glowflare.setSize(1f);
 		Skybox mrsky = AssetManager.getSkybox("space2");
 		s.setSkybox(mrsky);
 	}

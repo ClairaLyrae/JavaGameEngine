@@ -2,7 +2,6 @@ package com.javagameengine.events;
 
 /**
  * Event describing a mouse button being clicked.
- * @author ClairaLyrae
  */
 public class MouseClickEvent extends MouseEvent
 {

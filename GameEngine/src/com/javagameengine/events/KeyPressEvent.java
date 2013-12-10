@@ -3,8 +3,7 @@ package com.javagameengine.events;
 import org.lwjgl.input.Keyboard;
 
 /**
- * Describes a keyboard event in which a key is pressed, released, or held. 
- * @author ClairaLyrae
+ * Describes a keyboard event in which a key is pressed, released, or held.
  */
 public class KeyPressEvent extends KeyEvent
 {

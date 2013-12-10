@@ -7,8 +7,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.PixelFormat;
 
 /**
- * Allows for switching of display modes from inside the console enviroment. 
- * @author ClairaLyrae
+ * Console command allowing switching of display modes from inside the console environment. 
  */
 public class DisplayCommand extends Command
 {

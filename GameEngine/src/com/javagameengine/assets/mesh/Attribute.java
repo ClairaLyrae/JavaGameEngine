@@ -1,7 +1,9 @@
 package com.javagameengine.assets.mesh;
 
-
-// Type of data in this buffer
+/**
+ * Attribute is an enum which determines the different types of attribute buffers that can be tied to a mesh
+ * and are automatically bound to active program objects. 
+ */
 public enum Attribute 
 {
     POSITION(3, "in_position", AttributeFormat.FLOAT),	// 3 floats
@@ -22,16 +24,25 @@ public enum Attribute
         this.componentSize = componentSize;
     }
     
+    /**
+     * @return AttributeFormat describing the type of data this attribute is stored in
+     */
     public AttributeFormat getDataFormat()
     {
     	return format;
     }
     
+    /**
+     * @return Name of the attribute as it should appear inside the vertex shader
+     */
     public String getAttribName()
     {
     	return name;
     }
     
+    /**
+     * @return Number of values of type given by getDataFormat this attribute requires per element
+     */
     public int getComponentSize()
     {
         return componentSize;

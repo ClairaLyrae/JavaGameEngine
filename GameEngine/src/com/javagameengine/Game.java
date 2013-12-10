@@ -39,7 +39,6 @@ import com.javagameengine.sound.SoundManager;
  * <p>
  * The AbstractGame class also includes a number of abstract methods which are called at particular points in initialization and the game loop 
  * itself. These methods are used by classes that extend AbstractGame to set up game-specific data during start-up and the loop.
- * @author ClairaLyrae
  */
 public abstract class Game
 {

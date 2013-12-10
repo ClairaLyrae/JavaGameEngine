@@ -50,13 +50,10 @@ import com.javagameengine.math.Vector4f;
 import com.javagameengine.renderer.Drawable;
 import com.javagameengine.scene.Bounds;
 
-// TODO What is already here is not really anything. Before making this class, we have to figure out
-// how openGL deals with mesh data efficiently and construct the class based around that!
-
 /**
  * Stores the information describing a mesh and provides methods for manipulating the mesh or specifying openGL
- * rendering parameters.
- * @author ClairaLyrae
+ * rendering parameters. The Mesh object is composed of a number of AttributeBuffers which are bound to the 
+ * attributes specified in the Attribute enum.
  */
 public class Mesh extends NativeObject implements Drawable
 {

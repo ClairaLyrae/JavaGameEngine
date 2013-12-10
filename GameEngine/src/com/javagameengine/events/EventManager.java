@@ -12,9 +12,8 @@ import com.javagameengine.scene.Scene;
 
 /**
  * Handles Events and Listeners. When callEvent is called, this class looks through all of its registered 
- * Listener objects and calls each method that has the annotation @EventClass before it, only has one
+ * Listener objects and calls each method that has the annotation @EventMethod before it, only has one
  * parameter, and that parameter's type extends Event. 
- * @author ClairaLyrae
  */
 public class EventManager
 {
@@ -29,31 +28,51 @@ public class EventManager
 	{
 	}
 
+	/**
+	 * @return True if this manager is ignoring events
+	 */
 	public boolean isIgnoringEvents()
 	{
 		return ignoreEvents;
 	}
 	
+	/**
+	 * @param state True if manager should ignore called events
+	 */
 	public void ignoreEvents(boolean state)
 	{
 		ignoreEvents = state;
 	}
 	
-	public List<EventManager> getEventManagers()
+	/**
+	 * @return List of all EventManagers connected with this EventManager
+	 */
+	public List<EventManager> getSubManagers()
 	{
 		return subManagers;
 	}
 	
-	public boolean addEventManager(EventManager em)
+	/**
+	 * @param em EventManager to register
+	 */
+	public void registerEventManager(EventManager em)
 	{
-		return subManagers.add(em);
+		subManagers.add(em);
 	}
 	
-	public boolean removeEventManager(EventManager em)
+	/**
+	 * @param em EventManager to unregister
+	 * @return True if the given EventManager was unregistered
+	 */
+	public boolean unregisterEventManager(EventManager em)
 	{
 		return subManagers.remove(em);
 	}
 	
+	/**
+	 * @param em EventManager to check
+	 * @return True if given EventManager is registered to this manager
+	 */
 	public boolean hasEventManager(EventManager em)
 	{
 		return subManagers.contains(em);
@@ -109,7 +128,6 @@ public class EventManager
 	 */
 	public void unregisterListener(Listener l)
 	{
-		// Search through the map structure and remove all references to the Listener
 		List<Class<? extends Event>> list = new ArrayList<Class<? extends Event>>();
 		for(Class<? extends Event> c : methodCalls.keySet())
 		{
@@ -167,20 +185,8 @@ public class EventManager
 		}
 	}
 	
-	public void debugPrint()
+	public String toString()
 	{
-		System.out.println("Method Map:");
-		for(Class<? extends Event> c : methodCalls.keySet())
-		{
-			System.out.println("- Event Class: " + c.getName());
-			HashMap<Listener, Method> methods = methodCalls.get(c);
-			for(Listener l : methods.keySet())
-			{
-				System.out.println("-- Listener: " + l + ", Method: " + methods.get(l));
-			}
-		}
-		System.out.println("Listener List:");
-		for(Listener l : listeners)
-			System.out.println("- Listener: " + l);
+		return "eventManager=[eventClasses=" + methodCalls.size() + "], listeners=[" + listeners.size() + "]";
 	}
 }

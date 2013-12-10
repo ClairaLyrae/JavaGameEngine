@@ -19,8 +19,9 @@ import com.javagameengine.gui.GUI;
 import com.javagameengine.scene.Scene;
 
 /**
- * Loads all the assets located in the main game directory. Provides access to the assets.
- * @author ClairaLyrae
+ * AssetManager is a statically accessed class which maintains access to all game related objects.
+ * The manager loads all the assets located in the main game directory on runtime, and allows for objects
+ * to be added or removed during runtime. 
  */
 public class AssetManager
 {
@@ -118,6 +119,9 @@ public class AssetManager
 		return new ArrayList<String>(sounds.keySet());
 	}
 	
+	/**
+	 * Load all hardcoded directories into the AssetManager
+	 */
 	public static void loadAll()
 	{
 		// This is where the resource manager loads everything we need!
@@ -129,6 +133,11 @@ public class AssetManager
 		loadDir(skyboxDir);
 	}	
 	
+	/**
+	 * Loads the given file into the AssetManager if the file is of a valid type. 
+	 * @param f File to load
+	 * @throws IOException 
+	 */
 	public static void loadFile(File f) throws IOException
 	{
 		String[] name = f.getName().split("\\.");
@@ -184,6 +193,11 @@ public class AssetManager
 			// Generic file
 	}
 	
+	/**
+	 * @param ext File extension of file to test
+	 * @param types File extensions to test for
+	 * @return True if the given extension is contained in the given array
+	 */
 	public static boolean isFileType(String ext, String[] types)
 	{
 		for(String type : types)
@@ -195,7 +209,7 @@ public class AssetManager
 	}
 	
 	/**
-	 * Loads all files in a given dire
+	 * Loads all files in a given directory
 	 * @param dir Directory to load from
 	 */
 	public static void loadDir(String dir)

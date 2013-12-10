@@ -30,6 +30,11 @@ import com.javagameengine.scene.Bounds;
 import com.javagameengine.scene.RenderableComponent;
 import com.javagameengine.scene.component.Light.Usage;
 
+/**
+ * A skybox is a predefined mesh with an internally bound GLSL shader that can be loaded
+ * from a file. Skybox files are stored as a list of texture names corresponding to the different 
+ * faces of the skybox. 
+ */
 public class Skybox implements Drawable
 {
 	private static float[] normals = {
