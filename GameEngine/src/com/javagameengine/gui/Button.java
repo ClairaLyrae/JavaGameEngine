@@ -34,6 +34,13 @@ import com.javagameengine.scene.component.LaserShot;
 import com.javagameengine.util.SimpleText;
 
 
+/** Button extends GUIcomponent and serves as a button in the GUI buttons are drawn as GL_QUADS
+ * 	and implement Listeners for EventMethods onMouseClick and onKey. Buttons have three modes. 
+ *  Mode 0 is for a momentary button, mode 1 is On/Off, and mode 2 is slider. Methods onClick(), unClick(), and
+ *  getState() can be overridden to provide specific functionality for different buttons.
+ *  onMouseClick checks for mouse clicks within the boundaries of the button and empty
+ *  method onKey can be overridden to provide additional use. 
+ */
 public class Button extends GUIcomponent implements Listener{
 	
 	boolean clicked;

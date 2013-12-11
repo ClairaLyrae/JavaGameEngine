@@ -11,6 +11,11 @@ import com.javagameengine.events.Listener;
 import com.javagameengine.math.Color4f;
 import com.javagameengine.scene.Scene;
 
+/**
+ * GLquadGUIcomponent extends GUIcomponent and describes a box (GL_QUAD) which is part
+ * of a gui
+ *
+ */
 public class GLquadGUIcomponent extends GUIcomponent {
 
 	public GLquadGUIcomponent(int w, int h, int x, int y, 

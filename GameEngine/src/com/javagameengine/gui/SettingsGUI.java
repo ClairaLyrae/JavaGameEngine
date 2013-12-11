@@ -245,7 +245,11 @@ public class SettingsGUI extends GUI {
 					}
 				
 				System.out.println(resolution);
+				AssetManager.getGUI("settingsgui").updateSize();
+				AssetManager.getGUI("welcomegui").updateSize();
+				AssetManager.getGUI("hud").updateSize();
 			}
+			
 		};
 		innerBox.addChild(resolution_slider);
 		

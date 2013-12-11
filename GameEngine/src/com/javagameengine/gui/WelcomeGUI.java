@@ -64,5 +64,7 @@ public class WelcomeGUI extends GUI {
 		
 		rootComponents.add(mainBox);
 	}
+	
+
 
 }

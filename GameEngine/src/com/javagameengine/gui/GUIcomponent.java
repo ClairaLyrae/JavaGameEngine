@@ -20,8 +20,14 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
+/**
+ * GIUcomponent is an abstract class that describes all parts of a gui. This class must be extended by either
+ * GLquadGUIcomponent (a box) or another custom component.
+ *
+ */
 public abstract class GUIcomponent 
 {
 	protected int width;
@@ -91,13 +97,20 @@ public abstract class GUIcomponent
 	
 	}
 
-	private void updateAbsolute() {
+	public void updateAbsolute() {
 		
 		if(parent != null)
 		{
 			absoluteX = parent.absoluteX + xPos;
 			absoluteY = parent.absoluteY + yPos;
 		}
+		else 
+		{
+			absoluteX = (Display.getWidth() - width)/2;
+			absoluteY = (Display.getHeight() - height)/2;
+		}
+					
+			
 	}
 	
 	public void removeChild(GUIcomponent oldChild)
@@ -214,6 +227,16 @@ public abstract class GUIcomponent
 			return null;
 		return gui.getScene();
 	}
+
+
+
+	public void updateSize() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
 	
 
 }

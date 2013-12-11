@@ -20,6 +20,13 @@ import com.javagameengine.events.KeyPressEvent;
 import com.javagameengine.events.MouseClickEvent;
 import com.javagameengine.scene.Scene;
 
+
+/**
+ * GUI serves as a container for all gui components. GUIs can be built by instantiating
+ * GUIcomponents and adding them to the list rootComponents. These rootComponents can 
+ * have children added to them. Event manager can be used to keep track of gui
+ * instantiations
+ */
 public abstract class GUI {
 	
 	private EventManager eventmanager = new EventManager();
@@ -33,21 +40,6 @@ public abstract class GUI {
 	protected Scene scene;
 	ArrayList<GUIcomponent> rootComponents; 
 	static protected boolean crosshairs_visible = true;
-
-	public EventManager getEventManager()
-	{
-		return eventmanager;
-	}
-	
-	public boolean hasCursor()
-	{
-		return hasCursor;
-	}
-	
-	public void setCursor(boolean state)
-	{
-		hasCursor = state;
-	}
 	
 	public GUI()
 	{
@@ -68,6 +60,22 @@ public abstract class GUI {
 		rootComponents = new ArrayList<GUIcomponent>();
 		create();
 	}
+
+	public EventManager getEventManager()
+	{
+		return eventmanager;
+	}
+	
+	public boolean hasCursor()
+	{
+		return hasCursor;
+	}
+	
+	public void setCursor(boolean state)
+	{
+		hasCursor = state;
+	}
+	
 	
 
 	public void draw()
@@ -112,6 +120,25 @@ public abstract class GUI {
 		GUIcomponent[] array = rootComponents.toArray(new GUIcomponent[0]);
 		for(GUIcomponent c : array)
 			c.update(delta);
+	}
+	
+	public void updateSize()
+	{
+		System.out.println("updateSize called");
+		if(height != 0)
+		{
+			height = Display.getHeight();
+			centerY = height/2;
+		}
+		if(width != 0)
+		{
+			width = Display.getWidth();
+			centerX = width/2;
+		}
+		for(GUIcomponent c : rootComponents)
+		{
+			c.updateAbsolute();
+		}
 	}
 	
 
