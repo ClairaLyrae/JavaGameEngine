@@ -261,6 +261,7 @@ public class Renderer
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	    GL11.glDisable(GL11.GL_CULL_FACE);
 	    GL11.glMatrixMode(GL11.GL_PROJECTION);
+	    GL11.glDisable(GL_DEPTH_TEST);
 	    GL11.glLoadIdentity();
 		glOrtho(0, Display.getWidth(), 0, Display.getHeight(), 0f, 1f);
 	    GL11.glMatrixMode(GL11.GL_MODELVIEW);   

@@ -31,6 +31,8 @@ import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.NativeObject;
 import com.javagameengine.assets.mesh.Attribute;
 import com.javagameengine.renderer.Bindable;
+import com.javagameengine.renderer.RendererState;
+import com.javagameengine.renderer.RendererState.BlendMode;
 
 /**
  * Material defines a material composed of Textures and Shaders that can be
@@ -69,10 +71,21 @@ public class Material extends NativeObject implements Bindable
 			while ((line = reader.readLine()) != null)
 			{
 				String[] split = line.split(" ");
-				if (split.length == 1
-						&& split[0].equalsIgnoreCase("transparent"))
+				if (split.length > 0 && split[0].equalsIgnoreCase("blend"))
 				{
 					m.setTransparency(true);
+					if(split.length > 1)
+					{
+						BlendMode bm = BlendMode.valueOf(split[1].toUpperCase());
+						if(bm != null)
+							m.srcBlend = bm;
+					}
+					if(split.length > 2)
+					{
+						BlendMode bm = BlendMode.valueOf(split[2].toUpperCase());
+						if(bm != null)
+							m.destBlend = bm;
+					}	
 				}
 				if (split.length == 2 && split[0].equalsIgnoreCase("s"))
 				{
@@ -118,6 +131,11 @@ public class Material extends NativeObject implements Bindable
 
 	private Texture[] textures = new Texture[TextureType.values().length];
 
+	// TEMP 
+	public BlendMode srcBlend = BlendMode.ONE;
+	// TEMP 
+	public BlendMode destBlend = BlendMode.ONE_MINUS_SRC_ALPHA;
+	
 	private List<ShaderVariable> inputs = new ArrayList<ShaderVariable>();
 	private List<ShaderVariable> outputs = new ArrayList<ShaderVariable>();
 	

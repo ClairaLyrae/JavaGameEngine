@@ -358,8 +358,8 @@ public class Console implements Listener
 	    strbuffer.setReadPos(bpos);
 
 	    // If console is enabled, draw the input box too
-		glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
 		glBegin(GL_QUADS);
+			glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
 		    glVertex3f(0, yBuffer, 0f);
 		    glVertex3f(width, yBuffer, 0f);
 		    glVertex3f(width, yInput, 0f);
@@ -371,6 +371,7 @@ public class Console implements Listener
 		    glVertex3f(0, yInput, 0f);
 		glEnd();
 		glColor4f(1f, 1f, 1f, 1f);
+		
 		SimpleText.drawString("> " + input.toString() + "_" , 5, yInputText);
 	}
 	

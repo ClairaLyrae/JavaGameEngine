@@ -122,9 +122,8 @@ public abstract class GUI {
 			c.update(delta);
 	}
 	
-	public void updateSize()
+	public void updateSize(int oldWidth, int oldHeight)
 	{
-		System.out.println("updateSize called");
 		if(height != 0)
 		{
 			height = Display.getHeight();
@@ -137,7 +136,7 @@ public abstract class GUI {
 		}
 		for(GUIcomponent c : rootComponents)
 		{
-			c.updateAbsolute();
+			c.updatePos(oldWidth, oldHeight);
 		}
 	}
 	

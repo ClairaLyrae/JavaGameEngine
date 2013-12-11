@@ -28,7 +28,7 @@ public class LaserShot extends Component
 		if(laserMesh == null)
 			laserMesh = AssetManager.getMesh("laser");
 		if(sound == null)
-			sound = AssetManager.getSound("laser2");
+			sound = AssetManager.getSound("laser");
 	}
 
 	@Override

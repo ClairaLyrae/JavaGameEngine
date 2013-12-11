@@ -19,10 +19,11 @@ public class WelcomeGUI extends GUI {
 	@Override
 	public void create() {
 		
+		
 		GLquadGUIcomponent mainBox = new GLquadGUIcomponent(Display.getWidth(), Display.getHeight(), 0, 0,
 				Color4f.white.setTrans(0f), Color4f.white.setTrans(0f), null);
 		GLquadGUIcomponent innerBox = new GLquadGUIcomponent(340, 300, centerX-170, centerY-150,
-				Color4f.white.setTrans(), Color4f.black.setTrans(.9f), null);
+				Color4f.white.setTrans(), Color4f.black.setTrans(.5f), null);
 		
 		// Start Button
 		Button startButt = new Button(80, 20, 25, 20, "START", 0){
@@ -54,15 +55,13 @@ public class WelcomeGUI extends GUI {
 		innerBox.addChild(startButt);
 		innerBox.addChild(settingsButt);
 		innerBox.addChild(quitButt);
+		innerBox.addChild(new TextBox(90, 200, "L I G H T W E I G H T", Color4f.red));
+		innerBox.addChild(new TextBox(108, 180, "Game Engine Demo", Color4f.white));
 
 
 	//	innerBox.addChild(new TextBox(20, 350, "Welcome", Color4f.black));
 		
-		mainBox.addChild(innerBox);
-	
-
-		
-		rootComponents.add(mainBox);
+		this.addComponent(innerBox);
 	}
 	
 

@@ -97,8 +97,8 @@ public abstract class GUIcomponent
 	
 	}
 
-	public void updateAbsolute() {
-		
+	public void updateAbsolute() 
+	{	
 		if(parent != null)
 		{
 			absoluteX = parent.absoluteX + xPos;
@@ -106,11 +106,11 @@ public abstract class GUIcomponent
 		}
 		else 
 		{
-			absoluteX = (Display.getWidth() - width)/2;
-			absoluteY = (Display.getHeight() - height)/2;
-		}
-					
-			
+			absoluteX = xPos;
+			absoluteY = yPos;
+		}	
+		for(GUIcomponent c : children)
+			c.updateAbsolute();
 	}
 	
 	public void removeChild(GUIcomponent oldChild)
@@ -228,17 +228,12 @@ public abstract class GUIcomponent
 		return gui.getScene();
 	}
 
-
-
-	public void updateSize() {
-		// TODO Auto-generated method stub
-		
+	public void updatePos(int prevWidth, int prevHeight) 
+	{
+		xPos = (int)(Display.getWidth()*((float)xPos/prevWidth));
+		yPos = (int)(Display.getHeight()*((float)yPos/prevHeight));
+		updateAbsolute();
 	}
-
-
-
-	
-
 }
 
 

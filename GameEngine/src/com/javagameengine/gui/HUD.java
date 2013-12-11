@@ -28,21 +28,21 @@ public class HUD extends GUI implements Listener{
 	public void create() {
 		
 		Crosshairs cursor = new Crosshairs();
-		GLquadGUIcomponent mainBox = new GLquadGUIcomponent(0, 0, 0, 0,
+		GLquadGUIcomponent mainBox = new GLquadGUIcomponent(Display.getWidth(), Display.getHeight(), 0, 0,
 				Color4f.white.setTrans(0f), Color4f.white.setTrans(0f), null);
 		
 		// add hint for pause command
-		mainBox.addChild(new TextBox(10, Display.getHeight() - 15,
-				"PRESS ESC TO PAUSE", Color4f.white.setTrans()));
+		this.addComponent(new TextBox(20, Display.getHeight() - 31,
+				"PRESS ESC TO PAUSE", Color4f.white));
 		
 		
 		// ADD LASER SHOT COUNTER
 		GLquadGUIcomponent laserCount = new GLquadGUIcomponent(205, 30, 
-				Display.getWidth() - 200, Display.getHeight() - 31,
-				Color4f.white.setTrans(), Color4f.red.setTrans(), null);
-		laserCount.addChild(new TextBox(5, 5, "LASER POWER:", Color4f.black));
+				Display.getWidth() - 225, Display.getHeight() - 41,
+				Color4f.white.setTrans(0f), Color4f.red.setTrans(0f), null);
+		laserCount.addChild(new TextBox(5, 9, "LASER POWER:", Color4f.white));
 		GLquadGUIcomponent Lpower = new GLquadGUIcomponent(laserPower, 18, 100, 5, 
-				Color4f.green.setTrans(0f), Color4f.green, null){
+				Color4f.green.setTrans(0f), Color4f.cyan, null){
 			@Override
 			public void onUpdate(float delta) 
 			{
@@ -64,10 +64,10 @@ public class HUD extends GUI implements Listener{
 					updateDivisor--;
 			}
 		};
-		
 		laserCount.addChild(Lpower);
 	//	laserCount.addChild(new LaserCountText(100, 5, "0", Color4f.black));
-		mainBox.addChild(laserCount);
+		
+		this.addComponent(laserCount);
 
 
 		// ADD SOMETHING TO LISTEN FOR PAUSE COMMAND (ESC)
@@ -87,9 +87,8 @@ public class HUD extends GUI implements Listener{
 			}
 		};
 		
-		rootComponents.add(cursor);
-		rootComponents.add(PauseListener);
-		rootComponents.add(mainBox);
+		this.addComponent(cursor);
+		this.addComponent(PauseListener);
 		
 	}
 

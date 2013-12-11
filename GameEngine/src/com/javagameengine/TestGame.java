@@ -20,6 +20,7 @@ import com.javagameengine.gui.GUIcomponent;
 import com.javagameengine.gui.SettingsGUI;
 import com.javagameengine.gui.GLquadGUIcomponent;
 import com.javagameengine.math.Color4f;
+import com.javagameengine.renderer.RendererState.BlendMode;
 import com.javagameengine.scene.Node;
 import com.javagameengine.scene.Scene;
 import com.javagameengine.scene.component.Camera;
@@ -108,7 +109,9 @@ public class TestGame extends Game
 		Light sunLight = new Light();
 		sunLight.setIntensity(3f);
 		Node sunLightNode = new Node("light_1");
+		Node sunLightNodeFar = new Node("light_1_far");
 		sunLightNode.addComponent(sunLight);
+		sunLightNode.addChild(sunLightNodeFar);
 			
 		Light backLight = new Light();
 		backLight.setIntensity(3f);
@@ -124,18 +127,24 @@ public class TestGame extends Game
 		backLight.setDiffuseAndSpecularColor(new Color4f("124651", 1f));
 			
 		sunLightNode.getTransform().translate(50000f, 50000f, 0f);
+		sunLightNodeFar.getTransform().translate(10000f, 10000f, 0f);
 		backLightNode.getTransform().translate(-50000f, -50000f, -50000f);
 			
 		Flare sunflare = Flare.createFlare(AssetManager.getTexture("sunflare"));
 		sunLightNode.addComponent(sunflare);
 		Flare glowflare = Flare.createFlare(AssetManager.getTexture("sunglow"));
-		sunLightNode.addComponent(glowflare);
+		sunLightNodeFar.addComponent(glowflare);
 		sunflare.setAlwaysOnTop(true);
-		sunflare.setSize(0.5f);
+		sunflare.setSize(0.6f);
 		sunflare.setLayer(1);
 		glowflare.setAlwaysOnTop(false);
 		glowflare.setFadeEnabled(false);
 		glowflare.setSize(1f);
+		glowflare.setLayer(0);
+		sunflare.srcBlend = BlendMode.ONE;
+		sunflare.destBlend = BlendMode.ONE_MINUS_SRC_COLOR;
+		glowflare.srcBlend = BlendMode.SRC_ALPHA;
+		glowflare.destBlend = BlendMode.ONE;
 		Skybox mrsky = AssetManager.getSkybox("space2");
 		s.setSkybox(mrsky);
 	}

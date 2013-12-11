@@ -18,18 +18,35 @@ import com.javagameengine.scene.Scene;
 
 public class SoundManager
 {
+	private static boolean muted = false;
 	private static float global_volume = 1f;
+	
+	public static boolean isMuted()
+	{
+		return muted;
+	}
+	
+	public static void mute(boolean state)
+	{
+		muted = state;
+		setGlobalVolume(global_volume);
+	}
 	
 	public static float getGlobalVolume()
 	{
+		if(muted)
+			return 0f;
 		return global_volume;
 	}
 	
 	public static void setGlobalVolume(float f)
 	{
 		global_volume = f;
-		//for(Sound s : sources)
-		//	AL10.alSourcef(s.getID(), AL10.AL_GAIN, s.gain *= global_volume);
+		if(!muted)
+		{
+			for(Sound s : sources)
+				AL10.alSourcef(s.getID(), AL10.AL_GAIN, global_volume);
+		}
 	}
 	
 	private static int MAX_SOURCES = 16;

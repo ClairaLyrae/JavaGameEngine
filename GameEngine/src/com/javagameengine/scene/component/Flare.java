@@ -30,6 +30,7 @@ import com.javagameengine.renderer.Renderer;
 import com.javagameengine.renderer.RendererState;
 import com.javagameengine.renderer.RendererState.BlendMode;
 import com.javagameengine.scene.RenderableComponent;
+import com.javagameengine.util.MovingAverage;
 
 public class Flare extends RenderableComponent
 {
@@ -73,7 +74,7 @@ public class Flare extends RenderableComponent
 	private static Shader fragShader;
 
 	public BlendMode srcBlend = BlendMode.SRC_ALPHA;
-	public BlendMode destBlend = BlendMode.ONE;
+	public BlendMode destBlend = BlendMode.ONE_MINUS_SRC_ALPHA;
 	
 	private boolean drawAtInfinity = false;	// Draw this flare at effective infinity (extend position vector)
 	private boolean scaleByDistance = false;	// Allow flare to be affected by perspective
@@ -83,8 +84,8 @@ public class Flare extends RenderableComponent
 	
 	private float size = 10f;	// Flare size at full view
 	private float sizePercent = 1f;	// Read only, holds current occlusion percentage
-	private float fadeTestSize = 100f;	// Controls speed of fade out
-	private float fadeTestSizeMax = 100f;	// Controls speed of fade out
+	private float fadeTestSize = 7f;	// Controls speed of fade out
+	private float fadeTestSizeMax = 37f;	// Controls speed of fade out
 	
 	public float getFadeTestSize()
 	{
@@ -94,7 +95,7 @@ public class Flare extends RenderableComponent
 	public void setFadeTestSize(float s)
 	{
 		fadeTestSize = s;
-		fadeTestSizeMax = FastMath.PI*fadeTestSize*fadeTestSize*0.25f;
+		fadeTestSizeMax = FastMath.QUARTER_PI*fadeTestSize*fadeTestSize;
 	}
 	
 	public float getSize()
@@ -185,10 +186,11 @@ public class Flare extends RenderableComponent
 		billboard = AssetManager.getMesh("skybox");
 	}
 
+	private MovingAverage sampleaverage = new MovingAverage(10);
+	
 	@Override
 	public boolean onRender()
 	{
-		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(srcBlend.getGLParam(), destBlend.getGLParam());
 		if(fadeOut)
 		{
@@ -196,23 +198,23 @@ public class Flare extends RenderableComponent
 				@Override
 				public void query() 
 				{
-					GL11.glDepthMask(false);
 					GL11.glColorMask(false, false, false, false);
 					GL20.glUseProgram(0);
 					GL11.glPointSize(fadeTestSize);
 					GL11.glBegin(GL_POINTS);
-					GL11.glColor4f(1f, 0f, 0f, 1f);
+					GL11.glColor4f(1f, 1f, 1f, 1f);
 					GL11.glVertex3f(0f, 0f, 0f);
 					GL11.glEnd();
 					GL20.glUseProgram(mat.getID());
-					GL11.glDepthMask(true);
 					GL11.glColorMask(true, true, true, true);
 				}
 
 				@Override
 				public void onComplete(int samplesPassed) 
 				{ 
-					sizePercent = (float)samplesPassed/fadeTestSizeMax;
+					//System.out.println("Samples: " + samplesPassed + " from dimeter " + fadeTestSize + " at predicted " + fadeTestSizeMax);
+					sampleaverage.put((float)samplesPassed/fadeTestSizeMax);
+					sizePercent = sampleaverage.get();
 				}
 			};
 		}

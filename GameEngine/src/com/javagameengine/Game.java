@@ -19,6 +19,7 @@ import org.lwjgl.opengl.PixelFormat;
 import com.javagameengine.assets.AssetManager;
 import com.javagameengine.assets.NativeObject;
 import com.javagameengine.console.Console;
+import com.javagameengine.console.DisplayCommand;
 import com.javagameengine.events.EventManager;
 import com.javagameengine.events.KeyHeldEvent;
 import com.javagameengine.events.KeyPressEvent;
@@ -302,7 +303,9 @@ public abstract class Game
 		Scene oldScene = activeScene;
 		this.activeScene = newScene;
 		if(oldScene != null)
+		{
 			oldScene.getRoot().relink();
+		}
 		newScene.getRoot().relink();
 		return true;
 	}
@@ -323,5 +326,28 @@ public abstract class Game
 	private void updateFPS()
 	{
 		fps = 1000f/delta;
+	}
+	
+	public boolean setDisplaySize(int width, int height)
+	{
+		int oldWidth = Display.getWidth();
+		int oldHeight = Display.getHeight();
+		DisplayMode newMode = DisplayCommand.findDisplayMode(width, height);
+		if(newMode == null)
+			return false;
+		try
+		{
+			Display.setDisplayMode(newMode);
+		} catch (LWJGLException e)
+		{
+			return false;
+		}
+		Scene s = getActiveScene();
+		for(String guin : AssetManager.getGUIList())
+		{
+			GUI gui = AssetManager.getGUI(guin);
+			gui.updateSize(oldWidth, oldHeight);
+		}
+		return true;
 	}
 }
