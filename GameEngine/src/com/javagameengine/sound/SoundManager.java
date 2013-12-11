@@ -44,7 +44,7 @@ public class SoundManager
 
 	/**
 	 * Sets the spatial velocity of the listener
-	 * @param pos Spatial velocity of listener
+	 * @param vel Spatial velocity of listener
 	 */
 	public static void setListenerVelocity(Vector3f vel)
 	{

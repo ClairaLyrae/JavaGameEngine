@@ -43,10 +43,13 @@ public class LaserShot extends Component
 		PhysicsComponent phys = new PhysicsComponent(0f, false, 0f);
 		phys.getLinearVelocity().set(node.getTransform().getRotation().toRotationMatrix3f().multiplyInto(new Vector3f(0f, 0f, 40f), null));
 		
-		node.addComponent(new MeshRenderer(laserMaterial, laserMesh));
+		MeshRenderer mr = new MeshRenderer(laserMaterial, laserMesh);
+		mr.setLayer(5);
+		node.addComponent(mr);
 		node.addComponent(light);
 		node.addComponent(phys);
 		node.markAsTransient(4f);
+		
 
 		SoundManager.play(sound, 0.05f);
 		LaserCountText.increase();

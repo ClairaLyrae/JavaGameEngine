@@ -179,7 +179,7 @@ public abstract class Game
 		}
 	}
 	/**
-	 * @param Scene to check
+	 * @param s Scene to check
 	 * @return True if given scene is the active scene
 	 */
 	public boolean isActiveScene(Scene s)
@@ -189,7 +189,7 @@ public abstract class Game
 		return s == activeScene;
 	}
 	/**
-	 * @param Name of scene to check
+	 * @param s Name of scene to check
 	 * @return True if given scene is the active scene
 	 */
 	public boolean isActiveScene(String s)
@@ -286,7 +286,7 @@ public abstract class Game
 	}
 
 	/**
-	 * @param Name of scene to set as active
+	 * @param s Name of scene to set as active
 	 * @return True if scene was set as active
 	 */
 	public boolean setActiveScene(String s)

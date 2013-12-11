@@ -96,7 +96,8 @@ public abstract class GUI {
 	public void setScene(Scene newScene)
 	{
 		scene = newScene;
-		for(GUIcomponent c : rootComponents)
+		GUIcomponent[] array = rootComponents.toArray(new GUIcomponent[0]);
+		for(GUIcomponent c : array)
 			c.setGUI(this);
 	}
 	
@@ -108,7 +109,8 @@ public abstract class GUI {
 	
 	public void update(float delta)
 	{
-		for(GUIcomponent c : rootComponents)
+		GUIcomponent[] array = rootComponents.toArray(new GUIcomponent[0]);
+		for(GUIcomponent c : array)
 			c.update(delta);
 	}
 	
