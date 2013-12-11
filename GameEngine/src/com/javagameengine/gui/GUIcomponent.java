@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL11.glVertex2f;
 import static org.lwjgl.opengl.GL11.glVertex2i;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 
+import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -103,6 +104,13 @@ public abstract class GUIcomponent
 			absoluteX = parent.absoluteX + xPos;
 			absoluteY = parent.absoluteY + yPos;
 		}
+		else 
+		{
+			absoluteX = (Display.getWidth() - width)/2;
+			absoluteY = (Display.getHeight() - height)/2;
+		}
+					
+			
 	}
 	
 	public void removeChild(GUIcomponent oldChild)

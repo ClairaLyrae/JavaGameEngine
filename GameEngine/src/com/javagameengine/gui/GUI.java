@@ -122,10 +122,17 @@ public abstract class GUI {
 	
 	public void updateSize()
 	{
+		System.out.println("updateSize called");
 		if(height != 0)
+		{
 			height = Display.getHeight();
+			centerY = height/2;
+		}
 		if(width != 0)
+		{
 			width = Display.getWidth();
+			centerX = width/2;
+		}
 		for(GUIcomponent c : rootComponents)
 		{
 			c.updateAbsolute();
